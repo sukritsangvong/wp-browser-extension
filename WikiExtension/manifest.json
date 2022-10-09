@@ -1,0 +1,36 @@
+{
+	"manifest_version": 3,
+	"name": "WikiExtension",
+	"version": "0",
+	"action": {
+		"default_icon": {
+			"16": "assets/wikiIcon16.png"
+		},
+		"default_title": "WikiExtension",
+		"default_popup": "src/popup/popup.html"
+	},
+	"description": "A wikipedia extension",
+	"icons": {
+		"16": "assets/wikiIcon16.png"
+	},
+	"permission": [
+		"storage",
+		"tabs"
+	],
+	"host_permissions": [
+		"https://*.wikipedia.org/*"
+	],
+	"background": {
+		"service_worker": "src/background.js"
+	},
+	"content_scripts": [
+		{
+			"matches": [
+				"https://*.wikipedia.org/*"
+			],
+			"js": [
+				"src/content.js"
+			]
+		}
+	]
+}
