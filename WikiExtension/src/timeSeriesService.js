@@ -1,6 +1,7 @@
 import fetch from "node-fetch";
 
-const formatDateToYYYMMDD = (date) => `${date.getFullYear()}${date.getMonth()}${date.getDay()}`;
+const formatDateToYYYMMDD = (date) =>
+    `${date.getFullYear()}${("0" + (date.getMonth() + 1)).slice(-2)}${("0" + date.getDate()).slice(-2)}`;
 
 const formatYYYYMMDDToDate = (yyyymmdd) =>
     new Date(yyyymmdd.substring(0, 4), yyyymmdd.substring(4, 6) - 1, yyyymmdd.substring(6, 8));
@@ -47,10 +48,11 @@ const getPageViews = async (title, startDate, endDate, aggregateType) => {
     try {
         let result = await fetchPageViews(title, startDate, endDate, aggregateType);
         let formattedResult = formatPageViews(result);
-        console.log(formattedResult);
         return formattedResult;
     } catch (err) {
-        console.error(`Error fetching page views: ${err.message}`);
+        console.error(
+            `Error fetching page views on inputs title:${title} startDate:${startDate} endDate:${endDate} aggregateType:${aggregateType}: ${err.message}`
+        );
     }
 };
 
