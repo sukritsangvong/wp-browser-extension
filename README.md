@@ -34,8 +34,6 @@ import getPageViews from "./timeseriesService.js";
 
 // Get page views for the Pasta article since its creation until the beginning of 2022 by day
 const pastaResponse = await getPageViews("Pasta", WIKI_CREATION_DATE, new Date("2022-01-01"), AggregateType.DAILY);
-console.log(pastaResponse);
-
 /*
     Returns:
     [
