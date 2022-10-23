@@ -51,8 +51,9 @@ const getPageViews = async (title, startDate, endDate, aggregateType) => {
         return formattedResult;
     } catch (err) {
         console.error(
-            `Error fetching page views on inputs title:${title} startDate:${startDate} endDate:${endDate} aggregateType:${aggregateType}: ${err.message}`
+            `Error fetching page views on inputs title:${title} startDate:${startDate} endDate:${endDate} aggregateType:${aggregateType}\nError: ${err.message}`
         );
+        return null;
     }
 };
 
