@@ -2,6 +2,7 @@
 let renderGraphOverlay = () => {
     let graphContainer = document.createElement('div');
     let canvas = document.createElement('canvas');
+    canvas.style.maxHeight='150px';
     canvas.id = 'myChart';
     graphContainer.appendChild(canvas);
 
