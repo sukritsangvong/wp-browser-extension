@@ -19,3 +19,5 @@ for (var i = 0; i < arrayLength; i++) {
     highlightPersistentContent(persistent[i], '#99FF84');
 }
 ```
+
+## [Website](https://sukritsangvong.github.io/wp-browser-extension/)
