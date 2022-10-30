@@ -26,3 +26,23 @@ let highlightPersistentContent = (text, color) => {
 }
 
 renderGraphOverlay();
+
+
+/* The page id can be found as the last part of the link to
+ * the wikidata item on the left side of wikipedia pages.
+ * If no page id is found throws an error.
+ */
+const pageId = (() => {
+    let wiki_data_url;
+    try {
+        wiki_data_url = document.getElementById('t-wikibase').getElementsByTagName('a')[0].href;
+    } catch {
+        throw new Error("'Can't find page id!");
+    }
+    const wiki_page_id = wiki_data_url.split('/').slice(-1)[0];
+    console.info({
+        "wiki_data_url": wiki_data_url,
+        "wiki_page_id": wiki_page_id
+    });
+    return(wiki_page_id);
+})();
