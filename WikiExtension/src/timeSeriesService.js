@@ -15,7 +15,7 @@ const formatYYYYMMDDToDate = (yyyymmdd) =>
  * @param {Date} startDate
  * @param {Date} endDate
  * @param {string} aggregateType of either monthly or daily
- * @return {map} of an item of list with properties project, article, granularity(aggregateType), timestamp, access, agent, views
+ * @return {map} of an item of an array with properties project, article, granularity(aggregateType), timestamp, access, agent, views
  */
 const fetchPageViews = async (title, startDate, endDate, aggregateType) => {
     const formattedStartDate = formatDateToYYYMMDD(startDate);
@@ -29,8 +29,8 @@ const fetchPageViews = async (title, startDate, endDate, aggregateType) => {
 /**
  * Get all the revision objects on a given wikipedia title.
  *
- * The api only give us at most 20 reivision objects per request. However, it does give us a query to
- * use if there are any older revisions. If older versions of revision existm, we will get
+ * The api only gives us at most 20 reivision objects per request. However, it does give us a query to
+ * use if there are any older revisions. If older versions of revision exists, we will get
  * {
  *  revisions: [...],
  *  ...
@@ -38,7 +38,7 @@ const fetchPageViews = async (title, startDate, endDate, aggregateType) => {
  *  ...
  * }
  *
- * Thus, we keep calling the endpoint with the given querys if the older property exists in the
+ * Thus, we keep calling the endpoint with the given query if the older property exists in the
  * previous request.
  *
  * @param {string} title of a wikipedia article
@@ -65,7 +65,7 @@ const fetchPageRevisions = async (title, startDate, endDate) => {
         revisions.push(...localRevisions);
     }
 
-    // Filters revisions that are in between the given timerange.
+    // Filters revisions that are in between the given timerange
     return revisions.filter((revisionObject) => {
         const currentTimestamp = new Date(revisionObject.timestamp);
         return startDate <= currentTimestamp && currentTimestamp <= endDate;
@@ -74,7 +74,7 @@ const fetchPageRevisions = async (title, startDate, endDate) => {
 
 /**
  * TODO: Subject to change based on what the graph needs
- * @return formated fetchedPageViews as a list of lists that only contain date object and count
+ * @return formated fetchedPageViews as an array of arrays that only contain date object and count
  */
 const formatPageViews = (fetchedPageViews) => {
     return Array.from(fetchedPageViews.items).map((pageViewObject) => {
@@ -85,15 +85,15 @@ const formatPageViews = (fetchedPageViews) => {
 /**
  * TODO: Subject to change based on what the graph needs
  * @param {AggregateType} aggregateType
- * @return formated fetchedRevisions as a list of lists that only contain date object and count
+ * @return formated fetchedRevisions as an array of arrays that only contain date object and count
  */
 const formatPageRevisions = (fetchedRevisions, aggregateType) => {
     const pageRevisionCountMap = fetchedRevisions
         .map((revisionObject) => {
             const date = new Date(revisionObject.timestamp);
-            date.setHours(0, 0, 0, 0); // have date only contain year, month, and day (not time)
+            date.setHours(0, 0, 0, 0); // have date only contains year, month, and day (not time)
 
-            // Reduce dates to 1 to aggregate monthly instead of daily
+            // Set date to 1 to aggregate monthly instead of daily
             if (aggregateType == AggregateType.MONTHLY) {
                 date.setDate(1);
             }
@@ -105,7 +105,7 @@ const formatPageRevisions = (fetchedRevisions, aggregateType) => {
             return accumulator;
         }, {});
 
-    // Formats into list of lists
+    // Formats into an array of arrays
     return Object.keys(pageRevisionCountMap).map((key) => [key, pageRevisionCountMap[key]]);
 };
 
@@ -116,7 +116,7 @@ const formatPageRevisions = (fetchedRevisions, aggregateType) => {
  * @param {Date} startDate
  * @param {Date} endDate
  * @param {AggregateType} aggregateType an enum that represents string "monthly" or "daily"
- * @returns aggregated list of data of views per day or per month
+ * @returns aggregated array of data of views per day or per month
  */
 const getPageViews = async (title, startDate, endDate, aggregateType) => {
     try {
@@ -131,6 +131,15 @@ const getPageViews = async (title, startDate, endDate, aggregateType) => {
     }
 };
 
+/**
+ * Get revision counts on a given article within a given time range.
+ *
+ * @param {string} title of a wikipedia article
+ * @param {Date} startDate
+ * @param {Date} endDate
+ * @param {AggregateType} aggregateType an enum that represents string "monthly" or "daily"
+ * @returns aggregated array of data of revision counts per day or per month
+ */
 const getPageRevisionCount = async (title, startDate, endDate, aggregateType) => {
     try {
         let result = await fetchPageRevisions(title, startDate, endDate);
