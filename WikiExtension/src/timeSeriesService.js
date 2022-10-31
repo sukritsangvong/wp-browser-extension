@@ -88,7 +88,7 @@ const formatPageViews = (fetchedPageViews) => {
  * @return formated fetchedRevisions as a list of lists that only contain date object and count
  */
 const formatPageRevisions = (fetchedRevisions, aggregateType) => {
-    return fetchedRevisions
+    const pageRevisionCountMap = fetchedRevisions
         .map((revisionObject) => {
             const date = new Date(revisionObject.timestamp);
             date.setHours(0, 0, 0, 0); // have date only contain year, month, and day (not time)
@@ -104,6 +104,9 @@ const formatPageRevisions = (fetchedRevisions, aggregateType) => {
             accumulator[timestamp] = (accumulator[timestamp] ?? 0) + 1;
             return accumulator;
         }, {});
+
+    // Formats into list of lists
+    return Object.keys(pageRevisionCountMap).map((key) => [key, pageRevisionCountMap[key]]);
 };
 
 /**

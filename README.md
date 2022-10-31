@@ -63,10 +63,10 @@ const pastaRevisionResponse = await getPageRevisionCount(
 console.log(pastaRevisionResponse);
 /*
     Returns:
-    {
-        'Sat Jan 15 2022 00:00:00 GMT-0600 (Central Standard Time)': 1,
-        'Sat Jan 08 2022 00:00:00 GMT-0600 (Central Standard Time)': 1
-    }
+    [
+        [ 'Sat Jan 15 2022 00:00:00 GMT-0600 (Central Standard Time)', 1 ],
+        [ 'Sat Jan 08 2022 00:00:00 GMT-0600 (Central Standard Time)', 1 ]
+    ]
 */
 ```
 
