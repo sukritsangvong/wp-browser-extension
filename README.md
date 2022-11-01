@@ -30,7 +30,7 @@ Use enums.js as inputs for some of the parameters if needed.
 
 ```javascript
 import { WIKI_CREATION_DATE, AggregateType } from "./enums.js";
-import getPageViews from "./timeseriesService.js";
+import { getPageViews } from "./timeseriesService.js";
 
 // Get page views for the Pasta article since its creation until the beginning of 2022 by day
 const pastaResponse = await getPageViews("Pasta", WIKI_CREATION_DATE, new Date("2022-01-01"), AggregateType.DAILY);
@@ -45,6 +45,29 @@ const pastaResponse = await getPageViews("Pasta", WIKI_CREATION_DATE, new Date("
         ...
     ]
  */
+```
+
+### How to get revision count
+
+```javascript
+import { AggregateType } from "./enums.js";
+import { getPageRevisionCount } from "./timeseriesService.js";
+
+// Get monthly revision count for the Pasta article from Jan 2022
+const pastaRevisionResponse = await getPageRevisionCount(
+    "Pasta",
+    new Date("2022-01-01"),
+    new Date("2022-01-31"),
+    AggregateType.DAILY
+);
+console.log(pastaRevisionResponse);
+/*
+    Returns:
+    [
+        [ 'Sat Jan 15 2022 00:00:00 GMT-0600 (Central Standard Time)', 1 ],
+        [ 'Sat Jan 08 2022 00:00:00 GMT-0600 (Central Standard Time)', 1 ]
+    ]
+*/
 ```
 
 ## [Website](https://sukritsangvong.github.io/wp-browser-extension/)
