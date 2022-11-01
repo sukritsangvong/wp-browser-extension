@@ -4,8 +4,12 @@
 
 ### Set Up
 
-1. Visit [chrome://extensions/](chrome://extensions/) and toggle developper mode ON
-2. Click on `Load unpacked` and select the WikiExtension folder
+1. Make sure node 16.18.0 is installed - you can do this using nvm (node version manger)
+2. ```cd wikichange```
+3. ```npm install```
+4. ```npm run start``` (dev build) or ```npm run build``` (production build) 
+5. Visit [chrome://extensions/](chrome://extensions/) and toggle developper mode ON
+6. For dev build click on `Load unpacked` and select the wikichange/dist folder
 
 ### How to do highlighting
 
