@@ -1,0 +1,41 @@
+{
+    "name": "__MSG_appName__",
+    "short_name": "__MSG_appShortName__",
+    "description": "__MSG_appDescription__",
+    "homepage_url": "http://chrome.google.com/webstore",
+    "version": "0.0.1",
+    "version_name": "0.0.1",
+    "manifest_version": 3,
+    "default_locale": "en",
+    "minimum_chrome_version": "88",
+    "icons": {
+        "16": "assets/icons/wikiIcon16.png"
+    },
+    "action": {
+        "default_icon": {
+            "16": "assets/icons/wikiIcon16.png"
+        },
+        "default_title": "__MSG_appName__",
+        "default_popup": "popup.html"
+    },
+    "permissions": [
+		"storage",
+		"tabs"
+    ],
+    "host_permissions": [
+		"https://*.wikipedia.org/*"
+	],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "content_scripts": [
+		{
+			"matches": [
+				"https://*.wikipedia.org/*"
+			],
+			"js": [
+				"content.js"
+			]
+		}
+	]
+}

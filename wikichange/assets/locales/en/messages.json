@@ -1,0 +1,11 @@
+{
+    "appName": {
+        "message": "WikiChange"
+    },
+    "appShortName": {
+        "message": "WikiChange"
+    },
+    "appDescription": {
+        "message": "Annontate changes on Wikipedia pages"
+    }
+}

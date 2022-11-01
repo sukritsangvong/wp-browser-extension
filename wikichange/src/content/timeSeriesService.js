@@ -1,4 +1,3 @@
-import fetch from "node-fetch";
 import { AggregateType } from "./enums.js";
 
 const formatDateToYYYMMDD = (date) =>
