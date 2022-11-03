@@ -1,5 +1,8 @@
+import { WIKI_CREATION_DATE, AggregateType } from "./enums.js";
+import { getPageViews } from "./timeSeriesService.js";
+
 /* Creates the div for the graph overlay. TODO: create the graph and render it here */
-let renderGraphOverlay = () => {
+const renderGraphOverlay = () => {
     let graphContainer = document.createElement('div');
     graphContainer.style.cssText = 'width:40%;height:180px;background-color:#E3C2FF;';
 
@@ -17,7 +20,7 @@ let wikiText = document.getElementById('mw-content-text');
 let innerHTML = wikiText.innerHTML;
 
 /* Highlights the words that are given */
-let highlightPersistentContent = (text, color) => {
+const highlightPersistentContent = (text, color) => {
     let index = innerHTML.indexOf(text);
     if (index >= 0) { 
         innerHTML = innerHTML.substring(0, index) + `<mark style='background-color: ${color}'>` + innerHTML.substring(index, index + text.length) + '</mark>' + innerHTML.substring(index + text.length);
