@@ -1,1 +1,0 @@
-{"version":3,"file":"background.js","mappings":";;;;;AAAA","sources":["webpack://wikichange/./src/background.js"],"sourcesContent":["console.log('This is background service worker - edit me!');\n"],"names":[],"sourceRoot":""}

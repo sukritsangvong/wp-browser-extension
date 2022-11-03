@@ -1,10 +1,6 @@
 import { WIKI_CREATION_DATE, AggregateType } from "./enums.js";
 import { getPageViews } from "./timeSeriesService.js";
 
-// Get page views for the Pasta article since its creation until the beginning of 2022 by day
-const pastaResponse = getPageViews("Pasta", WIKI_CREATION_DATE, new Date("2022-01-01"), AggregateType.DAILY);
-console.log(pastaResponse);
-
 /* Creates the div for the graph overlay. TODO: create the graph and render it here */
 const renderGraphOverlay = () => {
     let graphContainer = document.createElement('div');
