@@ -6,7 +6,12 @@ const formatDateToYYYMMDD = (date) =>
 const formatYYYYMMDDToDate = (yyyymmdd) =>
     new Date(yyyymmdd.substring(0, 4), yyyymmdd.substring(4, 6) - 1, yyyymmdd.substring(6, 8));
 
-const getDiffBetweenDates = (date1, date2) => Math.ceil(Math.abs(date2 - date1) / (1000 * 60 * 60 * 24));
+const formatResponseToTimeseries = (response) => {
+    return {
+        x: response.map((resArray) => resArray[0].toLocaleDateString()),
+        y: response.map((resArray) => resArray[1]),
+    };
+};
 
 /**
  * Fetches page views information on a given wikipedia title. The response will only include stat since its creation
@@ -74,7 +79,6 @@ const fetchPageRevisions = async (title, startDate, endDate) => {
 };
 
 /**
- * TODO: Subject to change based on what the graph needs
  * @return formated fetchedPageViews as an array of arrays that only contain date object and count
  */
 const formatPageViews = (fetchedPageViews) => {
@@ -84,7 +88,6 @@ const formatPageViews = (fetchedPageViews) => {
 };
 
 /**
- * TODO: Subject to change based on what the graph needs
  * @param {AggregateType} aggregateType
  * @return formated fetchedRevisions as an array of arrays that only contain date object and count
  */
@@ -107,7 +110,7 @@ const formatPageRevisions = (fetchedRevisions, aggregateType) => {
         }, {});
 
     // Formats into an array of arrays
-    return Object.keys(pageRevisionCountMap).map((key) => [key, pageRevisionCountMap[key]]);
+    return Object.keys(pageRevisionCountMap).map((key) => [new Date(key), pageRevisionCountMap[key]]);
 };
 
 /**
@@ -154,33 +157,44 @@ const getPageRevisionCount = async (title, startDate, endDate, aggregateType) =>
     }
 };
 
-const getPageViewTimeseries = async (title, startDate, endDate, binNum) => {
+/**
+ * Get view counts on a given article in a timeseries format
+ *
+ * @param {string} title of a wikipedia article
+ * @param {Date} startDate
+ * @param {Date} endDate
+ * @returns a map of x and y. x contains array of dates in a format MM/DD/YYYY and y contains array of page views
+ */
+const getPageViewTimeseries = async (title, startDate, endDate) => {
     try {
         const pageViewsResponse = await getPageViews(title, startDate, endDate, AggregateType.DAILY);
-
-        const firstDate = pageViewsResponse[0][0];
-        const lastDate = pageViewsResponse[-1][0];
-        const diffDays = getDiffBetweenDates(firstDate, lastDate);
-
-        if (diffDays > binNum) {
-            // Create list that tells what each bin
-            const daysPerBin = Math.floor(diffDays / binNum);
-            const endDatePerBin = Array(binNum)
-                .fill(0)
-                .map((_, i) => {
-                    startDate.setDate(startDate.getDate() + (i + 1) * daysPerBin);
-                    return new Date(startDate.getTime());
-                });
-            endDatePerBin[-1] = lastDate;
-
-            return;
-        }
+        return formatResponseToTimeseries(pageViewsResponse);
     } catch (err) {
         console.error(
-            `Error getting page view timeseries data on title:${title} startDate:${startDate} endDate:${endDate} binNum:${binNum}\nError: ${err.message}`
+            `Error getting page view timeseries data on title:${title} startDate:${startDate} endDate:${endDate}\nError: ${err.message}`
         );
         return err;
     }
 };
 
-export { getPageViews, getPageRevisionCount, getPageViewTimeseries };
+/**
+ * Get revision counts on a given article in a timeseries format
+ *
+ * @param {string} title of a wikipedia article
+ * @param {Date} startDate
+ * @param {Date} endDate
+ * @returns a map of x and y. x contains array of dates in a format MM/DD/YYYY and y contains array of revision counts
+ */
+const getPageRevisionCountTimeseries = async (title, startDate, endDate) => {
+    try {
+        const pageRevisionCountResponse = await getPageRevisionCount(title, startDate, endDate, AggregateType.DAILY);
+        return formatResponseToTimeseries(pageRevisionCountResponse);
+    } catch (err) {
+        console.error(
+            `Error getting page revision count timeseries data on title:${title} startDate:${startDate} endDate:${endDate}\nError: ${err.message}`
+        );
+        return err;
+    }
+};
+
+export { getPageViews, getPageRevisionCount, getPageViewTimeseries, getPageRevisionCountTimeseries };
