@@ -8,7 +8,7 @@ const insertAfter = (newNode, existingNode) => {
 /* Creates the div for the graph overlay. TODO: create the graph and render it here */
 const renderGraphOverlay = () => {
     let floatContainer = document.createElement('div');
-    floatContainer.style.cssText = "display: flex;";
+    floatContainer.style.cssText = 'display: flex;';
     floatContainer.setAttribute('id', 'floatContainer');
 
     let graphContainer = document.createElement('div');
@@ -55,8 +55,8 @@ const pageId = (() => {
     }
     const wiki_page_id = wiki_data_url.split('/').slice(-1)[0];
     console.info({
-        "wiki_data_url": wiki_data_url,
-        "wiki_page_id": wiki_page_id
+        'wiki_data_url': wiki_data_url,
+        'wiki_page_id': wiki_page_id
     });
     return(wiki_page_id);
 })();
