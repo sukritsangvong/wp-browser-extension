@@ -1,5 +1,5 @@
 import { WIKI_CREATION_DATE, AggregateType } from "./enums.js";
-import { getPageViews } from "./timeSeriesService.js";
+import { getPageViews, getPageCreationDate } from "./timeSeriesService.js";
 
 /* Creates the div for the graph overlay. TODO: create the graph and render it here */
 const renderGraphOverlay = () => {
@@ -48,4 +48,11 @@ const pageId = (() => {
         "wiki_page_id": wiki_page_id
     });
     return(wiki_page_id);
+})();
+
+/* Get the title of a Wikipedia page by inspecting the html */
+const title = (() => {
+    const titleSpan = document.getElementsByClassName('mw-page-title-main');
+    const title = titleSpan[0].innerHTML;
+    return title;
 })();

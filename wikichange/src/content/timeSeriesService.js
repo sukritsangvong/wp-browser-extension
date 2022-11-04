@@ -1,6 +1,6 @@
 import { AggregateType } from "./enums.js";
 
-const formatDateToYYYMMDD = (date) =>
+const formatDateToYYYYMMDD = (date) =>
     `${date.getFullYear()}${("0" + (date.getMonth() + 1)).slice(-2)}${("0" + date.getDate()).slice(-2)}`;
 
 const formatYYYYMMDDToDate = (yyyymmdd) =>
@@ -17,8 +17,8 @@ const formatYYYYMMDDToDate = (yyyymmdd) =>
  * @return {map} of an item of an array with properties project, article, granularity(aggregateType), timestamp, access, agent, views
  */
 const fetchPageViews = async (title, startDate, endDate, aggregateType) => {
-    const formattedStartDate = formatDateToYYYMMDD(startDate);
-    const formattedEndDate = formatDateToYYYMMDD(endDate);
+    const formattedStartDate = formatDateToYYYYMMDD(startDate);
+    const formattedEndDate = formatDateToYYYYMMDD(endDate);
     const response = await fetch(
         `https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/en.wikipedia/all-access/all-agents/${title}/${aggregateType}/${formattedStartDate}/${formattedEndDate}`
     );
@@ -153,4 +153,19 @@ const getPageRevisionCount = async (title, startDate, endDate, aggregateType) =>
     }
 };
 
-export { getPageViews, getPageRevisionCount };
+/**
+ * Get the Wikipedia page creation date
+ *
+ * @param {string} title of a wikipedia article
+ * @returns a date in YYYMMDD format
+ */
+ const getPageCreationDate = async (title) => {
+    const response = await fetch(
+        `https://en.wikipedia.org/w/api.php?action=query&prop=revisions&rvlimit=1&rvprop=timestamp&rvdir=newer&titles=${title}&format=json`
+    );
+    const json = await response.json();
+    const date = json.query.pages[Object.keys(json.query.pages)[0]].revisions[0].timestamp;
+    return formatDateToYYYYMMDD(new Date(date));
+};
+
+export { getPageViews, getPageRevisionCount, getPageCreationDate };
