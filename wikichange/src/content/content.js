@@ -1,10 +1,21 @@
 import { WIKI_CREATION_DATE, AggregateType } from "./enums.js";
 import { getPageViews } from "./timeSeriesService.js";
 
+const insertAfter = (newNode, existingNode) => {
+    existingNode.parentNode.insertBefore(newNode, existingNode.nextSibling);
+}
+
 /* Creates the div for the graph overlay. TODO: create the graph and render it here */
 const renderGraphOverlay = () => {
+    let floatContainer = document.createElement('div');
+    floatContainer.style.cssText = "display: flex;";
+    floatContainer.setAttribute('id', 'floatContainer');
+
     let graphContainer = document.createElement('div');
+    graphContainer.setAttribute('id', 'graphOverlay');
     graphContainer.style.cssText = 'width:40%;height:180px;background-color:#E3C2FF;';
+
+    floatContainer.appendChild(graphContainer);
 
     let p = document.createElement('p');
     graphContainer.appendChild(p);
@@ -12,7 +23,7 @@ const renderGraphOverlay = () => {
     p.appendChild(text);
 
     let siteSub = document.getElementById('siteSub');
-    siteSub.append(graphContainer);
+    insertAfter(floatContainer, siteSub);
 }
 
 // Get wikipedia text, global as we shouldn't get it every time we highlight a word 
@@ -49,3 +60,20 @@ const pageId = (() => {
     });
     return(wiki_page_id);
 })();
+
+const renderDeleteAlert = (count) => {
+    let deleteContainer = document.createElement('div');
+    deleteContainer.innerHTML = `<div class="card" style="max-width: 18rem;border-style: solid;padding: 0.5rem;float: left;">
+                                    <div class="card-body">
+                                    <h5 class="card-title">Deletions</h5>
+                                    <p class="card-text">This article had ` + count + ` bytes of deleted content not shown in this overlay</p>
+                                    </div>
+                                </div>`;
+    deleteContainer.setAttribute('id', 'deleteAlert');
+    deleteContainer.style.cssText = 'padding:2.5%;';
+
+    let floatContainer = document.getElementById('floatContainer');
+    floatContainer.append(deleteContainer);
+}
+
+renderDeleteAlert(100);
