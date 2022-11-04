@@ -6,6 +6,8 @@ const formatDateToYYYMMDD = (date) =>
 const formatYYYYMMDDToDate = (yyyymmdd) =>
     new Date(yyyymmdd.substring(0, 4), yyyymmdd.substring(4, 6) - 1, yyyymmdd.substring(6, 8));
 
+const getDiffBetweenDates = (date1, date2) => Math.ceil(Math.abs(date2 - date1) / (1000 * 60 * 60 * 24));
+
 /**
  * Fetches page views information on a given wikipedia title. The response will only include stat since its creation
  * if the startDate comes before the article was created.
@@ -148,9 +150,37 @@ const getPageRevisionCount = async (title, startDate, endDate, aggregateType) =>
         console.error(
             `Error fetching revision count on inputs title:${title} startDate:${startDate} endDate:${endDate} aggregateType:${aggregateType}\nError: ${err.message}`
         );
-
         return err;
     }
 };
 
-export { getPageViews, getPageRevisionCount };
+const getPageViewTimeseries = async (title, startDate, endDate, binNum) => {
+    try {
+        const pageViewsResponse = await getPageViews(title, startDate, endDate, AggregateType.DAILY);
+
+        const firstDate = pageViewsResponse[0][0];
+        const lastDate = pageViewsResponse[-1][0];
+        const diffDays = getDiffBetweenDates(firstDate, lastDate);
+
+        if (diffDays > binNum) {
+            // Create list that tells what each bin
+            const daysPerBin = Math.floor(diffDays / binNum);
+            const endDatePerBin = Array(binNum)
+                .fill(0)
+                .map((_, i) => {
+                    startDate.setDate(startDate.getDate() + (i + 1) * daysPerBin);
+                    return new Date(startDate.getTime());
+                });
+            endDatePerBin[-1] = lastDate;
+
+            return;
+        }
+    } catch (err) {
+        console.error(
+            `Error getting page view timeseries data on title:${title} startDate:${startDate} endDate:${endDate} binNum:${binNum}\nError: ${err.message}`
+        );
+        return err;
+    }
+};
+
+export { getPageViews, getPageRevisionCount, getPageViewTimeseries };
