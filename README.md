@@ -5,9 +5,9 @@
 ### Set Up
 
 1. Make sure node 16.18.0 is installed - you can do this using nvm (node version manger)
-2. ```cd wikichange```
-3. ```npm install```
-4. ```npm run start``` (dev build) or ```npm run build``` (production build) 
+2. `cd wikichange`
+3. `npm install`
+4. `npm run start` (dev build) or `npm run build` (production build)
 5. Visit [chrome://extensions/](chrome://extensions/) and toggle developper mode ON
 6. For dev build click on `Load unpacked` and select the wikichange/dist folder
 
@@ -42,14 +42,12 @@ import { getPageViews } from "./timeseriesService.js";
 const pastaResponse = await getPageViews("Pasta", WIKI_CREATION_DATE, new Date("2022-01-01"), AggregateType.DAILY);
 /*
     Returns:
-    [
-        [ 2015-07-01T05:00:00.000Z, 2406 ],
-        [ 2015-07-02T05:00:00.000Z, 2076 ],
-        [ 2015-07-03T05:00:00.000Z, 1890 ],
-        [ 2015-07-04T05:00:00.000Z, 1770 ],
-        [ 2015-07-05T05:00:00.000Z, 1941 ],
+    {
+        {"7/1/2015" => 2406},
+        {"7/2/2015" => 2076},
+        {"7/3/2015" => 1890},
         ...
-    ]
+    }
  */
 ```
 
@@ -69,10 +67,10 @@ const pastaRevisionResponse = await getPageRevisionCount(
 console.log(pastaRevisionResponse);
 /*
     Returns:
-    [
-        [ 'Sat Jan 15 2022 00:00:00 GMT-0600 (Central Standard Time)', 1 ],
-        [ 'Sat Jan 08 2022 00:00:00 GMT-0600 (Central Standard Time)', 1 ]
-    ]
+    {
+        {"1/15/2022" => 1},
+        {"1/8/2022" => 1}
+    }
 */
 ```
 
