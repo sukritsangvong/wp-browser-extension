@@ -46,7 +46,7 @@ renderGraphOverlay();
  * the wikidata item on the left side of wikipedia pages.
  * If no page id is found throws an error.
  */
-const pageId = (() => {
+(() => {
     let wiki_data_url;
     try {
         wiki_data_url = document.getElementById('t-wikibase').getElementsByTagName('a')[0].href;
