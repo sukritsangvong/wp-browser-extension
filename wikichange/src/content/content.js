@@ -13,18 +13,23 @@ const renderGraphOverlay = () => {
 
     let graphContainer = document.createElement('div');
     graphContainer.setAttribute('id', 'graphOverlay');
-    graphContainer.style.cssText = 'width:40%;height:180px;background-color:#E3C2FF;';
+
+    let canvas = document.createElement('canvas');
+    canvas.style.maxHeight = '200px';
+    canvas.id = 'viewsEditsChart';
+    graphContainer.style.cssText = 'width:50%;height:20%;';
+    graphContainer.appendChild(canvas);
 
     floatContainer.appendChild(graphContainer);
 
     let p = document.createElement('p');
     graphContainer.appendChild(p);
-    let text = document.createTextNode('The graph overlay will be here');
-    p.appendChild(text);
 
     let siteSub = document.getElementById('siteSub');
     insertAfter(floatContainer, siteSub);
 }
+
+renderGraphOverlay();
 
 // Get wikipedia text, global as we shouldn't get it every time we highlight a word 
 let wikiText = document.getElementById('mw-content-text');
@@ -38,9 +43,6 @@ const highlightPersistentContent = (text, color) => {
         wikiText.innerHTML = innerHTML;
     }
 }
-
-renderGraphOverlay();
-
 
 /* The page id can be found as the last part of the link to
  * the wikidata item on the left side of wikipedia pages.
