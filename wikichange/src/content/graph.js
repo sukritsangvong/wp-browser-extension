@@ -10,20 +10,6 @@ const CHART_COLORS = {
     grey: 'rgb(201, 203, 207)'
 };
 
-/* Creates the div for the graph overlay. TODO: create the graph and render it here */
-let renderGraphOverlay = () => {
-    let graphContainer = document.createElement('div');
-    let canvas = document.createElement('canvas');
-    canvas.style.maxHeight = '150px';
-    canvas.id = 'myChart';
-    graphContainer.appendChild(canvas);
-
-    let siteSub = document.getElementById('siteSub');
-    siteSub.append(graphContainer);
-}
-
-renderGraphOverlay();
-
 const labels = [
     'January',
     'February',
@@ -83,6 +69,6 @@ const config = {
 };
 
 const myChart = new Chart(
-    document.getElementById('myChart'),
+    document.getElementById('viewsEditsChart'),
     config
 );
