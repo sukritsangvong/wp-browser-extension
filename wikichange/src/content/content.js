@@ -17,7 +17,7 @@ const renderGraphOverlay = () => {
     let canvas = document.createElement('canvas');
     canvas.style.maxHeight = '200px';
     canvas.id = 'viewsEditsChart';
-    graphContainer.style.cssText = 'width:50%;height:20%;';
+    graphContainer.style.cssText = 'width:75%;height:20%;';
     graphContainer.appendChild(canvas);
 
     floatContainer.appendChild(graphContainer);
