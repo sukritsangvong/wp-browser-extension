@@ -35,9 +35,9 @@ const renderSlider = (creationDate) => {
     let totalDaysDiff =  (now.getTime() - creationDate.getTime())/(1000 * 3600 * 24);
     let viewsEditsChart = document.getElementById('viewsEditsChart');
     let sliderDiv = document.createElement('div');
-    sliderDiv.innerHTML = `${now.toISOString().slice(0, 10)}  <input type="range" id="graphSlider" value="15" min="0" max="100">  ${creationDate.toISOString().slice(0, 10)}
-                            <br/><output id="output"></output>`;
-    sliderDiv.style.cssText = 'text-align:center;direction: rtl';
+    sliderDiv.innerHTML = `<div style="direction: rtl">${now.toISOString().slice(0, 10)}  <input type="range" id="graphSlider" value="100" min="0" max="100" style="width:60%;">  ${creationDate.toISOString().slice(0, 10)}</div>
+                            <br/><input type="date" value="${creationDate.toISOString().slice(0, 10)}" id="dateOutput" name="dateOutput" style="text-align: center;"> <button onclick="alert('WIP')">Highlight</button><br>`;
+    sliderDiv.style.cssText = 'text-align:center;';
     insertAfter(sliderDiv, viewsEditsChart);
 
     let slider = document.getElementById('graphSlider');
@@ -45,7 +45,7 @@ const renderSlider = (creationDate) => {
         let numDays = parseInt(totalDaysDiff*this.value/100);
         let date = new Date();
         date.setDate(now.getDate() - numDays);
-        document.getElementById('output').innerHTML = date.toISOString().slice(0, 10);
+        document.getElementById('dateOutput').value = date.toISOString().slice(0, 10);
     });
 }
 

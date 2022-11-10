@@ -157,7 +157,7 @@ const getPageRevisionCount = async (title, startDate, endDate, aggregateType) =>
  * Get the Wikipedia page creation date
  *
  * @param {string} title of a wikipedia article
- * @returns a date in YYYMMDD format
+ * @returns a date in YYYYMMDD format
  */
  const getPageCreationDate = async (title) => {
     const response = await fetch(
