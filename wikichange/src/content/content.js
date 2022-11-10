@@ -30,12 +30,12 @@ const renderGraphOverlay = () => {
 }
 
 /* Add simple slider to graph. Equivalency between dates and integers: 0: today, 100: creation date */
-const renderSlider = (start) => {
-    let end = new Date();
-    let totalDaysDiff =  (end.getTime() - start.getTime())/(1000 * 3600 * 24);
+const renderSlider = (creationDate) => {
+    let now = new Date();
+    let totalDaysDiff =  (now.getTime() - creationDate.getTime())/(1000 * 3600 * 24);
     let viewsEditsChart = document.getElementById('viewsEditsChart');
     let sliderDiv = document.createElement('div');
-    sliderDiv.innerHTML = `${end.toISOString().slice(0, 10)}  <input type="range" id="graphSlider" value="15" min="0" max="100">  ${start.toISOString().slice(0, 10)}
+    sliderDiv.innerHTML = `${now.toISOString().slice(0, 10)}  <input type="range" id="graphSlider" value="15" min="0" max="100">  ${creationDate.toISOString().slice(0, 10)}
                             <br/><output id="output"></output>`;
     sliderDiv.style.cssText = 'text-align:center;direction: rtl';
     insertAfter(sliderDiv, viewsEditsChart);
@@ -43,16 +43,16 @@ const renderSlider = (start) => {
     let slider = document.getElementById('graphSlider');
     slider.addEventListener('change', function (ev) {
         let numDays = parseInt(totalDaysDiff*this.value/100);
-        var date = new Date();
-        date.setDate(end.getDate() - numDays);
+        let date = new Date();
+        date.setDate(now.getDate() - numDays);
         document.getElementById('output').innerHTML = date.toISOString().slice(0, 10);
     });
 }
 
 /* Get the title of a Wikipedia page by inspecting the html */
 const title = (() => {
-    const titleSpan = document.getElementsByClassName('mw-page-title-main');
-    const title = titleSpan[0].innerHTML;
+    let titleSpan = document.getElementsByClassName('mw-page-title-main');
+    let title = titleSpan[0].innerHTML;
     return title;
 })();
 
