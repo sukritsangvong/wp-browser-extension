@@ -165,7 +165,7 @@ const getPageRevisionCount = async (title, startDate, endDate, aggregateType) =>
     );
     const json = await response.json();
     const date = json.query.pages[Object.keys(json.query.pages)[0]].revisions[0].timestamp;
-    return formatDateToYYYYMMDD(new Date(date));
+    return new Date(date);
 };
 
 export { getPageViews, getPageRevisionCount, getPageCreationDate };

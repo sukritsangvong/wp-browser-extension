@@ -29,7 +29,37 @@ const renderGraphOverlay = () => {
     insertAfter(floatContainer, siteSub);
 }
 
+/* Add simple slider to graph. Equivalency between dates and integers: 0: today, 100: creation date */
+const renderSlider = (start) => {
+    let end = new Date();
+    let totalDaysDiff =  (end.getTime() - start.getTime())/(1000 * 3600 * 24);
+    let viewsEditsChart = document.getElementById('viewsEditsChart');
+    let sliderDiv = document.createElement('div');
+    sliderDiv.innerHTML = `${end.toISOString().slice(0, 10)}  <input type="range" id="graphSlider" value="15" min="0" max="100">  ${start.toISOString().slice(0, 10)}
+                            <br/><output id="output"></output>`;
+    sliderDiv.style.cssText = 'text-align:center;direction: rtl';
+    insertAfter(sliderDiv, viewsEditsChart);
+
+    let slider = document.getElementById('graphSlider');
+    slider.addEventListener('change', function (ev) {
+        let numDays = parseInt(totalDaysDiff*this.value/100);
+        var date = new Date();
+        date.setDate(end.getDate() - numDays);
+        document.getElementById('output').innerHTML = date.toISOString().slice(0, 10);
+    });
+}
+
+/* Get the title of a Wikipedia page by inspecting the html */
+const title = (() => {
+    const titleSpan = document.getElementsByClassName('mw-page-title-main');
+    const title = titleSpan[0].innerHTML;
+    return title;
+})();
+
 renderGraphOverlay();
+getPageCreationDate(title).then(function(date) {
+    renderSlider(date);
+});
 
 // Get wikipedia text, global as we shouldn't get it every time we highlight a word 
 let wikiText = document.getElementById('mw-content-text');
@@ -61,13 +91,6 @@ const highlightPersistentContent = (text, color) => {
         'wiki_page_id': wiki_page_id
     });
     return(wiki_page_id);
-})();
-
-/* Get the title of a Wikipedia page by inspecting the html */
-const title = (() => {
-    const titleSpan = document.getElementsByClassName('mw-page-title-main');
-    const title = titleSpan[0].innerHTML;
-    return title;
 })();
 
 const renderDeleteAlert = (count) => {
