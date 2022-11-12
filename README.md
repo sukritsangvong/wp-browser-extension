@@ -35,18 +35,15 @@ for (var i = 0; i < arrayLength; i++) {
 Use enums.js as inputs for some of the parameters if needed.
 
 ```javascript
-import { WIKI_CREATION_DATE, AggregateType } from "./enums.js";
-import { getPageViews } from "./timeseriesService.js";
+import { getPageViewTimeseries } from "./timeseriesService.js";
 
-// Get page views for the Pasta article since its creation until the beginning of 2022 by day
-const pastaResponse = await getPageViews("Pasta", WIKI_CREATION_DATE, new Date("2022-01-01"), AggregateType.DAILY);
+// Get page views for the Pasta article
+const pastaResponse = await getPageViewTimeseries("Pasta", new Date("2015-07-01"), new Date("2022-01-01"));
 /*
     Returns:
     {
-        {"7/1/2015" => 2406},
-        {"7/2/2015" => 2076},
-        {"7/3/2015" => 1890},
-        ...
+        x: ["7/1/2015", "7/2/2015", ...]
+        y: [2406, 2076, ...]
     }
  */
 ```
@@ -54,22 +51,19 @@ const pastaResponse = await getPageViews("Pasta", WIKI_CREATION_DATE, new Date("
 ### How to get revision count
 
 ```javascript
-import { AggregateType } from "./enums.js";
-import { getPageRevisionCount } from "./timeseriesService.js";
+import { getPageRevisionCountTimeseries } from "./timeseriesService.js";
 
-// Get monthly revision count for the Pasta article from Jan 2022
-const pastaRevisionResponse = await getPageRevisionCount(
+// Get revision count for the Pasta article from Jan 2022
+const pastaRevisionResponse = await getPageRevisionCountTimeseries(
     "Pasta",
     new Date("2022-01-01"),
-    new Date("2022-01-31"),
-    AggregateType.DAILY
+    new Date("2022-01-31")
 );
-console.log(pastaRevisionResponse);
 /*
     Returns:
     {
-        {"1/15/2022" => 1},
-        {"1/8/2022" => 1}
+        x: ["1/1/2022", ..., "1/8/2022", ...]
+        y: [0, 0, ..., 1, ...]
     }
 */
 ```
