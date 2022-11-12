@@ -7,7 +7,8 @@ const formatYYYYMMDDToDate = (yyyymmdd) =>
     new Date(yyyymmdd.substring(0, 4), yyyymmdd.substring(4, 6) - 1, yyyymmdd.substring(6, 8));
 
 // Gets number of days from date1 to date2 (inclusive)
-const getDiffDaysBetweenTwoDates = (date1, date2) => (date2.getTime() - date1.getTime()) / (1000 * 3600 * 24) + 1;
+const getDiffDaysBetweenTwoDates = (date1, date2) =>
+    Math.ceil(Math.abs(date2.getTime() - date1.getTime()) / (1000 * 3600 * 24) + 1);
 
 const getDatesBetweenTwoDates = (date1, date2) => {
     const currentDate = new Date(date1);
@@ -226,4 +227,4 @@ const getPageCreationDate = async (title) => {
     return new Date(date);
 };
 
-export { getPageViews, getPageRevisionCount, getPageCreationDate };
+export { getPageRevisionCountTimeseries, getPageViewTimeseries, getPageCreationDate };
