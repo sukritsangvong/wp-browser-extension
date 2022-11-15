@@ -32,12 +32,14 @@ const injectGraphToPage = async (title, startDate, endDate) => {
                 data: pageViews["y"],
                 borderColor: CHART_COLORS.red,
                 yAxisID: "y",
+                borderWidth: 2,
             },
             {
                 label: "Edits",
                 data: revisions["y"],
                 borderColor: CHART_COLORS.blue,
                 yAxisID: "y1",
+                borderWidth: 2,
             },
         ],
     };
@@ -68,6 +70,11 @@ const injectGraphToPage = async (title, startDate, endDate) => {
                     grid: {
                         drawOnChartArea: false, // only want the grid lines for one axis to show up
                     },
+                },
+            },
+            elements: {
+                point: {
+                    radius: 0,
                 },
             },
         },
