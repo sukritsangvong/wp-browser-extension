@@ -40,7 +40,7 @@ const renderGraphOverlay = async () => {
 
 /* Get the title of a Wikipedia page by inspecting the html */
 const title = (() => {
-    let titleSpan = document.getElementsByClassName('mw-page-title-main');
+    let titleSpan = document.getElementsByClassName("mw-page-title-main");
     let title = titleSpan[0].innerHTML;
     return title;
 })();
@@ -48,45 +48,47 @@ const title = (() => {
 /* Add simple slider to graph. Equivalency between dates and integers: 0: today, 100: creation date */
 const renderSlider = (creationDate) => {
     let now = new Date();
-    let totalDaysDiff =  (now.getTime() - creationDate.getTime())/(1000 * 3600 * 24);
-    let viewsEditsChart = document.getElementById('viewsEditsChart');
-    let sliderDiv = document.createElement('div');
+    let totalDaysDiff = (now.getTime() - creationDate.getTime()) / (1000 * 3600 * 24);
+    let viewsEditsChart = document.getElementById("viewsEditsChart");
+    let sliderDiv = document.createElement("div");
     let initialDate = new Date();
-    initialDate.setDate(now.getDate() - (totalDaysDiff*0.5));
+    initialDate.setDate(now.getDate() - totalDaysDiff * 0.5);
     // let closestRevision = fetchRevisionFromDate(title, initialDate)
 
     sliderDiv.innerHTML = `<div style="direction: rtl">${now.toISOString().slice(0, 10)}  
                                 <input type="range" id="graphSlider" value="50" min="0" max="100" style="width:60%;">  
                                 ${creationDate.toISOString().slice(0, 10)}
                             </div>
-                            <br/><input type="date" value="${initialDate.toISOString().slice(0, 10)}" id="dateOutput" name="dateOutput" style="text-align: center;"> 
+                            <br/><input type="date" value="${initialDate
+                                .toISOString()
+                                .slice(0, 10)}" id="dateOutput" name="dateOutput" style="text-align: center;"> 
                                 <button id = "highlightButton">Highlight</button><p id="revisionDate">Showing highlight for closest revision (<b>date: <span id="closesRev"></span></b>)</p>`;
-    sliderDiv.style.cssText = 'text-align:center;';
+    sliderDiv.style.cssText = "text-align:center;";
     insertAfter(sliderDiv, viewsEditsChart);
 
-    let slider = document.getElementById('graphSlider');
-    let dateInput = document.getElementById('dateOutput');
-    let button = document.getElementById('highlightButton');
+    let slider = document.getElementById("graphSlider");
+    let dateInput = document.getElementById("dateOutput");
+    let button = document.getElementById("highlightButton");
 
-    slider.addEventListener('change', function (ev) {
-        let numDays = parseInt(totalDaysDiff*this.value/100);
+    slider.addEventListener("change", function (ev) {
+        let numDays = parseInt((totalDaysDiff * this.value) / 100);
         let date = new Date();
         date.setDate(now.getDate() - numDays);
         dateInput.value = date.toISOString().slice(0, 10);
     });
 
-    dateInput.addEventListener('change', function (ev) {
-        let daysDiff = (new Date(this.value).getTime() - creationDate.getTime())/(1000 * 3600 * 24);
-        let sliderVal = 100 - (daysDiff/totalDaysDiff)*100;
+    dateInput.addEventListener("change", function (ev) {
+        let daysDiff = (new Date(this.value).getTime() - creationDate.getTime()) / (1000 * 3600 * 24);
+        let sliderVal = 100 - (daysDiff / totalDaysDiff) * 100;
         slider.value = sliderVal;
     });
 
-    button.addEventListener('click', function(ev) {
-        let spanClosestRev = document.getElementById('closesRev');
+    button.addEventListener("click", function (ev) {
+        let spanClosestRev = document.getElementById("closesRev");
         // call fetchRevisionFromDate(title, dateInput.value)
         spanClosestRev.innerHTML = dateInput.value;
     });
-}
+};
 
 renderGraphOverlay();
 getPageCreationDate(title).then(function (date) {
