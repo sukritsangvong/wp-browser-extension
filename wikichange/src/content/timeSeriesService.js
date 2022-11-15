@@ -6,6 +6,25 @@ const formatDateToYYYYMMDD = (date) =>
 const formatYYYYMMDDToDate = (yyyymmdd) =>
     new Date(yyyymmdd.substring(0, 4), yyyymmdd.substring(4, 6) - 1, yyyymmdd.substring(6, 8));
 
+// Gets number of days from date1 to date2 (inclusive)
+const getDiffDaysBetweenTwoDates = (date1, date2) =>
+    Math.ceil(Math.abs(date2.getTime() - date1.getTime()) / (1000 * 3600 * 24) + 1);
+
+const getDatesBetweenTwoDates = (date1, date2) => {
+    const currentDate = new Date(date1);
+    return new Array(getDiffDaysBetweenTwoDates(date1, date2))
+        .fill(0)
+        .map(() => new Date(currentDate.setDate(currentDate.getDate() + 1)));
+};
+
+const formatResponseToTimeseries = (response, startDate, endDate) => {
+    const allDates = getDatesBetweenTwoDates(startDate, endDate);
+    return {
+        x: allDates.map((date) => date.toLocaleDateString()),
+        y: allDates.map((date) => response.get(date.toLocaleDateString()) ?? 0),
+    };
+};
+
 /**
  * Fetches page views information on a given wikipedia title. The response will only include stat since its creation
  * if the startDate comes before the article was created.
@@ -72,19 +91,19 @@ const fetchPageRevisions = async (title, startDate, endDate) => {
 };
 
 /**
- * TODO: Subject to change based on what the graph needs
- * @return formated fetchedPageViews as an array of arrays that only contain date object and count
+ * @return formated fetchedPageViews as a Map object of localDateString time and page views
  */
 const formatPageViews = (fetchedPageViews) => {
-    return Array.from(fetchedPageViews.items).map((pageViewObject) => {
-        return [formatYYYYMMDDToDate(pageViewObject.timestamp), pageViewObject.views];
-    });
+    return new Map(
+        Array.from(fetchedPageViews.items).map((pageViewObject) => {
+            return [formatYYYYMMDDToDate(pageViewObject.timestamp).toLocaleDateString(), pageViewObject.views];
+        })
+    );
 };
 
 /**
- * TODO: Subject to change based on what the graph needs
  * @param {AggregateType} aggregateType
- * @return formated fetchedRevisions as an array of arrays that only contain date object and count
+ * @return formated fetchedRevisions as a Map object of localDateString time and revision count
  */
 const formatPageRevisions = (fetchedRevisions, aggregateType) => {
     const pageRevisionCountMap = fetchedRevisions
@@ -104,8 +123,9 @@ const formatPageRevisions = (fetchedRevisions, aggregateType) => {
             return accumulator;
         }, {});
 
-    // Formats into an array of arrays
-    return Object.keys(pageRevisionCountMap).map((key) => [key, pageRevisionCountMap[key]]);
+    return new Map(
+        Object.keys(pageRevisionCountMap).map((key) => [new Date(key).toLocaleDateString(), pageRevisionCountMap[key]])
+    );
 };
 
 /**
@@ -148,7 +168,46 @@ const getPageRevisionCount = async (title, startDate, endDate, aggregateType) =>
         console.error(
             `Error fetching revision count on inputs title:${title} startDate:${startDate} endDate:${endDate} aggregateType:${aggregateType}\nError: ${err.message}`
         );
+        return err;
+    }
+};
 
+/**
+ * Get view counts on a given article in a timeseries format
+ *
+ * @param {string} title of a wikipedia article
+ * @param {Date} startDate
+ * @param {Date} endDate
+ * @returns a map of x and y. x contains array of all dates between the given range in a format MM/DD/YYYY and y contains array of page views
+ */
+const getPageViewTimeseries = async (title, startDate, endDate) => {
+    try {
+        const pageViewsResponse = await getPageViews(title, startDate, endDate, AggregateType.DAILY);
+        return formatResponseToTimeseries(pageViewsResponse, startDate, endDate);
+    } catch (err) {
+        console.error(
+            `Error getting page view timeseries data on title:${title} startDate:${startDate} endDate:${endDate}\nError: ${err.message}`
+        );
+        return err;
+    }
+};
+
+/**
+ * Get revision counts on a given article in a timeseries format
+ *
+ * @param {string} title of a wikipedia article
+ * @param {Date} startDate
+ * @param {Date} endDate
+ * @returns a map of x and y. x contains array of all dates between the given range in a format MM/DD/YYYY and y contains array of revision counts
+ */
+const getPageRevisionCountTimeseries = async (title, startDate, endDate) => {
+    try {
+        const pageRevisionCountResponse = await getPageRevisionCount(title, startDate, endDate, AggregateType.DAILY);
+        return formatResponseToTimeseries(pageRevisionCountResponse, startDate, endDate);
+    } catch (err) {
+        console.error(
+            `Error getting page revision count timeseries data on title:${title} startDate:${startDate} endDate:${endDate}\nError: ${err.message}`
+        );
         return err;
     }
 };
@@ -159,7 +218,7 @@ const getPageRevisionCount = async (title, startDate, endDate, aggregateType) =>
  * @param {string} title of a wikipedia article
  * @returns a date in YYYYMMDD format
  */
- const getPageCreationDate = async (title) => {
+const getPageCreationDate = async (title) => {
     const response = await fetch(
         `https://en.wikipedia.org/w/api.php?action=query&prop=revisions&rvlimit=1&rvprop=timestamp&rvdir=newer&titles=${title}&format=json`
     );
@@ -168,4 +227,4 @@ const getPageRevisionCount = async (title, startDate, endDate, aggregateType) =>
     return new Date(date);
 };
 
-export { getPageViews, getPageRevisionCount, getPageCreationDate };
+export { getPageRevisionCountTimeseries, getPageViewTimeseries, getPageCreationDate };
