@@ -38,13 +38,6 @@ const renderGraphOverlay = async () => {
     injectGraphToPage(title, creationDate, new Date(Date.now()));
 };
 
-/* Get the title of a Wikipedia page by inspecting the html */
-const title = (() => {
-    let titleSpan = document.getElementsByClassName("mw-page-title-main");
-    let title = titleSpan[0].innerHTML;
-    return title;
-})();
-
 /* Add simple slider to graph. Equivalency between dates and integers: 0: today, 100: creation date */
 const renderSlider = (creationDate) => {
     let now = new Date();
