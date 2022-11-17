@@ -22,14 +22,32 @@ let innerHTML = wikiText.innerHTML;
 /* Highlights the words that are given */
 const highlightPersistentContent = (text, color) => {
     let index = innerHTML.indexOf(text);
-    if (index >= 0) { 
+    console.log(index);
+    if (index >= 0) {
+        console.log(innerHTML.substring(index - 25, index + text.length + 25))
         innerHTML = innerHTML.substring(0, index) + `<mark style='background-color: ${color}'>` + innerHTML.substring(index, index + text.length) + '</mark>' + innerHTML.substring(index + text.length);
         wikiText.innerHTML = innerHTML;
     }
 }
 
 renderGraphOverlay();
-
+highlightPersistentContent("Ukraine",  "#99FF84");
+const persistent = [
+    "ranked #1 in Undergraduate Teaching by U.S. News & World Report for over a decade",
+    "Founded in 1866",
+    "Admissions is highly selective",
+    "Carleton is one of the highest sources of undergraduate students pursuing doctorates",
+    "private",
+    "liberal arts college",
+    "Northfield",
+    "Extracurricular organizations",
+    "Arboretum",
+    "Cowling Arboretum"
+];
+var arrayLength = persistent.length;
+for (var i = 0; i < arrayLength; i++) {
+    highlightPersistentContent(persistent[i], "#99FF84");
+}
 
 /* The page id can be found as the last part of the link to
  * the wikidata item on the left side of wikipedia pages.
@@ -49,3 +67,17 @@ const pageId = (() => {
     });
     return(wiki_page_id);
 })();
+
+const fetchChangeWithHTML = async (startID, endID) => {
+    const response = await fetch(
+        `https://en.wikipedia.org/w/api.php?action=compare&format=json&fromrev=${startID}&torev=${endID}&prop=diff%7Cids%7Ctitle%7Ctimestamp&formatversion=2`
+    );
+    const data = await response.json();
+    const parser = new DOMParser()
+    const document = parser.parseFromString(data['compare']['body'], 'text/html')
+    const x = document.querySelectorAll("ins.diffchange.diffchange-inline");
+    const result = [...x].map(node => node.innerText);
+    return data['compare']['body']
+}
+console.log(fetchChangeWithHTML(1120213443, 1114427258))
+console.log("1 con vit xoe ra 2 cai canh")
