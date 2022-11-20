@@ -47,47 +47,43 @@ const fetchPageViews = async (title, startDate, endDate, aggregateType) => {
 /**
  * Get all the revision objects on a given wikipedia title.
  *
- * The api only gives us at most 20 reivision objects per request. However, it does give us a query to
- * use if there are any older revisions. If older versions of revision exists, we will get
+ * The api only gives us at most 500 reivision objects per request. However, it does give us a svcontinue to
+ * use to get more requests if needed. If older versions of revision exists, we will get
+ *
  * {
- *  revisions: [...],
- *  ...
- *  older: 'https://en.wikipedia.org/w/rest.php/v1/page/Jupiter/history?older_than=1103899458',
+ *  continue: { rvcontinue: ...},
+ *  query: { pages: [ { ... revisions: [], ...} ]}
  *  ...
  * }
  *
- * Thus, we keep calling the endpoint with the given query if the older property exists in the
- * previous request.
+ * Thus, we keep calling the endpoint (use rvcontinue instead of rvstart and rvend with the given query if
+ * the older property exists in the previous request.
  *
  * @param {string} title of a wikipedia article
  * @param {Date} startDate
  * @param {Date} endDate
- * @returns An array containing all revision objects
+ * @returns An array containing all revisions' timestamps
  */
 const fetchPageRevisions = async (title, startDate, endDate) => {
-    const response = await fetch(`https://en.wikipedia.org/w/rest.php/v1/page/${title}/history`);
+    const response = await fetch(
+        `https://en.wikipedia.org/w/api.php?action=query&format=json&prop=revisions&titles=${title}&formatversion=2&rvprop=timestamp&rvslots=*&rvlimit=500&rvstart=${endDate.toISOString()}&rvend=${startDate.toISOString()}`
+    );
     let curJsonResponse = await response.json();
 
-    let revisions = curJsonResponse.revisions;
+    let revisions = curJsonResponse.query.pages[0].revisions;
 
-    while (curJsonResponse.hasOwnProperty("older")) {
-        const localResponse = await fetch(curJsonResponse.older);
-        curJsonResponse = await localResponse.json();
+    while (curJsonResponse.hasOwnProperty("continue")) {
+        let continueString = curJsonResponse.continue.rvcontinue;
+        const continueResponse = await fetch(
+            `https://en.wikipedia.org/w/api.php?action=query&format=json&prop=revisions&titles=Pasta&formatversion=2&rvprop=timestamp&rvslots=*&rvlimit=500&rvcontinue=${continueString}`
+        );
 
-        const localRevisions = curJsonResponse.revisions;
-
-        // Stop making requests when requesting passes startDate
-        const localLatestTimestamp = new Date(localRevisions[0].timestamp);
-        if (localLatestTimestamp < startDate) break;
-
+        curJsonResponse = await continueResponse.json();
+        const localRevisions = curJsonResponse.query.pages[0].revisions;
         revisions.push(...localRevisions);
     }
 
-    // Filters revisions that are in between the given timerange
-    return revisions.filter((revisionObject) => {
-        const currentTimestamp = new Date(revisionObject.timestamp);
-        return startDate <= currentTimestamp && currentTimestamp <= endDate;
-    });
+    return revisions;
 };
 
 /**
