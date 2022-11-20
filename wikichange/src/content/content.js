@@ -93,7 +93,7 @@ let wikiText = document.getElementById("mw-content-text");
 let innerHTML = wikiText.innerHTML;
 
 /* Highlights the words that are given */
-const highlightPersistentContent = (text, color) => {
+const highlightContent = (text, color) => {
     let index = innerHTML.indexOf(text);
     if (index >= 0) {
         innerHTML =
@@ -103,6 +103,32 @@ const highlightPersistentContent = (text, color) => {
             "</mark>" +
             innerHTML.substring(index + text.length);
         wikiText.innerHTML = innerHTML;
+    }
+};
+
+/* Highlights the words that are given with context. No support for links yet */
+const highlightContentWithContext = (json, color) => {
+    let foundIndex = -1;
+    let controlIndex = 0;
+    let highlight = json["highlight"];
+    let before = json["content_before"];
+    let after = json["content_after"];
+    while ((foundIndex = innerHTML.indexOf(highlight, controlIndex)) != -1) {
+        let afterText = innerHTML.substring(foundIndex + highlight.length, foundIndex + highlight.length + after.length);
+        let beforeText = innerHTML.substring(foundIndex - before.length, foundIndex);
+        console.log("After " + afterText);
+        console.log("Before " + beforeText);
+        if (afterText === after && beforeText === before) {
+            innerHTML =
+                innerHTML.substring(0, foundIndex) +
+                `<mark style='background-color: ${color}'>` +
+                innerHTML.substring(foundIndex, foundIndex + highlight.length) +
+                "</mark>" +
+                innerHTML.substring(foundIndex + highlight.length);
+            wikiText.innerHTML = innerHTML;
+            break;
+        }
+        controlIndex = foundIndex + highlight.length;
     }
 };
 
