@@ -1,5 +1,6 @@
 import { getPageCreationDate } from "./timeSeriesService.js";
 import injectGraphToPage from "./graph.js";
+import fetchChangeWithHTML from "./compareRevisionService.js";
 
 const insertAfter = (newNode, existingNode) => {
     existingNode.parentNode.insertBefore(newNode, existingNode.nextSibling);
@@ -114,10 +115,13 @@ const highlightContentWithContext = (json, color) => {
     let before = json["content_before"];
     let after = json["content_after"];
     while ((foundIndex = innerHTML.indexOf(highlight, controlIndex)) != -1) {
-        let afterText = innerHTML.substring(foundIndex + highlight.length, foundIndex + highlight.length + after.length);
+        let afterText = innerHTML.substring(
+            foundIndex + highlight.length,
+            foundIndex + highlight.length + after.length
+        );
         let beforeText = innerHTML.substring(foundIndex - before.length, foundIndex);
-        console.log("After " + afterText);
-        console.log("Before " + beforeText);
+        // console.log("After " + afterText);
+        // console.log("Before " + beforeText);
         if (afterText === after && beforeText === before) {
             innerHTML =
                 innerHTML.substring(0, foundIndex) +
@@ -126,6 +130,7 @@ const highlightContentWithContext = (json, color) => {
                 "</mark>" +
                 innerHTML.substring(foundIndex + highlight.length);
             wikiText.innerHTML = innerHTML;
+            console.log("highlighed " + highlight);
             break;
         }
         controlIndex = foundIndex + highlight.length;
@@ -170,3 +175,12 @@ const renderDeleteAlert = (count) => {
 };
 
 renderDeleteAlert(100);
+
+const highlight = async () => {
+    const arr = await fetchChangeWithHTML(1017943025, 1121863425);
+    arr.forEach((element) => {
+        console.log(element);
+        highlightContentWithContext(element, "#99FF84");
+    });
+};
+highlight();
