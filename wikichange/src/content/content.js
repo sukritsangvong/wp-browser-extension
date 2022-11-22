@@ -125,15 +125,13 @@ const highlightPersistentContent = (text, color) => {
     return wiki_page_id;
 })();
 
-const renderDeleteAlert = (count) => {
+const renderDeleteAlert = () => {
     let deleteContainer = document.createElement("div");
     deleteContainer.innerHTML =
         `<div class="card" style="max-width: 18rem;border-style: solid;padding: 0.5rem;float: left;">
                                     <div class="card-body">
                                     <h5 class="card-title">Deletions</h5>
-                                    <p class="card-text">This article had ` +
-        count +
-        ` bytes of deleted content not shown in this overlay</p>
+                                    <p class="card-text">This article has deleted content not shown in this overlay</p>
                                     </div>
                                 </div>`;
     deleteContainer.setAttribute("id", "deleteAlert");
@@ -143,4 +141,4 @@ const renderDeleteAlert = (count) => {
     floatContainer.append(deleteContainer);
 };
 
-renderDeleteAlert(100);
+renderDeleteAlert();
