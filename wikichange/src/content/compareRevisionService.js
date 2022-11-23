@@ -22,35 +22,46 @@ const fetchChangeWithHTML = async (startID, endID) => {
     let contentAfter = "";
     const result = [];
     divsWithIns.forEach((element) => {
+        console.log(element);
         element.childNodes.forEach((child) => {
-            const nodeType = child.nodeType;
-            const content = child.textContent;
+            console.log(child);
+            const nodeName = child.nodeName;
+            const content = child.textContent.replaceAll(/(<ref.*?>.*?<\/ref>)/g, "");
 
-            if (nodeType == Node.TEXT_NODE) {
-                // div of text
+            if (nodeName == "#text") {
                 if (contentBefore == "") {
                     contentBefore = content;
                 } else {
                     contentAfter = content;
-                    result.push({
-                        content_before: contentBefore,
-                        highlight: highlight,
-                        content_after: contentAfter,
-                    });
+
+                    addJsonToResultAndReset(result, contentBefore, highlight, contentAfter);
                     contentBefore = "";
                     highlight = "";
                     contentAfter = "";
                 }
-            } else if (nodeType == Node.ELEMENT_NODE) {
-                // div of ins
+            } else if (nodeName == "INS") {
                 highlight += content;
-            } else {
-                // something else
-                console.error("SHOULD NOT EVER REACH THIS ELSE IN COMPARE REVISION");
             }
         });
+
+        if (contentBefore != "" || highlight || ("" && contentAfter) || "") {
+            addJsonToResultAndReset(result, contentBefore, highlight, contentAfter);
+            contentBefore = "";
+            highlight = "";
+            contentAfter = "";
+        }
     });
     return result;
+};
+
+const addJsonToResultAndReset = (result, contentBefore, highlight, contentAfter) => {
+    console.log({ before: contentBefore, high: highlight, after: contentAfter });
+    // Only look at max 20 characters before and after
+    result.push({
+        content_before: contentBefore.substring(Math.max(contentBefore.length - 20, 0)),
+        highlight: highlight,
+        content_after: contentAfter.substring(0, Math.min(contentAfter.length, 21)),
+    });
 };
 
 export default fetchChangeWithHTML;
