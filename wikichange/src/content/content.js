@@ -163,7 +163,6 @@ const highlightContentUsingNodes = (context, color) => {
   }
 
   let newValue, node, parent;
-
   textNodes.every((textNode) => {
     node = textNode;
     parent = node.parentNode;
