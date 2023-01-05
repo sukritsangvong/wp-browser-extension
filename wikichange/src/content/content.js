@@ -148,7 +148,9 @@ const highlightContentWithContext = (json, color) => {
 
 /* Highlights the words that are given with context. Support for links, 
 there are some edge cases that don't work yet (highlight is link + no link) or 
-context and highlight are links */
+context and highlight are links 
+Note: Walker code idea and sample use (eg.: document.createTreeWalker and walker.nextNode()) 
+is courtesy of ChatGPT */
 const highlightContentUsingNodes = (context, color) => {
   let textNodes = [];
   let walker = document.createTreeWalker(
