@@ -120,8 +120,8 @@ const highlightContentWithContext = (json, color) => {
             foundIndex + highlight.length + after.length
         );
         let beforeText = innerHTML.substring(foundIndex - before.length, foundIndex);
-        // console.log("After " + afterText);
-        // console.log("Before " + beforeText);
+        console.log("After " + afterText);
+        console.log("Before " + beforeText);
         if (afterText === after && beforeText === before) {
             innerHTML =
                 innerHTML.substring(0, foundIndex) +
@@ -130,11 +130,62 @@ const highlightContentWithContext = (json, color) => {
                 "</mark>" +
                 innerHTML.substring(foundIndex + highlight.length);
             wikiText.innerHTML = innerHTML;
-            console.log("highlighed " + highlight);
             break;
         }
         controlIndex = foundIndex + highlight.length;
     }
+};
+
+/* Highlights the words that are given with context. Support for links, 
+there are some edge cases that don't work yet (highlight is link + no link) or 
+context and highlight are links 
+Note: Walker code idea and sample use (eg.: document.createTreeWalker and walker.nextNode()) 
+is courtesy of ChatGPT */
+const highlightContentUsingNodes = (context, color) => {
+    let textNodes = [];
+    let walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+
+    while (walker.nextNode()) {
+        textNodes.push(walker.currentNode);
+    }
+
+    let newValue, node, parent;
+    textNodes.every((textNode) => {
+        node = textNode;
+        parent = node.parentNode;
+        let value = node.nodeValue;
+        newValue = value.replace(
+            context.highlight,
+            `<mark style='background-color: ${color}'>${context.highlight}</mark>`
+        );
+
+        if (newValue !== value) {
+            if (value.includes(context.content_after) || value.includes(context.content_before)) {
+                // Or because of edge cases, if good context this will almost always work
+                let newNode = document.createElement("span");
+                newNode.innerHTML = newValue;
+                parent.replaceChild(newNode, node);
+                return false;
+            } else {
+                // maybe it is a link, check parent's previous and next siblings
+                if (
+                    node.parentNode != null &&
+                    node.parentNode.nextSibling != null &&
+                    node.parentNode.nextSibling.nodeValue != null &&
+                    node.parentNode.previousSibling != null &&
+                    node.parentNode.previousSibling.nodeValue != null &&
+                    (node.parentNode.nextSibling.nodeValue.includes(context.content_after) ||
+                        node.parentNode.previousSibling.nodeValue.includes(context.content_before))
+                ) {
+                    let newNode = document.createElement("span");
+                    newNode.innerHTML = newValue;
+                    parent.replaceChild(newNode, node);
+                    return false;
+                }
+            }
+        }
+        return true;
+    });
 };
 
 /* The page id can be found as the last part of the link to
