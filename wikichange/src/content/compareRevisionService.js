@@ -22,9 +22,7 @@ const fetchChangeWithHTML = async (startID, endID) => {
     let contentAfter = "";
     const result = [];
     divsWithIns.forEach((element) => {
-        console.log(element);
         element.childNodes.forEach((child) => {
-            console.log(child);
             const nodeName = child.nodeName;
             const content = child.textContent.replaceAll(/(<ref.*?>.*?<\/ref>)/g, "");
 
@@ -55,12 +53,10 @@ const fetchChangeWithHTML = async (startID, endID) => {
 };
 
 const addJsonToResultAndReset = (result, contentBefore, highlight, contentAfter) => {
-    console.log({ before: contentBefore, high: highlight, after: contentAfter });
-    // Only look at max 20 characters before and after
     result.push({
-        content_before: contentBefore.substring(Math.max(contentBefore.length - 20, 0)),
+        content_before: contentBefore,
         highlight: highlight,
-        content_after: contentAfter.substring(0, Math.min(contentAfter.length, 21)),
+        content_after: contentAfter,
     });
 };
 
