@@ -188,7 +188,9 @@ const highlightContentUsingNodes = (context, color) => {
         // maybe it is a link, check parent's previous and next siblings
         if (
           node.parentNode != null &&
+          node.parentNode.nextSibling != null &&
           node.parentNode.nextSibling.nodeValue != null &&
+          node.parentNode.previousSibling != null &&
           node.parentNode.previousSibling.nodeValue != null &&
           (node.parentNode.nextSibling.nodeValue.includes(
             context.content_after
