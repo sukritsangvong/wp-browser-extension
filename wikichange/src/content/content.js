@@ -239,7 +239,13 @@ renderDeleteAlert(100);
 const highlightRevisionBetweenDates = async (title, curDate, oldDate) => {
     const curRevisionId = await fetchRevisionFromDate(title, curDate);
     const oldRevisionId = await fetchRevisionFromDate(title, oldDate);
-    highlight(curRevisionId, oldRevisionId);
+    try {
+        highlight(curRevisionId, oldRevisionId);
+    } catch (err) {
+        console.error(
+            `Error highlighting revisions between dates for inputs title:${title} curDate:${curDate} oldDate:${oldDate}\nError: ${err}`
+        );
+    }
 };
 
 /**
