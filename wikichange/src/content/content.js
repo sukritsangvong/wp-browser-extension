@@ -97,7 +97,8 @@ getPageCreationDate(title).then(function (date) {
 let wikiText = document.getElementById("mw-content-text");
 let innerHTML = wikiText.innerHTML;
 
-/* Highlights the words that are given */
+/* 1st highlighter: super simple with no context
+Highlights the words that are given */
 const highlightContent = (text, color) => {
     let index = innerHTML.indexOf(text);
     if (index >= 0) {
@@ -111,7 +112,7 @@ const highlightContent = (text, color) => {
     }
 };
 
-/* Highlights the words that are given with context. No support for links yet */
+/* Highlights the words that are given with context. No support for links */
 const highlightContentWithContext = (json, color) => {
     let foundIndex = -1;
     let controlIndex = 0;

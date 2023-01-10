@@ -65,7 +65,7 @@ const addJsonToResultAndReset = (result, contentBefore, highlight, contentAfter)
  *
  * @param {string} title of a wikipedia article
  * @param {Date} date
- * @returns {int} an ID represent the revision
+ * @returns {int, date} an ID represent the revision and a date of the revision
  */
 const fetchRevisionFromDate = async (title, date) => {
     // Try fetch a revision id that comes right after the given date
