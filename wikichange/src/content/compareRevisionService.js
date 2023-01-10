@@ -65,7 +65,7 @@ const addJsonToResultAndReset = (result, contentBefore, highlight, contentAfter)
  *
  * @param {string} title of a wikipedia article
  * @param {Date} date
- * @returns {int} an ID represent the revision
+ * @returns {int, date} an ID represent the revision and a date of the revision
  */
 const fetchRevisionFromDate = async (title, date) => {
     // Try fetch a revision id that comes right after the given date
@@ -74,7 +74,7 @@ const fetchRevisionFromDate = async (title, date) => {
             `https://en.wikipedia.org/w/api.php?action=query&format=json&prop=revisions&titles=${title}&formatversion=2&rvprop=ids%7Ctimestamp&rvlimit=1&rvstart=${date.toISOString()}&rvdir=newer`
         );
         const data = await response.json();
-        return data["query"]["pages"][0]["revisions"][0]["revid"];
+        return [data["query"]["pages"][0]["revisions"][0]["revid"], data["query"]["pages"][0]["revisions"][0]["timestamp"]];
     } catch (err) {
         console.error(
             `Error getting revision for newers inputs on title:${title} date:${date}\nError: ${err}\nTrying to fetch for older dates...`
@@ -87,7 +87,7 @@ const fetchRevisionFromDate = async (title, date) => {
             `https://en.wikipedia.org/w/api.php?action=query&format=json&prop=revisions&titles=${title}&formatversion=2&rvprop=ids%7Ctimestamp&rvlimit=1&rvstart=${date.toISOString()}&rvdir=older`
         );
         const data = await response.json();
-        return data["query"]["pages"][0]["revisions"][0]["revid"];
+        return [data["query"]["pages"][0]["revisions"][0]["revid"], data["query"]["pages"][0]["revisions"][0]["timestamp"]];
     } catch (err) {
         console.error(`Error getting revision for older inputs on title:${title} date:${date}\nError: ${err}`);
         return -1;
