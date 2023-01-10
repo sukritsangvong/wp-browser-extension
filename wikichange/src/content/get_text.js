@@ -1,4 +1,4 @@
-text = `From Wikipedia, the free encyclopedia
+const text = `From Wikipedia, the free encyclopedia
 2022-12-29  2001-10-12
 
 Jump to navigation
@@ -91,7 +91,7 @@ In modern times
 The art of pasta ma
 `;
 
-wikitext = `{{short description|Cooked dough food in Italian cuisine}}
+const wikitext = `{{short description|Cooked dough food in Italian cuisine}}
 {{Other uses}}
 {{pp-semi-indef}}
 {{pp-move-indef|small=yes}}
@@ -184,41 +184,40 @@ class Graph {
     }
 }
 function findCleanContext(before, after, highlight) {
-    const node_regex = /( ([a-zA-Z]+)){2,}/g;
+    const node_regex = /([a-zA-Z]+ ?){2,}/g;
     const nodesBefore = before.match(node_regex);
-    // const nodesAfter = after.match(node_regex);
-    // console.log(nodesBefore);
+    const nodesAfter = after.match(node_regex);
+    console.log(nodesBefore);
     // console.log(nodesAfter);
     const beforeNodes = nodesBefore.map((a) => [...text.matchAll(new RegExp(`${a.trim()}`, 'g'))]);
-    // console.log(beforeNodes);
+    console.log(beforeNodes);
     const beforeGraph = new Graph(beforeNodes);
-
-
 }
 
-// const fl = () => {findCleanContext(`===History of manufacturing===
-// At the beginning of the 17th century, [[Naples]] had rudimentary machines for producing pasta, later establishing`
-// , `machine and press, making pasta manufacturing cost-effective.<ref name="something-else">{{cite web |title=History of pasta |url=http://www.internationalpasta.org/index.aspx?id=6 |publisher=International Pasta Organisation |access-date=18 November 2018 |date=2018}}</ref> In 1740, a license for the first pasta factory was issued in [[Venice]].<ref name=something-else/> During the 1800s, [[water mill]]s and [[Mill (grinding)|stone grinders]] were used to separate semolina from the bran, initiating expansion of the pasta market.<ref name=something-else/> In 1859, Joseph Topits (1824−1876) founded Hungary's first pasta factory, in the city of [[Pest, Hungary|Pest]], which worked with steam machines; it was one of the first pasta factories in Central Europe.<ref name="tésztáklexikona">{{cite web|url=https://ujgastrovatmagazin.eoldal.hu/cikkek/a-tesztak-lexikonja/kifott-tesztak/a-tesztak-lexikonja---tesztatortenelem---kifott-tesztak-3..html|title=A TÉSZTÁK LEXIKONJA - TÉSZTATÖRTÉNELEM - KIFŐTT TÉSZTÁK 3. 2017.01.02 (visited - 2019. January 3.)|language=hu}}</ref> By 1867, [[Buitoni]] Company in [[Sansepolcro]], [[Tuscany]] was an established pasta manufacturer.<ref>{{cite web|title=The History of Pasta: It's not what you think!|url=http://www.pasta-recipes-by-italians.com/history-of-pasta.html|publisher=Pasta Recipes by Italians|access-date=26 March 2012}}</ref> During the early 1900s, artificial drying and [[extrusion]] processes enabled greater variety of pasta preparation and larger volumes for export, beginning a period called "The Industry of Pasta".<ref name=something-else/><ref>{{cite web |author1=Justin Demetri |title=History of pasta |url=https://www.lifeinitaly.com/food/history-of-pasta |publisher=Life in Italy |access-date=18 November 2018 |date=10 May 2018}}</ref> In 1884, the Zátka Brothers's plant in Boršov nad Vltavou was founded, making it Bohemia's first pasta factory.<ref name="praharadio">{{cite web|url=https://www.radio.cz/en/section/panorama/the-oldest-czech-pasta-plant-relies-on-traditional-taste-of-its-customers|title=Radio Praha - THE OLDEST CZECH PASTA PLANT RELIES ON TRADITIONAL TASTE OF ITS CUSTOMERS (visited - 2019. January 3.)|date=11 September 2008}}</ref>`
-// , `the [[kneading]] `);};
+const fl = () => {findCleanContext(`===History of manufacturing===
+At the beginning of the 17th century, [[Naples]] had rudimentary machines for producing pasta, later establishing`
+, `machine and press, making pasta manufacturing cost-effective.<ref name="something-else">{{cite web |title=History of pasta |url=http://www.internationalpasta.org/index.aspx?id=6 |publisher=International Pasta Organisation |access-date=18 November 2018 |date=2018}}</ref> In 1740, a license for the first pasta factory was issued in [[Venice]].<ref name=something-else/> During the 1800s, [[water mill]]s and [[Mill (grinding)|stone grinders]] were used to separate semolina from the bran, initiating expansion of the pasta market.<ref name=something-else/> In 1859, Joseph Topits (1824−1876) founded Hungary's first pasta factory, in the city of [[Pest, Hungary|Pest]], which worked with steam machines; it was one of the first pasta factories in Central Europe.<ref name="tésztáklexikona">{{cite web|url=https://ujgastrovatmagazin.eoldal.hu/cikkek/a-tesztak-lexikonja/kifott-tesztak/a-tesztak-lexikonja---tesztatortenelem---kifott-tesztak-3..html|title=A TÉSZTÁK LEXIKONJA - TÉSZTATÖRTÉNELEM - KIFŐTT TÉSZTÁK 3. 2017.01.02 (visited - 2019. January 3.)|language=hu}}</ref> By 1867, [[Buitoni]] Company in [[Sansepolcro]], [[Tuscany]] was an established pasta manufacturer.<ref>{{cite web|title=The History of Pasta: It's not what you think!|url=http://www.pasta-recipes-by-italians.com/history-of-pasta.html|publisher=Pasta Recipes by Italians|access-date=26 March 2012}}</ref> During the early 1900s, artificial drying and [[extrusion]] processes enabled greater variety of pasta preparation and larger volumes for export, beginning a period called "The Industry of Pasta".<ref name=something-else/><ref>{{cite web |author1=Justin Demetri |title=History of pasta |url=https://www.lifeinitaly.com/food/history-of-pasta |publisher=Life in Italy |access-date=18 November 2018 |date=10 May 2018}}</ref> In 1884, the Zátka Brothers's plant in Boršov nad Vltavou was founded, making it Bohemia's first pasta factory.<ref name="praharadio">{{cite web|url=https://www.radio.cz/en/section/panorama/the-oldest-czech-pasta-plant-relies-on-traditional-taste-of-its-customers|title=Radio Praha - THE OLDEST CZECH PASTA PLANT RELIES ON TRADITIONAL TASTE OF ITS CUSTOMERS (visited - 2019. January 3.)|date=11 September 2008}}</ref>`
+, `the [[kneading]] `);};
+
 findCleanContext(`===History of manufacturing===
     At the beginning of the 17th century, [[Naples]] had rudimentary machines for producing pasta, later establishing`
     , `machine and press, making pasta manufacturing cost-effective.<ref name="something-else">{{cite web |title=History of pasta |url=http://www.internationalpasta.org/index.aspx?id=6 |publisher=International Pasta Organisation |access-date=18 November 2018 |date=2018}}</ref> In 1740, a license for the first pasta factory was issued in [[Venice]].<ref name=something-else/> During the 1800s, [[water mill]]s and [[Mill (grinding)|stone grinders]] were used to separate semolina from the bran, initiating expansion of the pasta market.<ref name=something-else/> In 1859, Joseph Topits (1824−1876) founded Hungary's first pasta factory, in the city of [[Pest, Hungary|Pest]], which worked with steam machines; it was one of the first pasta factories in Central Europe.<ref name="tésztáklexikona">{{cite web|url=https://ujgastrovatmagazin.eoldal.hu/cikkek/a-tesztak-lexikonja/kifott-tesztak/a-tesztak-lexikonja---tesztatortenelem---kifott-tesztak-3..html|title=A TÉSZTÁK LEXIKONJA - TÉSZTATÖRTÉNELEM - KIFŐTT TÉSZTÁK 3. 2017.01.02 (visited - 2019. January 3.)|language=hu}}</ref> By 1867, [[Buitoni]] Company in [[Sansepolcro]], [[Tuscany]] was an established pasta manufacturer.<ref>{{cite web|title=The History of Pasta: It's not what you think!|url=http://www.pasta-recipes-by-italians.com/history-of-pasta.html|publisher=Pasta Recipes by Italians|access-date=26 March 2012}}</ref> During the early 1900s, artificial drying and [[extrusion]] processes enabled greater variety of pasta preparation and larger volumes for export, beginning a period called "The Industry of Pasta".<ref name=something-else/><ref>{{cite web |author1=Justin Demetri |title=History of pasta |url=https://www.lifeinitaly.com/food/history-of-pasta |publisher=Life in Italy |access-date=18 November 2018 |date=10 May 2018}}</ref> In 1884, the Zátka Brothers's plant in Boršov nad Vltavou was founded, making it Bohemia's first pasta factory.<ref name="praharadio">{{cite web|url=https://www.radio.cz/en/section/panorama/the-oldest-czech-pasta-plant-relies-on-traditional-taste-of-its-customers|title=Radio Praha - THE OLDEST CZECH PASTA PLANT RELIES ON TRADITIONAL TASTE OF ITS CUSTOMERS (visited - 2019. January 3.)|date=11 September 2008}}</ref>`
     , `the [[kneading]] `);
 
-function isHidden(el) {
-    var style = window.getComputedStyle(el);
-    return ((style.display === 'none') || (style.visibility === 'hidden'));
-}
+// function isHidden(el) {
+//     var style = window.getComputedStyle(el);
+//     return ((style.display === 'none') || (style.visibility === 'hidden'));
+// }
 // get the body tag
-var body = document.getElementById('bodyContent');
-// get all tags inside body
-var allTags = body.getElementsByTagName('*');
-//console.log(allTags);
-for (var i = 0, max = allTags.length; i < max; i++) {
-    if (isHidden(allTags[i])) {
-        // hidden
-    }
-    else {
-        console.log(allTags[i].innerText);
-    }
-}
+// var body = document.getElementById('bodyContent');
+// // get all tags inside body
+// var allTags = body.getElementsByTagName('*');
+// //console.log(allTags);
+// for (var i = 0, max = allTags.length; i < max; i++) {
+//     if (isHidden(allTags[i])) {
+//         // hidden
+//     }
+//     else {
+//         console.log(allTags[i].innerText);
+//     }
+// }
