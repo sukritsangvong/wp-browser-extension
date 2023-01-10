@@ -1,6 +1,6 @@
 import { getPageCreationDate } from "./timeSeriesService.js";
 import injectGraphToPage from "./graph.js";
-import fetchChangeWithHTML from "./compareRevisionService.js";
+import { fetchChangeWithHTML, fetchRevisionFromDate } from "./compareRevisionService.js";
 
 const insertAfter = (newNode, existingNode) => {
     existingNode.parentNode.insertBefore(newNode, existingNode.nextSibling);
@@ -13,7 +13,7 @@ const title = (() => {
     return title;
 })();
 
-/* Creates the div for the graph overlay. TODO: create the graph and render it here */
+/* Creates the div for the graph overlay. */
 const renderGraphOverlay = async () => {
     let floatContainer = document.createElement("div");
     floatContainer.style.cssText = "display: flex;";
@@ -47,7 +47,8 @@ const renderSlider = (creationDate) => {
     let sliderDiv = document.createElement("div");
     let initialDate = new Date();
     initialDate.setDate(now.getDate() - totalDaysDiff * 0.5);
-    // let closestRevision = fetchRevisionFromDate(title, initialDate)
+
+    highlightRevisionBetweenDates(title, now, initialDate);
 
     sliderDiv.innerHTML = `<div style="direction: rtl">${now.toISOString().slice(0, 10)}  
                                 <input type="range" id="graphSlider" value="50" min="0" max="100" style="width:60%;">  
@@ -79,8 +80,9 @@ const renderSlider = (creationDate) => {
 
     button.addEventListener("click", function (ev) {
         let spanClosestRev = document.getElementById("closesRev");
-        // call fetchRevisionFromDate(title, dateInput.value)
         spanClosestRev.innerHTML = dateInput.value;
+
+        highlightRevisionBetweenDates(title, now, new Date(dateInput.value));
     });
 };
 
@@ -197,7 +199,7 @@ const highlightContentUsingNodes = (context, color) => {
     try {
         wiki_data_url = document.getElementById("t-wikibase").getElementsByTagName("a")[0].href;
     } catch {
-        throw new Error("'Can't find page id!");
+        throw new Error("Can't find page id!");
     }
     const wiki_page_id = wiki_data_url.split("/").slice(-1)[0];
     console.info({
@@ -227,11 +229,29 @@ const renderDeleteAlert = (count) => {
 
 renderDeleteAlert(100);
 
-const highlight = async () => {
-    const arr = await fetchChangeWithHTML(1017943025, 1121863425);
+/**
+ * Highlight the current page to a revision on a given date
+ *
+ * @param {string} title of the wikipedia page
+ * @param {Date} curDate to highlight on
+ * @param {Date} oldDate to compare reivion on curDate to
+ */
+const highlightRevisionBetweenDates = async (title, curDate, oldDate) => {
+    const curRevisionId = await fetchRevisionFromDate(title, curDate);
+    const oldRevisionId = await fetchRevisionFromDate(title, oldDate);
+    highlight(curRevisionId, oldRevisionId);
+};
+
+/**
+ * Highlight a page by comparing two revisions
+ *
+ * @param {int} revisionId of the page that contains highlights
+ * @param {int} oldRevisionId of the page to compare to
+ */
+const highlight = async (revisionId, oldRevisionId) => {
+    const arr = await fetchChangeWithHTML(oldRevisionId, revisionId);
     arr.forEach((element) => {
         console.log(element);
-        highlightContentWithContext(element, "#99FF84");
+        highlightContentUsingNodes(element, "#99FF84");
     });
 };
-highlight();
