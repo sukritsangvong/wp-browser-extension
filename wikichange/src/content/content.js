@@ -40,7 +40,7 @@ const renderGraphOverlay = async () => {
 };
 
 /* Add simple slider to graph. Equivalency between dates and integers: 0: today, 100: creation date */
-const renderSlider = (creationDate) => {
+const renderSlider = async (creationDate) => {
     let now = new Date();
     let totalDaysDiff = (now.getTime() - creationDate.getTime()) / (1000 * 3600 * 24);
     let viewsEditsChart = document.getElementById("viewsEditsChart");
@@ -57,7 +57,8 @@ const renderSlider = (creationDate) => {
                             <br/><input type="date" value="${initialDate
                                 .toISOString()
                                 .slice(0, 10)}" id="dateOutput" name="dateOutput" style="text-align: center;"> 
-                                <button id = "highlightButton">Highlight</button><p id="revisionDate">Showing highlight for closest revision (<b>date: <span id="closesRev"></span></b>)</p>`;
+                                <button id = "highlightButton">Highlight</button><p id="revisionDate">Showing highlight for closest revision (<b>date: <span id="closesRev">
+                                ${(await fetchRevisionFromDate(title, initialDate))[1].slice(0, 10)}</span></b>)</p>`;
     sliderDiv.style.cssText = "text-align:center;";
     insertAfter(sliderDiv, viewsEditsChart);
 
@@ -78,11 +79,12 @@ const renderSlider = (creationDate) => {
         slider.value = sliderVal;
     });
 
-    button.addEventListener("click", function (ev) {
+    button.addEventListener("click", async function (ev) {
         let spanClosestRev = document.getElementById("closesRev");
-        spanClosestRev.innerHTML = dateInput.value;
+        let date = new Date(dateInput.value);
+        spanClosestRev.innerHTML = (await fetchRevisionFromDate(title, date))[1].slice(0, 10);
 
-        highlightRevisionBetweenDates(title, now, new Date(dateInput.value));
+        highlightRevisionBetweenDates(title, now, date);
     });
 };
 
@@ -209,15 +211,13 @@ const highlightContentUsingNodes = (context, color) => {
     return wiki_page_id;
 })();
 
-const renderDeleteAlert = (count) => {
+const renderDeleteAlert = () => {
     let deleteContainer = document.createElement("div");
     deleteContainer.innerHTML =
         `<div class="card" style="max-width: 18rem;border-style: solid;padding: 0.5rem;float: left;">
                                     <div class="card-body">
                                     <h5 class="card-title">Deletions</h5>
-                                    <p class="card-text">This article had ` +
-        count +
-        ` bytes of deleted content not shown in this overlay</p>
+                                    <p class="card-text">This article had deleted content not shown in this overlay</p>
                                     </div>
                                 </div>`;
     deleteContainer.setAttribute("id", "deleteAlert");
@@ -227,7 +227,7 @@ const renderDeleteAlert = (count) => {
     floatContainer.append(deleteContainer);
 };
 
-renderDeleteAlert(100);
+renderDeleteAlert();
 
 /**
  * Highlight the current page to a revision on a given date
@@ -237,8 +237,8 @@ renderDeleteAlert(100);
  * @param {Date} oldDate to compare reivion on curDate to
  */
 const highlightRevisionBetweenDates = async (title, curDate, oldDate) => {
-    const curRevisionId = await fetchRevisionFromDate(title, curDate);
-    const oldRevisionId = await fetchRevisionFromDate(title, oldDate);
+    const curRevisionId = (await fetchRevisionFromDate(title, curDate))[0];
+    const oldRevisionId = (await fetchRevisionFromDate(title, oldDate))[0];
     try {
         highlight(curRevisionId, oldRevisionId);
     } catch (err) {
@@ -258,6 +258,6 @@ const highlight = async (revisionId, oldRevisionId) => {
     const arr = await fetchChangeWithHTML(oldRevisionId, revisionId);
     arr.forEach((element) => {
         console.log(element);
-        highlightContentUsingNodes(element, "#99FF84");
+        highlightContentUsingNodes(element, "#AFE1AF");
     });
 };
