@@ -60,4 +60,38 @@ const addJsonToResultAndReset = (result, contentBefore, highlight, contentAfter)
     });
 };
 
-export default fetchChangeWithHTML;
+/**
+ * Fetch the closest revision to the date (in increasing order in time)
+ *
+ * @param {string} title of a wikipedia article
+ * @param {Date} date
+ * @returns {int} an ID represent the revision
+ */
+const fetchRevisionFromDate = async (title, date) => {
+    // Try fetch a revision id that comes right after the given date
+    try {
+        const response = await fetch(
+            `https://en.wikipedia.org/w/api.php?action=query&format=json&prop=revisions&titles=${title}&formatversion=2&rvprop=ids%7Ctimestamp&rvlimit=1&rvstart=${date.toISOString()}&rvdir=newer`
+        );
+        const data = await response.json();
+        return data["query"]["pages"][0]["revisions"][0]["revid"];
+    } catch (err) {
+        console.error(
+            `Error getting revision for newers inputs on title:${title} date:${date}\nError: ${err}\nTrying to fetch for older dates...`
+        );
+    }
+
+    // Try fetch with older dates in case there is nothing newer than the given date
+    try {
+        const response = await fetch(
+            `https://en.wikipedia.org/w/api.php?action=query&format=json&prop=revisions&titles=${title}&formatversion=2&rvprop=ids%7Ctimestamp&rvlimit=1&rvstart=${date.toISOString()}&rvdir=older`
+        );
+        const data = await response.json();
+        return data["query"]["pages"][0]["revisions"][0]["revid"];
+    } catch (err) {
+        console.error(`Error getting revision for older inputs on title:${title} date:${date}\nError: ${err}`);
+        return -1;
+    }
+};
+
+export { fetchChangeWithHTML, fetchRevisionFromDate };
