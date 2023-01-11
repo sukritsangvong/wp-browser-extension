@@ -2,18 +2,32 @@ import { getPageCreationDate } from "./timeSeriesService.js";
 import injectGraphToPage from "./graph.js";
 import { fetchChangeWithHTML, fetchRevisionFromDate } from "./compareRevisionService.js";
 
+/**
+ * Inserts a new node after an existing node
+ * 
+ * @param {HTMLElement} newNode 
+ * @param {HTMLElement} existingNode 
+ */
 const insertAfter = (newNode, existingNode) => {
     existingNode.parentNode.insertBefore(newNode, existingNode.nextSibling);
 };
 
-/* Get the title of a Wikipedia page by inspecting the html */
+/**
+ * Get the title of a Wikipedia page by inspecting the html
+ * @returns a string with title of a page
+ */
 const title = (() => {
     let titleSpan = document.getElementsByClassName("mw-page-title-main");
     let title = titleSpan[0].innerHTML;
     return title;
 })();
 
-/* Creates the div for the graph overlay. */
+/**
+ * Creates the div for the graph overlay by first creating a container
+ * then the child, which is the div for the graph. Resize the graph
+ * div and make sure the site sub "From Wikipedia, the free encyclopedia"
+ * is above the graph and below the title
+ */
 const renderGraphOverlay = async () => {
     let floatContainer = document.createElement("div");
     floatContainer.style.cssText = "display: flex;";
@@ -39,7 +53,13 @@ const renderGraphOverlay = async () => {
     injectGraphToPage(title, creationDate, new Date(Date.now()));
 };
 
-/* Add simple slider to graph. Equivalency between dates and integers: 0: today, 100: creation date */
+/**
+ * Add slider and date input to container, below the graph. Slider and date input are connected
+ * Equivalency between dates and integers: 0: today, 100: creation date
+ * When slider changes, date input also changes, upon clicking highlight and closest revision date appears
+ * 
+ * @param {Date} creationDate of a Wiki page
+ */
 const renderSlider = async (creationDate) => {
     let now = new Date();
     let totalDaysDiff = (now.getTime() - creationDate.getTime()) / (1000 * 3600 * 24);
@@ -89,6 +109,10 @@ const renderSlider = async (creationDate) => {
 };
 
 renderGraphOverlay();
+
+/**
+ * Once we have the Wikipedia's page creation date, we render the slider
+ */
 getPageCreationDate(title).then(function (date) {
     renderSlider(date);
 });
@@ -97,8 +121,12 @@ getPageCreationDate(title).then(function (date) {
 let wikiText = document.getElementById("mw-content-text");
 let innerHTML = wikiText.innerHTML;
 
-/* 1st highlighter: super simple with no context
-Highlights the words that are given */
+/**
+ * Simple highlighter with no context. Highlights the first word that matches text
+ * 
+ * @param {string} text that we want to highlight
+ * @param {string} color of the highlighting
+ */
 const highlightContent = (text, color) => {
     let index = innerHTML.indexOf(text);
     if (index >= 0) {
@@ -112,7 +140,13 @@ const highlightContent = (text, color) => {
     }
 };
 
-/* Highlights the words that are given with context. No support for links */
+/**
+ * Highlights the words that are given with context. No support for links
+ * Loops through the page until it finds a match, does this based on indexes. 
+ * 
+ * @param {dictionary} json dictionary entry with keys "content_before", "highlight" and "content_after"
+ * @param {string} color of the highlight
+ */
 const highlightContentWithContext = (json, color) => {
     let foundIndex = -1;
     let controlIndex = 0;
@@ -125,8 +159,7 @@ const highlightContentWithContext = (json, color) => {
             foundIndex + highlight.length + after.length
         );
         let beforeText = innerHTML.substring(foundIndex - before.length, foundIndex);
-        console.log("After " + afterText);
-        console.log("Before " + beforeText);
+
         if (afterText === after && beforeText === before) {
             innerHTML =
                 innerHTML.substring(0, foundIndex) +
@@ -141,11 +174,17 @@ const highlightContentWithContext = (json, color) => {
     }
 };
 
-/* Highlights the words that are given with context. Support for links, 
-there are some edge cases that don't work yet (highlight is link + no link) or 
-context and highlight are links 
-Note: Walker code idea and sample use (eg.: document.createTreeWalker and walker.nextNode()) 
-is courtesy of ChatGPT */
+/**
+ *  Highlights the words that are given with context. Support for links, 
+ *  there are some edge cases that don't work yet (highlight is link + no link) or 
+ *  context and highlight are links. Loops through the DOM tree text nodes, and if no patial
+ *  match, checks if it's a link (parent's siblings may contain the needed text)
+ *  Note: Walker code idea and sample use (eg.: document.createTreeWalker and walker.nextNode()) 
+ *  is courtesy of ChatGPT
+ *
+ * @param {dictionary} context dictionary entry with keys "content_before", "highlight" and "content_after"
+ * @param {string} color of the highlight
+ */
 const highlightContentUsingNodes = (context, color) => {
     let textNodes = [];
     let walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
@@ -193,9 +232,10 @@ const highlightContentUsingNodes = (context, color) => {
     });
 };
 
-/* The page id can be found as the last part of the link to
+/** The page id can be found as the last part of the link to
  * the wikidata item on the left side of wikipedia pages.
  * If no page id is found throws an error.
+ * @returns the page id of a Wikipedia page
  */
 (() => {
     let wiki_data_url;
@@ -212,6 +252,9 @@ const highlightContentUsingNodes = (context, color) => {
     return wiki_page_id;
 })();
 
+/**
+ * Creates a text container with information about deletions side by side with the graph
+ */
 const renderDeleteAlert = () => {
     let deleteContainer = document.createElement("div");
     deleteContainer.innerHTML =
