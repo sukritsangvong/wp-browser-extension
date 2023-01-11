@@ -5,8 +5,8 @@ import { fetchChangeWithHTML, fetchRevisionFromDate } from "./compareRevisionSer
 /**
  * Inserts a new node after an existing node
  * 
- * @param {*} newNode 
- * @param {*} existingNode 
+ * @param {HTMLElement} newNode 
+ * @param {HTMLElement} existingNode 
  */
 const insertAfter = (newNode, existingNode) => {
     existingNode.parentNode.insertBefore(newNode, existingNode.nextSibling);
@@ -14,6 +14,7 @@ const insertAfter = (newNode, existingNode) => {
 
 /**
  * Get the title of a Wikipedia page by inspecting the html
+ * @returns a string with title of a page
  */
 const title = (() => {
     let titleSpan = document.getElementsByClassName("mw-page-title-main");
@@ -57,7 +58,7 @@ const renderGraphOverlay = async () => {
  * Equivalency between dates and integers: 0: today, 100: creation date
  * When slider changes, date input also changes, upon clicking highlight and closest revision date appears
  * 
- * @param {*} creationDate of a Wiki page
+ * @param {Date} creationDate of a Wiki page
  */
 const renderSlider = async (creationDate) => {
     let now = new Date();
@@ -120,12 +121,11 @@ getPageCreationDate(title).then(function (date) {
 let wikiText = document.getElementById("mw-content-text");
 let innerHTML = wikiText.innerHTML;
 
-
 /**
  * Simple highlighter with no context. Highlights the first word that matches text
  * 
- * @param {*} text that we want to highlight
- * @param {*} color of the highlighting
+ * @param {string} text that we want to highlight
+ * @param {string} color of the highlighting
  */
 const highlightContent = (text, color) => {
     let index = innerHTML.indexOf(text);
@@ -140,13 +140,12 @@ const highlightContent = (text, color) => {
     }
 };
 
-
 /**
  * Highlights the words that are given with context. No support for links
  * Loops through the page until it finds a match, does this based on indexes. 
  * 
- * @param {*} json dictionary entry with keys "content_before", "highlight" and "content_after"
- * @param {*} color of the highlight
+ * @param {dictionary} json dictionary entry with keys "content_before", "highlight" and "content_after"
+ * @param {string} color of the highlight
  */
 const highlightContentWithContext = (json, color) => {
     let foundIndex = -1;
@@ -183,8 +182,8 @@ const highlightContentWithContext = (json, color) => {
  *  Note: Walker code idea and sample use (eg.: document.createTreeWalker and walker.nextNode()) 
  *  is courtesy of ChatGPT
  *
- * @param {*} context dictionary entry with keys "content_before", "highlight" and "content_after"
- * @param {*} color of the highlight
+ * @param {dictionary} context dictionary entry with keys "content_before", "highlight" and "content_after"
+ * @param {string} color of the highlight
  */
 const highlightContentUsingNodes = (context, color) => {
     let textNodes = [];
@@ -236,6 +235,7 @@ const highlightContentUsingNodes = (context, color) => {
 /** The page id can be found as the last part of the link to
  * the wikidata item on the left side of wikipedia pages.
  * If no page id is found throws an error.
+ * @returns the page id of a Wikipedia page
  */
 (() => {
     let wiki_data_url;
