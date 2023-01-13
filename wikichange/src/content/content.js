@@ -83,8 +83,7 @@ const renderSlider = async (creationDate) => {
     sliderDiv.style.cssText = "text-align:center;";
     insertAfter(sliderDiv, viewsEditsChart);
 
-    let loader = document.getElementById("loader");
-    // TODO: render the loader by the highlight button
+    renderLoader();
 
     let slider = document.getElementById("graphSlider");
     let dateInput = document.getElementById("dateOutput");
@@ -104,6 +103,7 @@ const renderSlider = async (creationDate) => {
     });
 
     button.addEventListener("click", async function (ev) {
+        document.getElementById("loader").style.display = "inline-block";
         let spanClosestRev = document.getElementById("closesRev");
         let date = new Date(dateInput.value);
         spanClosestRev.innerHTML = (await fetchRevisionFromDate(title, date))[1].slice(0, 10);
@@ -119,6 +119,30 @@ const renderSlider = async (creationDate) => {
 };
 
 renderGraphOverlay();
+
+/**
+ * Render a simple JS loader by the highlight button
+ */
+const renderLoader = () => {
+    let loader = document.getElementById("loader");
+    loader.style.border = "5px solid #f3f3f3";
+    loader.style.borderTop = "5px solid #3498db";
+    loader.style.borderRadius = "50%";
+    loader.style.width = "15px";
+    loader.style.height = "15px";
+    loader.style.position = "absolute";
+    loader.style.marginLeft = "4px";
+    loader.style.display = "inline-block"
+    loader.style.animation = "spin 2s linear infinite";
+
+    let keyframes = `@keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }`;
+    let style = document.createElement('style');
+    style.innerHTML = keyframes;
+    document.head.appendChild(style);
+};
 
 /**
  * Once we have the Wikipedia's page creation date, we render the slider
@@ -312,4 +336,5 @@ const highlight = async (revisionId, oldRevisionId) => {
     arr.forEach((element) => {
         highlightContentUsingNodes(element, "#AFE1AF");
     });
+    document.getElementById("loader").style.display = "none";
 };
