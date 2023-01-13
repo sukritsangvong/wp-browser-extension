@@ -4,9 +4,9 @@ import { fetchChangeWithHTML, fetchRevisionFromDate } from "./compareRevisionSer
 
 /**
  * Inserts a new node after an existing node
- * 
- * @param {HTMLElement} newNode 
- * @param {HTMLElement} existingNode 
+ *
+ * @param {HTMLElement} newNode
+ * @param {HTMLElement} existingNode
  */
 const insertAfter = (newNode, existingNode) => {
     existingNode.parentNode.insertBefore(newNode, existingNode.nextSibling);
@@ -57,7 +57,7 @@ const renderGraphOverlay = async () => {
  * Add slider and date input to container, below the graph. Slider and date input are connected
  * Equivalency between dates and integers: 0: today, 100: creation date
  * When slider changes, date input also changes, upon clicking highlight and closest revision date appears
- * 
+ *
  * @param {Date} creationDate of a Wiki page
  */
 const renderSlider = async (creationDate) => {
@@ -123,7 +123,7 @@ let innerHTML = wikiText.innerHTML;
 
 /**
  * Simple highlighter with no context. Highlights the first word that matches text
- * 
+ *
  * @param {string} text that we want to highlight
  * @param {string} color of the highlighting
  */
@@ -142,8 +142,8 @@ const highlightContent = (text, color) => {
 
 /**
  * Highlights the words that are given with context. No support for links
- * Loops through the page until it finds a match, does this based on indexes. 
- * 
+ * Loops through the page until it finds a match, does this based on indexes.
+ *
  * @param {dictionary} json dictionary entry with keys "content_before", "highlight" and "content_after"
  * @param {string} color of the highlight
  */
@@ -175,11 +175,11 @@ const highlightContentWithContext = (json, color) => {
 };
 
 /**
- *  Highlights the words that are given with context. Support for links, 
- *  there are some edge cases that don't work yet (highlight is link + no link) or 
+ *  Highlights the words that are given with context. Support for links,
+ *  there are some edge cases that don't work yet (highlight is link + no link) or
  *  context and highlight are links. Loops through the DOM tree text nodes, and if no patial
  *  match, checks if it's a link (parent's siblings may contain the needed text)
- *  Note: Walker code idea and sample use (eg.: document.createTreeWalker and walker.nextNode()) 
+ *  Note: Walker code idea and sample use (eg.: document.createTreeWalker and walker.nextNode())
  *  is courtesy of ChatGPT
  *
  * @param {dictionary} context dictionary entry with keys "content_before", "highlight" and "content_after"
@@ -257,8 +257,7 @@ const highlightContentUsingNodes = (context, color) => {
  */
 const renderDeleteAlert = () => {
     let deleteContainer = document.createElement("div");
-    deleteContainer.innerHTML =
-        `<div class="card" style="max-width: 18rem;border-style: solid;padding: 0.5rem;float: left;">
+    deleteContainer.innerHTML = `<div class="card" style="max-width: 18rem;border-style: solid;padding: 0.5rem;float: left;">
                                     <div class="card-body">
                                     <h5 class="card-title">Deletions</h5>
                                     <p class="card-text">This article had deleted content not shown in this overlay</p>
@@ -301,7 +300,6 @@ const highlightRevisionBetweenDates = async (title, curDate, oldDate) => {
 const highlight = async (revisionId, oldRevisionId) => {
     const arr = await fetchChangeWithHTML(oldRevisionId, revisionId);
     arr.forEach((element) => {
-        console.log(element);
         highlightContentUsingNodes(element, "#AFE1AF");
     });
 };
