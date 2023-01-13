@@ -220,6 +220,8 @@ const highlightContentWithContext = (json, color) => {
  * @param {string} color of the highlight
  */
 const highlightContentUsingNodes = (context, color) => {
+    context.highlight = context.highlight.trim();
+
     let textNodes = [];
     let walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
 
