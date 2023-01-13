@@ -77,10 +77,14 @@ const renderSlider = async (creationDate) => {
                             <br/><input type="date" value="${initialDate
                                 .toISOString()
                                 .slice(0, 10)}" id="dateOutput" name="dateOutput" style="text-align: center;"> 
-                                <button id = "highlightButton">Highlight</button><p id="revisionDate">Showing highlight for closest revision (<b>date: <span id="closesRev">
+                                <button id = "highlightButton">Highlight</button> <div id="loader"></div>
+                                <p id="revisionDate">Showing highlight for closest revision (<b>date: <span id="closesRev">
                                 ${(await fetchRevisionFromDate(title, initialDate))[1].slice(0, 10)}</span></b>)</p>`;
     sliderDiv.style.cssText = "text-align:center;";
     insertAfter(sliderDiv, viewsEditsChart);
+
+    let loader = document.getElementById("loader");
+    // TODO: render the loader by the highlight button
 
     let slider = document.getElementById("graphSlider");
     let dateInput = document.getElementById("dateOutput");
@@ -104,8 +108,14 @@ const renderSlider = async (creationDate) => {
         let date = new Date(dateInput.value);
         spanClosestRev.innerHTML = (await fetchRevisionFromDate(title, date))[1].slice(0, 10);
 
+        let oldHighlights = document.getElementsByClassName('extension-highlight');
+        Array.from(oldHighlights).forEach(function(oldHighlights) {
+            oldHighlights.style.backgroundColor = "inherit";
+            oldHighlights.style.color = "inherit";
+        });
         highlightRevisionBetweenDates(title, now, date);
     });
+
 };
 
 renderGraphOverlay();
@@ -132,7 +142,7 @@ const highlightContent = (text, color) => {
     if (index >= 0) {
         innerHTML =
             innerHTML.substring(0, index) +
-            `<mark style='background-color: ${color}'>` +
+            `<mark style='background-color: ${color}' class='extension-highlight'>` +
             innerHTML.substring(index, index + text.length) +
             "</mark>" +
             innerHTML.substring(index + text.length);
@@ -163,7 +173,7 @@ const highlightContentWithContext = (json, color) => {
         if (afterText === after && beforeText === before) {
             innerHTML =
                 innerHTML.substring(0, foundIndex) +
-                `<mark style='background-color: ${color}'>` +
+                `<mark style='background-color: ${color}' class='extension-highlight'>` +
                 innerHTML.substring(foundIndex, foundIndex + highlight.length) +
                 "</mark>" +
                 innerHTML.substring(foundIndex + highlight.length);
@@ -200,7 +210,7 @@ const highlightContentUsingNodes = (context, color) => {
         let value = node.nodeValue;
         newValue = value.replace(
             context.highlight,
-            `<mark style='background-color: ${color}'>${context.highlight}</mark>`
+            `<mark style='background-color: ${color}' class='extension-highlight'>${context.highlight}</mark>`
         );
 
         if (newValue !== value) {
