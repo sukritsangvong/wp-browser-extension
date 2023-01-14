@@ -1,6 +1,6 @@
 import { getPageCreationDate } from "./timeSeriesService.js";
 import injectGraphToPage from "./graph.js";
-import { fetchChangeWithHTML, fetchRevisionFromDate } from "./compareRevisionService.js";
+import { fetchChangeWithHTML, fetchRevisionFromDate, getRevisionPageLink } from "./compareRevisionService.js";
 
 /**
  * Inserts a new node after an existing node
@@ -68,7 +68,10 @@ const renderSlider = async (creationDate) => {
     let initialDate = new Date();
     initialDate.setDate(now.getDate() - totalDaysDiff * 0.5);
 
-    highlightRevisionBetweenDates(title, now, initialDate);
+    let curRevisionId = (await fetchRevisionFromDate(title, now))[0];
+    let oldRevisionId = (await fetchRevisionFromDate(title, initialDate))[0];
+
+    highlightRevisionBetweenRevisionIds(title, curRevisionId, oldRevisionId);
 
     sliderDiv.innerHTML = `<div style="direction: rtl">${now.toISOString().slice(0, 10)}  
                                 <input type="range" id="graphSlider" value="50" min="0" max="100" style="width:60%;">  
@@ -78,6 +81,8 @@ const renderSlider = async (creationDate) => {
                                 .toISOString()
                                 .slice(0, 10)}" id="dateOutput" name="dateOutput" style="text-align: center;"> 
                                 <button id = "highlightButton">Highlight</button> <div id="loader"></div>
+                                <p></p>
+                                <button id = "revisionButton">Go To Revision Page</button></div>
                                 <p id="revisionDate">Showing highlight for closest revision (<b>date: <span id="closesRev">
                                 ${(await fetchRevisionFromDate(title, initialDate))[1].slice(0, 10)}</span></b>)</p>`;
     sliderDiv.style.cssText = "text-align:center;";
@@ -85,9 +90,10 @@ const renderSlider = async (creationDate) => {
 
     renderLoader();
 
-    let slider = document.getElementById("graphSlider");
-    let dateInput = document.getElementById("dateOutput");
-    let button = document.getElementById("highlightButton");
+    const slider = document.getElementById("graphSlider");
+    const dateInput = document.getElementById("dateOutput");
+    const highlightButton = document.getElementById("highlightButton");
+    const revisionButton = document.getElementById("revisionButton");
 
     slider.addEventListener("change", function (ev) {
         let numDays = parseInt((totalDaysDiff * this.value) / 100);
@@ -102,22 +108,38 @@ const renderSlider = async (creationDate) => {
         slider.value = sliderVal;
     });
 
-    button.addEventListener("click", async function (ev) {
+    highlightButton.addEventListener("click", async function (ev) {
         document.getElementById("loader").style.display = "inline-block";
-        button.disabled = true;
+        highlightButton.disabled = true;
+        revisionButton.disabled = true; // disable until we get new set of revIds
 
-        let spanClosestRev = document.getElementById("closesRev");
-        let date = new Date(dateInput.value);
+        const spanClosestRev = document.getElementById("closesRev");
+        const date = new Date(dateInput.value);
         spanClosestRev.innerHTML = (await fetchRevisionFromDate(title, date))[1].slice(0, 10);
 
-        let oldHighlights = document.getElementsByClassName('extension-highlight');
-        Array.from(oldHighlights).forEach(function(oldHighlights) {
+        const oldHighlights = document.getElementsByClassName("extension-highlight");
+        Array.from(oldHighlights).forEach(function (oldHighlights) {
             oldHighlights.style.backgroundColor = "inherit";
             oldHighlights.style.color = "inherit";
         });
-        highlightRevisionBetweenDates(title, now, date);
+
+        // update revision ids
+        curRevisionId = (await fetchRevisionFromDate(title, now))[0];
+        oldRevisionId = (await fetchRevisionFromDate(title, date))[0];
+
+        highlightRevisionBetweenRevisionIds(title, curRevisionId, oldRevisionId);
+        revisionButton.disabled = false;
     });
 
+    revisionButton.addEventListener("click", async function (ev) {
+        try {
+            window.open(getRevisionPageLink(curRevisionId, oldRevisionId), "_blank");
+        } catch (err) {
+            console.error(
+                `Error getting revision link between revision ids for inputs title:${title} curRevisionId:${curRevisionId} oldRevisionId:${oldRevisionId}\nError: ${err}`
+            );
+        }
+    });
 };
 
 renderGraphOverlay();
@@ -137,14 +159,14 @@ const renderLoader = () => {
     loader.style.height = "15px";
     loader.style.position = "absolute";
     loader.style.marginLeft = "4px";
-    loader.style.display = "inline-block"
+    loader.style.display = "inline-block";
     loader.style.animation = "spin 2s linear infinite";
 
     let keyframes = `@keyframes spin {
         0% { transform: rotate(0deg); }
         100% { transform: rotate(360deg); }
     }`;
-    let style = document.createElement('style');
+    let style = document.createElement("style");
     style.innerHTML = keyframes;
     document.head.appendChild(style);
 };
@@ -317,17 +339,15 @@ renderDeleteAlert();
  * Highlight the current page to a revision on a given date
  *
  * @param {string} title of the wikipedia page
- * @param {Date} curDate to highlight on
- * @param {Date} oldDate to compare reivion on curDate to
+ * @param {string} curRevisionId to highlight on
+ * @param {string} oldRevisionId to compare reivion on curDate to
  */
-const highlightRevisionBetweenDates = async (title, curDate, oldDate) => {
-    const curRevisionId = (await fetchRevisionFromDate(title, curDate))[0];
-    const oldRevisionId = (await fetchRevisionFromDate(title, oldDate))[0];
+const highlightRevisionBetweenRevisionIds = async (title, curRevisionId, oldRevisionId) => {
     try {
         highlight(curRevisionId, oldRevisionId);
     } catch (err) {
         console.error(
-            `Error highlighting revisions between dates for inputs title:${title} curDate:${curDate} oldDate:${oldDate}\nError: ${err}`
+            `Error highlighting revisions between revition ids for inputs title:${title} curRevisionId:${curRevisionId} oldRevisionId:${oldRevisionId}\nError: ${err}`
         );
     }
 };
