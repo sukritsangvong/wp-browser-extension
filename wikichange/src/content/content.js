@@ -104,6 +104,8 @@ const renderSlider = async (creationDate) => {
 
     button.addEventListener("click", async function (ev) {
         document.getElementById("loader").style.display = "inline-block";
+        button.disabled = true;
+
         let spanClosestRev = document.getElementById("closesRev");
         let date = new Date(dateInput.value);
         spanClosestRev.innerHTML = (await fetchRevisionFromDate(title, date))[1].slice(0, 10);
@@ -124,6 +126,9 @@ renderGraphOverlay();
  * Render a simple JS loader by the highlight button
  */
 const renderLoader = () => {
+    let button = document.getElementById("highlightButton");
+    button.disabled = true;
+
     let loader = document.getElementById("loader");
     loader.style.border = "5px solid #f3f3f3";
     loader.style.borderTop = "5px solid #3498db";
@@ -338,5 +343,7 @@ const highlight = async (revisionId, oldRevisionId) => {
     arr.forEach((element) => {
         highlightContentUsingNodes(element, "#AFE1AF");
     });
+    let button = document.getElementById("highlightButton");
+    button.disabled = false;
     document.getElementById("loader").style.display = "none";
 };
