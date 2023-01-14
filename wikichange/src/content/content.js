@@ -77,10 +77,13 @@ const renderSlider = async (creationDate) => {
                             <br/><input type="date" value="${initialDate
                                 .toISOString()
                                 .slice(0, 10)}" id="dateOutput" name="dateOutput" style="text-align: center;"> 
-                                <button id = "highlightButton">Highlight</button><p id="revisionDate">Showing highlight for closest revision (<b>date: <span id="closesRev">
+                                <button id = "highlightButton">Highlight</button> <div id="loader"></div>
+                                <p id="revisionDate">Showing highlight for closest revision (<b>date: <span id="closesRev">
                                 ${(await fetchRevisionFromDate(title, initialDate))[1].slice(0, 10)}</span></b>)</p>`;
     sliderDiv.style.cssText = "text-align:center;";
     insertAfter(sliderDiv, viewsEditsChart);
+
+    renderLoader();
 
     let slider = document.getElementById("graphSlider");
     let dateInput = document.getElementById("dateOutput");
@@ -100,15 +103,51 @@ const renderSlider = async (creationDate) => {
     });
 
     button.addEventListener("click", async function (ev) {
+        document.getElementById("loader").style.display = "inline-block";
+        button.disabled = true;
+
         let spanClosestRev = document.getElementById("closesRev");
         let date = new Date(dateInput.value);
         spanClosestRev.innerHTML = (await fetchRevisionFromDate(title, date))[1].slice(0, 10);
 
+        let oldHighlights = document.getElementsByClassName('extension-highlight');
+        Array.from(oldHighlights).forEach(function(oldHighlights) {
+            oldHighlights.style.backgroundColor = "inherit";
+            oldHighlights.style.color = "inherit";
+        });
         highlightRevisionBetweenDates(title, now, date);
     });
+
 };
 
 renderGraphOverlay();
+
+/**
+ * Render a simple JS loader by the highlight button
+ */
+const renderLoader = () => {
+    let button = document.getElementById("highlightButton");
+    button.disabled = true;
+
+    let loader = document.getElementById("loader");
+    loader.style.border = "5px solid #f3f3f3";
+    loader.style.borderTop = "5px solid #3498db";
+    loader.style.borderRadius = "50%";
+    loader.style.width = "15px";
+    loader.style.height = "15px";
+    loader.style.position = "absolute";
+    loader.style.marginLeft = "4px";
+    loader.style.display = "inline-block"
+    loader.style.animation = "spin 2s linear infinite";
+
+    let keyframes = `@keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }`;
+    let style = document.createElement('style');
+    style.innerHTML = keyframes;
+    document.head.appendChild(style);
+};
 
 /**
  * Once we have the Wikipedia's page creation date, we render the slider
@@ -132,7 +171,7 @@ const highlightContent = (text, color) => {
     if (index >= 0) {
         innerHTML =
             innerHTML.substring(0, index) +
-            `<mark style='background-color: ${color}'>` +
+            `<mark style='background-color: ${color}' class='extension-highlight'>` +
             innerHTML.substring(index, index + text.length) +
             "</mark>" +
             innerHTML.substring(index + text.length);
@@ -163,7 +202,7 @@ const highlightContentWithContext = (json, color) => {
         if (afterText === after && beforeText === before) {
             innerHTML =
                 innerHTML.substring(0, foundIndex) +
-                `<mark style='background-color: ${color}'>` +
+                `<mark style='background-color: ${color}' class='extension-highlight'>` +
                 innerHTML.substring(foundIndex, foundIndex + highlight.length) +
                 "</mark>" +
                 innerHTML.substring(foundIndex + highlight.length);
@@ -186,6 +225,8 @@ const highlightContentWithContext = (json, color) => {
  * @param {string} color of the highlight
  */
 const highlightContentUsingNodes = (context, color) => {
+    context.highlight = context.highlight.trim();
+
     let textNodes = [];
     let walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
 
@@ -200,7 +241,7 @@ const highlightContentUsingNodes = (context, color) => {
         let value = node.nodeValue;
         newValue = value.replace(
             context.highlight,
-            `<mark style='background-color: ${color}'>${context.highlight}</mark>`
+            `<mark style='background-color: ${color}' class='extension-highlight'>${context.highlight}</mark>`
         );
 
         if (newValue !== value) {
@@ -302,4 +343,7 @@ const highlight = async (revisionId, oldRevisionId) => {
     arr.forEach((element) => {
         highlightContentUsingNodes(element, "#AFE1AF");
     });
+    let button = document.getElementById("highlightButton");
+    button.disabled = false;
+    document.getElementById("loader").style.display = "none";
 };
