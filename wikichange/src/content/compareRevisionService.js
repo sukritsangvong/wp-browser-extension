@@ -100,4 +100,13 @@ const fetchRevisionFromDate = async (title, date) => {
     }
 };
 
-export { fetchChangeWithHTML, fetchRevisionFromDate };
+/**
+ * @param {string} currentRevisionId of id to be highlighted on
+ * @param {string} oldRevisionId of id to be compared to
+ * @returns
+ */
+const getRevisionPageLink = (currentRevisionId, oldRevisionId) => {
+    return `https://en.wikipedia.org/w/index.php?title=Pasta&diff=${currentRevisionId}&oldid=${oldRevisionId}`;
+};
+
+export { fetchChangeWithHTML, fetchRevisionFromDate, getRevisionPageLink };
