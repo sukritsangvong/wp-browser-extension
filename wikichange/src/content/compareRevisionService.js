@@ -11,6 +11,12 @@ const fetchChangeWithHTML = async (startID, endID) => {
         return node.parentElement;
     });
 
+    const allDivs = document.querySelectorAll("div");
+    const divsWithNoInsOuts = [...allDivs].filter((curDiv) => {
+        return curDiv.querySelectorAll("ins.diffchange.diffchange-inline,del.diffchange.diffchange-inline").length == 0;
+    });
+    divsWithNoInsOuts.forEach((x) => console.log(x.innerHTML));
+
     // Removes duplicate divs
     const divsWithIns = divsWithInsWithDuplicate.filter(
         (v, i, a) => a.findIndex((v2) => v2.innerHTML === v.innerHTML) === i
@@ -48,6 +54,10 @@ const fetchChangeWithHTML = async (startID, endID) => {
             highlight = "";
             contentAfter = "";
         }
+    });
+
+    divsWithNoInsOuts.forEach((curDiv) => {
+        addJsonToResultAndReset(result, "", curDiv.innerText, "");
     });
     return result;
 };
