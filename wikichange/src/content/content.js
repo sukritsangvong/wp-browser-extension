@@ -360,9 +360,11 @@ const highlightRevisionBetweenRevisionIds = async (title, curRevisionId, oldRevi
  */
 const highlight = async (revisionId, oldRevisionId) => {
     const arr = await fetchChangeWithHTML(oldRevisionId, revisionId);
+    console.groupCollapsed('highlight-messages');
     arr.forEach((element) => {
         highlightContentUsingNodes(element, "#AFE1AF");
     });
+    console.groupEnd();
     let button = document.getElementById("highlightButton");
     button.disabled = false;
     document.getElementById("loader").style.display = "none";

@@ -35,7 +35,10 @@
 			],
 			"js": [
 				"content.js"
-			]
+			],
+            "css": [
+                "assets/content.css"
+            ]
 		}
 	]
 }

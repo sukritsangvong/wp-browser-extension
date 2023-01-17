@@ -46,7 +46,7 @@
             },
             {
                 "name": "content",
-                "src": "./src/content/*.js"
+                "src": "./src/content/root.js"
             },
             {
                 "name": "popup",
