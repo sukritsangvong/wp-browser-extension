@@ -1,3 +1,4 @@
+import { map } from "./tagEveryWord";
 const stylesheet = document.createElement('style');
 document.head.append(stylesheet);
 
@@ -7,13 +8,25 @@ document.head.append(stylesheet);
  * @param {int} end of the indexes to highligh (inclusive)
  */
 const markPage = (start, end) => {
-    let style = '';
-    for(let i = start; i <= end; i++) {
-        style += `mark#mark-${i} {
+    let prevStart = 0;
+    let intermediary = [];
+    for(let index in map){
+        if(index <= start){
+            prevStart = index;
+        } else {
+            intermediary.push(index);
+        }
+        if(index > end){
+            intermediary.pop();
+            break;
+        }
+    }
+    console.info(intermediary);
+    let style = intermediary.reduce((accumulator, index) => `${accumulator}, mark#mark-${index}`, `mark#mark-${prevStart}`);
+    style = `${style} {
             background-color: yellow;
         }
         `;
-    }
     stylesheet.innerText += style;
 };
 

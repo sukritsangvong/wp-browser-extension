@@ -1,4 +1,4 @@
-import { text } from "./tagEveryChar";
+import { text } from "./tagEveryWord";
 import { markPage, removeMarks } from "./markPage";
 import "./content";
 
