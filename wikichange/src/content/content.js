@@ -35,21 +35,46 @@ const renderGraphOverlay = async () => {
 
     let graphContainer = document.createElement("div");
     graphContainer.setAttribute("id", "graphOverlay");
-
+    graphContainer.setAttribute("text-align", "center");
     let canvas = document.createElement("canvas");
     canvas.style.maxHeight = "200px";
     canvas.id = "viewsEditsChart";
-    graphContainer.style.cssText = "width:75%;height:20%;";
+    graphContainer.style.cssText = "width:100%;height:20%;";
     graphContainer.appendChild(canvas);
-
     floatContainer.appendChild(graphContainer);
 
     let p = document.createElement("p");
     graphContainer.appendChild(p);
 
+    const ctx = canvas.getContext('2d');
+    let percentage = 0;
+    let diff;
+    
+    function progressBar() {
+        const { canvas: { width, height}} = ctx;
+        const angle = Math.PI / 180;
+        diff = ((percentage/100) * angle * 360 * 10).toFixed(2);
+        ctx.clearRect(0, 0, width, height);
+        ctx.fillStyle = 'rgba(54, 162, 235, 1)';
+        ctx.font = 'bold 20px sans-serif';
+        ctx.fillText(`${percentage} %`, width/2, height/2);
+
+        ctx.beginPath();
+        const radius = height*0.4;
+        ctx.strokeStyle = 'rgba(54, 162, 235, 1)';
+        ctx.lineWidth = 10;
+        ctx.arc(width / 2, height /2, radius, angle *270, diff / 10 + angle *270, false);
+        ctx.stroke();
+
+        if (percentage >= 100) {
+            clearTimeout(sim);
+        } 
+        percentage++;
+    };
     let siteSub = document.getElementById("siteSub");
     insertAfter(floatContainer, siteSub);
-    const creationDate = await getPageCreationDate();
+    const creationDate = await getPageCreationDate(title);
+    const sim = setInterval(progressBar, 2);
     injectGraphToPage(title, creationDate, new Date(Date.now()));
 };
 
@@ -65,35 +90,36 @@ const renderSlider = async (creationDate) => {
     let totalDaysDiff = (now.getTime() - creationDate.getTime()) / (1000 * 3600 * 24);
     let viewsEditsChart = document.getElementById("viewsEditsChart");
     let sliderDiv = document.createElement("div");
+    sliderDiv.setAttribute("id", "sliderDiv");
     let initialDate = new Date();
     initialDate.setDate(now.getDate() - totalDaysDiff * 0.5);
 
     let curRevisionId = (await fetchRevisionFromDate(title, now))[0];
     let oldRevisionId = (await fetchRevisionFromDate(title, initialDate))[0];
-
+    console.log(fetchChangeWithHTML(curRevisionId, oldRevisionId));
     highlightRevisionBetweenRevisionIds(title, curRevisionId, oldRevisionId);
 
-    sliderDiv.innerHTML = `<div style="direction: rtl">${now.toISOString().slice(0, 10)}  
-                                <input type="range" id="graphSlider" value="50" min="0" max="100" style="width:60%;">  
-                                ${creationDate.toISOString().slice(0, 10)}
+    sliderDiv.innerHTML = `<div style="padding-left:5%; direction: rtl;">  
+                                <input type="range" id="graphSlider" value="50" min="0" max="100" style="width:90%;">  
                             </div>
-                            <br/><input type="date" value="${initialDate
+                            <input type="date" value="${initialDate
                                 .toISOString()
                                 .slice(0, 10)}" id="dateOutput" name="dateOutput" style="text-align: center;"> 
                                 <button id = "highlightButton">Highlight</button> <div id="loader"></div>
                                 <p></p>
-                                <button id = "revisionButton">Go To Revision Page</button></div>
-                                <p id="revisionDate">Showing highlight for closest revision (<b>date: <span id="closesRev">
-                                ${(await fetchRevisionFromDate(title, initialDate))[1].slice(0, 10)}</span></b>)</p>`;
+                                <div class="card" style="max-width: 100%;border-style: solid;">
+                                    <div class="card-body">
+                                    <p class="card-text" id="revisionContext"> Compared to the <a href=${(getRevisionPageLink(curRevisionId, oldRevisionId))} target="_blank">${(await fetchRevisionFromDate(title, initialDate))[1].toLocaleDateString().slice(0, 10)}</a> version, the current page has 30 differences highlight below</p>
+                                    </div>
+                                </div>`;
     sliderDiv.style.cssText = "text-align:center;";
     insertAfter(sliderDiv, viewsEditsChart);
-
     renderLoader();
 
     const slider = document.getElementById("graphSlider");
     const dateInput = document.getElementById("dateOutput");
     const highlightButton = document.getElementById("highlightButton");
-    const revisionButton = document.getElementById("revisionButton");
+    // const revisionButton = document.getElementById("revisionButton");
 
     slider.addEventListener("change", function (ev) {
         let numDays = parseInt((totalDaysDiff * this.value) / 100);
@@ -111,11 +137,8 @@ const renderSlider = async (creationDate) => {
     highlightButton.addEventListener("click", async function (ev) {
         document.getElementById("loader").style.display = "inline-block";
         highlightButton.disabled = true;
-        revisionButton.disabled = true; // disable until we get new set of revIds
-
-        const spanClosestRev = document.getElementById("closesRev");
+        // revisionButton.disabled = true; // disable until we get new set of revIds
         const date = new Date(dateInput.value);
-        spanClosestRev.innerHTML = (await fetchRevisionFromDate(title, date))[1].slice(0, 10);
 
         const oldHighlights = document.getElementsByClassName("extension-highlight");
         Array.from(oldHighlights).forEach(function (oldHighlights) {
@@ -127,19 +150,22 @@ const renderSlider = async (creationDate) => {
         curRevisionId = (await fetchRevisionFromDate(title, now))[0];
         oldRevisionId = (await fetchRevisionFromDate(title, date))[0];
 
+        // Change the revision context box
+        const revisionContext = document.getElementById("revisionContext");
+        revisionContext.innerHTML = `Compared to the <a href=${(getRevisionPageLink(curRevisionId, oldRevisionId))} target="_blank">${(await fetchRevisionFromDate(title, date))[1].toLocaleDateString().slice(0, 10)}</a> version, the current page has 30 differences highlighted below`;
         highlightRevisionBetweenRevisionIds(title, curRevisionId, oldRevisionId);
-        revisionButton.disabled = false;
+        // revisionButton.disabled = false;
     });
 
-    revisionButton.addEventListener("click", async function (ev) {
-        try {
-            window.open(getRevisionPageLink(curRevisionId, oldRevisionId), "_blank");
-        } catch (err) {
-            console.error(
-                `Error getting revision link between revision ids for inputs title:${title} curRevisionId:${curRevisionId} oldRevisionId:${oldRevisionId}\nError: ${err}`
-            );
-        }
-    });
+    // revisionButton.addEventListener("click", async function (ev) {
+    //     try {
+    //         window.open(getRevisionPageLink(curRevisionId, oldRevisionId), "_blank");
+    //     } catch (err) {
+    //         console.error(
+    //             `Error getting revision link between revision ids for inputs title:${title} curRevisionId:${curRevisionId} oldRevisionId:${oldRevisionId}\nError: ${err}`
+    //         );
+    //     }
+    // });
 };
 
 renderGraphOverlay();
@@ -319,18 +345,18 @@ const highlightContentUsingNodes = (context, color) => {
  * Creates a text container with information about deletions side by side with the graph
  */
 const renderDeleteAlert = () => {
+    // <p id="revisionDate">Highlighting closest revision to <a href=${(getRevisionPageLink(curRevisionId, oldRevisionId))} target="_blank">
+    // ${(await fetchRevisionFromDate(title, initialDate))[1].toLocaleDateString().slice(0, 10)}</a></p>
     let deleteContainer = document.createElement("div");
     deleteContainer.innerHTML = `<div class="card" style="max-width: 18rem;border-style: solid;padding: 0.5rem;float: left;">
                                     <div class="card-body">
-                                    <h5 class="card-title">Deletions</h5>
                                     <p class="card-text">This article had deleted content not shown in this overlay</p>
                                     </div>
                                 </div>`;
     deleteContainer.setAttribute("id", "deleteAlert");
-    deleteContainer.style.cssText = "padding:2.5%;";
 
-    let floatContainer = document.getElementById("floatContainer");
-    floatContainer.append(deleteContainer);
+    let sliderDiv = document.getElementById("sliderDiv");
+    //sliderDiv.append(deleteContainer);
 };
 
 renderDeleteAlert();

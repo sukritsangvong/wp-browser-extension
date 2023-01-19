@@ -15,7 +15,6 @@ const fetchChangeWithHTML = async (startID, endID) => {
     const divsWithNoInsOuts = [...allDivs].filter((curDiv) => {
         return curDiv.querySelectorAll("ins.diffchange.diffchange-inline,del.diffchange.diffchange-inline").length == 0;
     });
-    divsWithNoInsOuts.forEach((x) => console.log(x.innerHTML));
 
     // Removes duplicate divs
     const divsWithIns = divsWithInsWithDuplicate.filter(
@@ -86,7 +85,7 @@ const fetchRevisionFromDate = async (title, date) => {
         const data = await response.json();
         return [
             data["query"]["pages"][0]["revisions"][0]["revid"],
-            data["query"]["pages"][0]["revisions"][0]["timestamp"],
+            new Date(data["query"]["pages"][0]["revisions"][0]["timestamp"]),
         ];
     } catch (err) {
         console.error(
@@ -102,7 +101,7 @@ const fetchRevisionFromDate = async (title, date) => {
         const data = await response.json();
         return [
             data["query"]["pages"][0]["revisions"][0]["revid"],
-            data["query"]["pages"][0]["revisions"][0]["timestamp"],
+            new Date(data["query"]["pages"][0]["revisions"][0]["timestamp"]),
         ];
     } catch (err) {
         console.error(`Error getting revision for older inputs on title:${title} date:${date}\nError: ${err}`);
