@@ -7,7 +7,7 @@ document.head.append(stylesheet);
  * @param {int} start of the indexes to highlight
  * @param {int} end of the indexes to highligh (inclusive)
  */
-const markPage = (start, end) => {
+const markPageWord = (start, end) => {
     let prevStart = 0;
     let intermediary = [];
     for(let index in map){
@@ -37,4 +37,4 @@ const removeMarks = () => {
     stylesheet.innerText = '';
 };
 
-export { markPage, removeMarks };
+export { markPageWord, removeMarks };
