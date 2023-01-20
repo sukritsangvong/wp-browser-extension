@@ -57,7 +57,7 @@ const renderGraphOverlay = async () => {
         ctx.clearRect(0, 0, width, height);
         ctx.fillStyle = 'rgb(54, 162, 235)';
         ctx.font = 'bold 20px sans-serif';
-        ctx.fillText(`${percentage} %`, 0.45*width, 0.5*height);
+        ctx.fillText(`${percentage} %`, 0.475*width, 0.475*height);
 
         ctx.beginPath();
         const radius = height*0.4;
@@ -110,7 +110,7 @@ const renderSlider = async (creationDate) => {
                             <div style= "padding-left: 3%; padding-top: 3%; text-align: center;">
                                 <div class="card" style="border-style: solid;">
                                     <div class="card-body" style="text-align: center;">
-                                    <p class="card-text" id="revisionDate"> Comparing the current Wikipedia page to the <a href=${(getRevisionPageLink(curRevisionId, oldRevisionId))} target="_blank">${(await fetchRevisionFromDate(title, initialDate))[1].toLocaleDateString().slice(0, 10)} version</a> (the closest revision to your chosen time)</p>
+                                    <p class="card-text" id="revisionDate"> Comparing the current Wikipedia page to the <a href=${(getRevisionPageLink(title, curRevisionId, oldRevisionId))} target="_blank">${(await fetchRevisionFromDate(title, initialDate))[1].toLocaleDateString().slice(0, 10)} version</a> (the closest revision to your chosen time)</p>
                                     <p class="card-text"> Newly added texts are highlighted in green, but the deletions are not included </p>
                                     </div>
                                 </div>
@@ -155,14 +155,14 @@ const renderSlider = async (creationDate) => {
 
         // Change the revision context box
         const contextBox = document.getElementById("revisionContext");
-        contextBox.innerHTML = `Comparing the current Wikipedia page to the <a href=${(getRevisionPageLink(curRevisionId, oldRevisionId))} target="_blank">${(await fetchRevisionFromDate(title, date))[1].toLocaleDateString().slice(0, 10)} version</a> (the closest revision to your chosen time) Newly added texts are highlighted in green, but the deletions are not included.`;
+        contextBox.innerHTML = `Comparing the current Wikipedia page to the <a href=${(getRevisionPageLink(title, curRevisionId, oldRevisionId))} target="_blank">${(await fetchRevisionFromDate(title, date))[1].toLocaleDateString().slice(0, 10)} version</a> (the closest revision to your chosen time) Newly added texts are highlighted in green, but the deletions are not included.`;
         highlightRevisionBetweenRevisionIds(title, curRevisionId, oldRevisionId);
         revisionButton.disabled = false;
     });
 
     revisionButton.addEventListener("click", async function (ev) {
         try {
-            window.open(getRevisionPageLink(curRevisionId, oldRevisionId), "_blank");
+            window.open(getRevisionPageLink(title, curRevisionId, oldRevisionId), "_blank");
         } catch (err) {
             console.error(
                 `Error getting revision link between revision ids for inputs title:${title} curRevisionId:${curRevisionId} oldRevisionId:${oldRevisionId}\nError: ${err}`

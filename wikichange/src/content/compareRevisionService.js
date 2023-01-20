@@ -114,8 +114,8 @@ const fetchRevisionFromDate = async (title, date) => {
  * @param {string} oldRevisionId of id to be compared to
  * @returns
  */
-const getRevisionPageLink = (currentRevisionId, oldRevisionId) => {
-    return `https://en.wikipedia.org/w/index.php?title=Pasta&diff=${currentRevisionId}&oldid=${oldRevisionId}`;
+const getRevisionPageLink = (title, currentRevisionId, oldRevisionId) => {
+    return `https://en.wikipedia.org/w/index.php?title=${title}&diff=${currentRevisionId}&oldid=${oldRevisionId}`;
 };
 
 export { fetchChangeWithHTML, fetchRevisionFromDate, getRevisionPageLink };
