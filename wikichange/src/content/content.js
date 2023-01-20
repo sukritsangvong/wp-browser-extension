@@ -35,14 +35,14 @@ const renderGraphOverlay = async () => {
 
     let graphContainer = document.createElement("div");
     graphContainer.setAttribute("id", "graphOverlay");
-    graphContainer.setAttribute("text-align", "center");
+    graphContainer.style.cssText = "text-align:center;width:100%;height:20%;";
+
     let canvas = document.createElement("canvas");
     canvas.style.maxHeight = "200px";
     canvas.id = "viewsEditsChart";
-    graphContainer.style.cssText = "width:100%;height:20%;";
+
     graphContainer.appendChild(canvas);
     floatContainer.appendChild(graphContainer);
-
     let p = document.createElement("p");
     graphContainer.appendChild(p);
 
@@ -55,13 +55,13 @@ const renderGraphOverlay = async () => {
         const angle = Math.PI / 180;
         diff = ((percentage/100) * angle * 360 * 10).toFixed(2);
         ctx.clearRect(0, 0, width, height);
-        ctx.fillStyle = 'rgba(54, 162, 235, 1)';
+        ctx.fillStyle = 'rgb(54, 162, 235)';
         ctx.font = 'bold 20px sans-serif';
-        ctx.fillText(`${percentage} %`, width/2, height/2);
+        ctx.fillText(`${percentage} %`, 0.45*width, 0.5*height);
 
         ctx.beginPath();
         const radius = height*0.4;
-        ctx.strokeStyle = 'rgba(54, 162, 235, 1)';
+        ctx.strokeStyle = 'rgb(54, 162, 235)';
         ctx.lineWidth = 10;
         ctx.arc(width / 2, height /2, radius, angle *270, diff / 10 + angle *270, false);
         ctx.stroke();
@@ -74,7 +74,7 @@ const renderGraphOverlay = async () => {
     let siteSub = document.getElementById("siteSub");
     insertAfter(floatContainer, siteSub);
     const creationDate = await getPageCreationDate(title);
-    const sim = setInterval(progressBar, 2);
+    const sim = setInterval(progressBar, 3);
     injectGraphToPage(title, creationDate, new Date(Date.now()));
 };
 
@@ -96,7 +96,6 @@ const renderSlider = async (creationDate) => {
 
     let curRevisionId = (await fetchRevisionFromDate(title, now))[0];
     let oldRevisionId = (await fetchRevisionFromDate(title, initialDate))[0];
-    console.log(fetchChangeWithHTML(curRevisionId, oldRevisionId));
     highlightRevisionBetweenRevisionIds(title, curRevisionId, oldRevisionId);
 
     sliderDiv.innerHTML = `<div style="padding-left:5%; direction: rtl;">  
@@ -107,11 +106,15 @@ const renderSlider = async (creationDate) => {
                                 .slice(0, 10)}" id="dateOutput" name="dateOutput" style="text-align: center;"> 
                                 <button id = "highlightButton">Highlight</button> <div id="loader"></div>
                                 <p></p>
-                                <div class="card" style="max-width: 100%;border-style: solid;">
-                                    <div class="card-body">
-                                    <p class="card-text" id="revisionContext"> Compared to the <a href=${(getRevisionPageLink(curRevisionId, oldRevisionId))} target="_blank">${(await fetchRevisionFromDate(title, initialDate))[1].toLocaleDateString().slice(0, 10)}</a> version, the current page has 30 differences highlight below</p>
+                                <button id = "revisionButton">Go To Revision Page</button>
+                            <div style= "padding-left: 3%; padding-top: 3%; text-align: center;">
+                                <div class="card" style="border-style: solid;">
+                                    <div class="card-body" style="text-align: center;">
+                                    <p class="card-text" id="revisionDate"> Comparing the current Wikipedia page to the <a href=${(getRevisionPageLink(curRevisionId, oldRevisionId))} target="_blank">${(await fetchRevisionFromDate(title, initialDate))[1].toLocaleDateString().slice(0, 10)} version</a> (the closest revision to your chosen time)</p>
+                                    <p class="card-text"> Newly added texts are highlighted in green, but the deletions are not included </p>
                                     </div>
-                                </div>`;
+                                </div>
+                            </div>`;
     sliderDiv.style.cssText = "text-align:center;";
     insertAfter(sliderDiv, viewsEditsChart);
     renderLoader();
@@ -119,7 +122,7 @@ const renderSlider = async (creationDate) => {
     const slider = document.getElementById("graphSlider");
     const dateInput = document.getElementById("dateOutput");
     const highlightButton = document.getElementById("highlightButton");
-    // const revisionButton = document.getElementById("revisionButton");
+    const revisionButton = document.getElementById("revisionButton");
 
     slider.addEventListener("change", function (ev) {
         let numDays = parseInt((totalDaysDiff * this.value) / 100);
@@ -137,7 +140,7 @@ const renderSlider = async (creationDate) => {
     highlightButton.addEventListener("click", async function (ev) {
         document.getElementById("loader").style.display = "inline-block";
         highlightButton.disabled = true;
-        // revisionButton.disabled = true; // disable until we get new set of revIds
+        revisionButton.disabled = true; // disable until we get new set of revIds
         const date = new Date(dateInput.value);
 
         const oldHighlights = document.getElementsByClassName("extension-highlight");
@@ -151,21 +154,21 @@ const renderSlider = async (creationDate) => {
         oldRevisionId = (await fetchRevisionFromDate(title, date))[0];
 
         // Change the revision context box
-        const revisionContext = document.getElementById("revisionContext");
-        revisionContext.innerHTML = `Compared to the <a href=${(getRevisionPageLink(curRevisionId, oldRevisionId))} target="_blank">${(await fetchRevisionFromDate(title, date))[1].toLocaleDateString().slice(0, 10)}</a> version, the current page has 30 differences highlighted below`;
+        const contextBox = document.getElementById("revisionContext");
+        contextBox.innerHTML = `Comparing the current Wikipedia page to the <a href=${(getRevisionPageLink(curRevisionId, oldRevisionId))} target="_blank">${(await fetchRevisionFromDate(title, date))[1].toLocaleDateString().slice(0, 10)} version</a> (the closest revision to your chosen time) Newly added texts are highlighted in green, but the deletions are not included.`;
         highlightRevisionBetweenRevisionIds(title, curRevisionId, oldRevisionId);
-        // revisionButton.disabled = false;
+        revisionButton.disabled = false;
     });
 
-    // revisionButton.addEventListener("click", async function (ev) {
-    //     try {
-    //         window.open(getRevisionPageLink(curRevisionId, oldRevisionId), "_blank");
-    //     } catch (err) {
-    //         console.error(
-    //             `Error getting revision link between revision ids for inputs title:${title} curRevisionId:${curRevisionId} oldRevisionId:${oldRevisionId}\nError: ${err}`
-    //         );
-    //     }
-    // });
+    revisionButton.addEventListener("click", async function (ev) {
+        try {
+            window.open(getRevisionPageLink(curRevisionId, oldRevisionId), "_blank");
+        } catch (err) {
+            console.error(
+                `Error getting revision link between revision ids for inputs title:${title} curRevisionId:${curRevisionId} oldRevisionId:${oldRevisionId}\nError: ${err}`
+            );
+        }
+    });
 };
 
 renderGraphOverlay();
@@ -340,26 +343,6 @@ const highlightContentUsingNodes = (context, color) => {
     });
     return wiki_page_id;
 })();
-
-/**
- * Creates a text container with information about deletions side by side with the graph
- */
-const renderDeleteAlert = () => {
-    // <p id="revisionDate">Highlighting closest revision to <a href=${(getRevisionPageLink(curRevisionId, oldRevisionId))} target="_blank">
-    // ${(await fetchRevisionFromDate(title, initialDate))[1].toLocaleDateString().slice(0, 10)}</a></p>
-    let deleteContainer = document.createElement("div");
-    deleteContainer.innerHTML = `<div class="card" style="max-width: 18rem;border-style: solid;padding: 0.5rem;float: left;">
-                                    <div class="card-body">
-                                    <p class="card-text">This article had deleted content not shown in this overlay</p>
-                                    </div>
-                                </div>`;
-    deleteContainer.setAttribute("id", "deleteAlert");
-
-    let sliderDiv = document.getElementById("sliderDiv");
-    //sliderDiv.append(deleteContainer);
-};
-
-renderDeleteAlert();
 
 /**
  * Highlight the current page to a revision on a given date
