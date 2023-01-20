@@ -19,16 +19,7 @@ const CHART_COLORS = {
  * @param {string} title of the article
  * @param {Date} startDate
  * @param {Date} endDate
- * Tooltip.positioners.myCustomPositioner = function(elements, eventPosition) {
-    // A reference to the tooltip model
-    const tooltip = this;
-
-
-    return {
-        x: 0,
-        y: 0
-    };
-};
+ * 
  */
  
 const injectGraphToPage = async (title, startDate, endDate) => {

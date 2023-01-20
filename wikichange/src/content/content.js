@@ -220,7 +220,6 @@ const highlightContentWithContext = (json, color) => {
             foundIndex + highlight.length + after.length
         );
         let beforeText = innerHTML.substring(foundIndex - before.length, foundIndex);
-
         if (afterText === after && beforeText === before) {
             innerHTML =
                 innerHTML.substring(0, foundIndex) +
@@ -318,12 +317,14 @@ const highlightContentUsingNodes = (context, color) => {
 /**
  * Creates a text container with information about deletions side by side with the graph
  */
-const renderDeleteAlert = () => {
+const renderDeleteAlert = (count) => {
     let deleteContainer = document.createElement("div");
     deleteContainer.innerHTML = `<div class="card" style="max-width: 18rem;border-style: solid;padding: 0.5rem;float: left;">
                                     <div class="card-body">
-                                    <h5 class="card-title">Deletions</h5>
-                                    <p class="card-text">This article had deleted content not shown in this overlay</p>
+                                    <h5 class="card-title">Highlights</h5>
+                                    <p class="card-text">This article had ` +
+        count +
+        ` terms highlighted.</p>
                                     </div>
                                 </div>`;
     deleteContainer.setAttribute("id", "deleteAlert");
@@ -333,7 +334,6 @@ const renderDeleteAlert = () => {
     floatContainer.append(deleteContainer);
 };
 
-renderDeleteAlert();
 
 /**
  * Highlight the current page to a revision on a given date
@@ -344,7 +344,9 @@ renderDeleteAlert();
  */
 const highlightRevisionBetweenRevisionIds = async (title, curRevisionId, oldRevisionId) => {
     try {
-        highlight(curRevisionId, oldRevisionId);
+        highlight(curRevisionId, oldRevisionId).then(changesArr => {
+            renderDeleteAlert(changesArr.length);
+        });
     } catch (err) {
         console.error(
             `Error highlighting revisions between revition ids for inputs title:${title} curRevisionId:${curRevisionId} oldRevisionId:${oldRevisionId}\nError: ${err}`
