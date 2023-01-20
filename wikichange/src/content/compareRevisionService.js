@@ -15,7 +15,6 @@ const fetchChangeWithHTML = async (startID, endID) => {
     const divsWithNoInsOuts = [...allDivs].filter((curDiv) => {
         return curDiv.querySelectorAll("ins.diffchange.diffchange-inline,del.diffchange.diffchange-inline").length == 0;
     });
-    divsWithNoInsOuts.forEach((x) => console.log(x.innerHTML));
 
     // Removes duplicate divs
     const divsWithIns = divsWithInsWithDuplicate.filter(

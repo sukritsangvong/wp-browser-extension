@@ -111,4 +111,37 @@ const pastaRevisionResponse = await getPageRevisionCountTimeseries(
 */
 ```
 
+### How to use the highlight functions
+## The Char Version vs Word Version
+To run the char version import the following in root.js or a file that is eventually imported in root.js to get the marks created in the html.
+```javascript
+import { text } from "./tagEveryChar";
+import { markPageChar, removeMarks } from "./markPageChar";
+``` 
+
+To run the word version import the following in root.js or a file that is eventually imported in root.js to get the marks created in the html.
+```javascript
+import { text } from "./tagEveryWord";
+import { markPageWord, removeMarks } from "./markPageWord";
+``` 
+
+Make sure that not both are being used at the same time and for best performance disable the old highlighting mechanism, which is easiest done by commenting out
+```javascript
+import "./content";
+```
+in root.js. Note, this will disable the graph as well.
+
+## Testing Code
+
+```javascript
+console.info(text.substring(0, 21));
+console.info(text.substring(50, 91));
+markPageChar(0, 20); // Works with markPageWord
+markPageChar(50, 90); // Works with markPageWord
+setTimeout(() => {
+    removeMarks();
+    console.warn('mark clear!');
+}, 5500);
+```
+
 ## [Website](https://sukritsangvong.github.io/wp-browser-extension/)
