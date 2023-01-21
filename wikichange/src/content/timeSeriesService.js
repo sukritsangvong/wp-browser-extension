@@ -21,7 +21,7 @@ const formatResponseToTimeseries = (response, startDate, endDate) => {
     const allDates = getDatesBetweenTwoDates(startDate, endDate);
     return {
         x: allDates.map((date) => date.toLocaleDateString()),
-        y: allDates.map((date) => response.get(date.toLocaleDateString()) ?? 0),
+        y: allDates.map((date) => response.get(date.toLocaleDateString()) ?? null),
     };
 };
 
