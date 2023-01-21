@@ -147,6 +147,7 @@ renderGraphOverlay();
 /**
  * Render a simple JS loader by the highlight button
  */
+
 const renderLoader = () => {
     let button = document.getElementById("highlightButton");
     button.disabled = true;
@@ -317,14 +318,15 @@ const highlightContentUsingNodes = (context, color) => {
 /**
  * Creates a text container with information about deletions side by side with the graph
  */
+const deleteContainer = document.createElement("div");
+
 const renderDeleteAlert = (count) => {
-    let deleteContainer = document.createElement("div");
     deleteContainer.innerHTML = `<div class="card" style="max-width: 18rem;border-style: solid;padding: 0.5rem;float: left;">
                                     <div class="card-body">
                                     <h5 class="card-title">Highlights</h5>
                                     <p class="card-text">This article had ` +
         count +
-        ` terms highlighted.</p>
+        ` terms highlighted. These are the revisions that were made on this particular date. </p>
                                     </div>
                                 </div>`;
     deleteContainer.setAttribute("id", "deleteAlert");
@@ -368,4 +370,5 @@ const highlight = async (revisionId, oldRevisionId) => {
     let button = document.getElementById("highlightButton");
     button.disabled = false;
     document.getElementById("loader").style.display = "none";
+    return arr;
 };
