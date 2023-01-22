@@ -85,7 +85,7 @@ const fetchRevisionFromDate = async (title, date) => {
         const data = await response.json();
         return [
             data["query"]["pages"][0]["revisions"][0]["revid"],
-            data["query"]["pages"][0]["revisions"][0]["timestamp"],
+            new Date(data["query"]["pages"][0]["revisions"][0]["timestamp"]),
         ];
     } catch (err) {
         console.error(
@@ -101,7 +101,7 @@ const fetchRevisionFromDate = async (title, date) => {
         const data = await response.json();
         return [
             data["query"]["pages"][0]["revisions"][0]["revid"],
-            data["query"]["pages"][0]["revisions"][0]["timestamp"],
+            new Date(data["query"]["pages"][0]["revisions"][0]["timestamp"]),
         ];
     } catch (err) {
         console.error(`Error getting revision for older inputs on title:${title} date:${date}\nError: ${err}`);
@@ -114,8 +114,8 @@ const fetchRevisionFromDate = async (title, date) => {
  * @param {string} oldRevisionId of id to be compared to
  * @returns
  */
-const getRevisionPageLink = (currentRevisionId, oldRevisionId) => {
-    return `https://en.wikipedia.org/w/index.php?title=Pasta&diff=${currentRevisionId}&oldid=${oldRevisionId}`;
+const getRevisionPageLink = (title, currentRevisionId, oldRevisionId) => {
+    return `https://en.wikipedia.org/w/index.php?title=${title}&diff=${currentRevisionId}&oldid=${oldRevisionId}`;
 };
 
 export { fetchChangeWithHTML, fetchRevisionFromDate, getRevisionPageLink };

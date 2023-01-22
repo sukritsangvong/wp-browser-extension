@@ -75,7 +75,7 @@ const fetchPageRevisions = async (title, startDate, endDate) => {
     while (curJsonResponse.hasOwnProperty("continue")) {
         let continueString = curJsonResponse.continue.rvcontinue;
         const continueResponse = await fetch(
-            `https://en.wikipedia.org/w/api.php?action=query&format=json&prop=revisions&titles=Pasta&formatversion=2&rvprop=timestamp&rvslots=*&rvlimit=500&rvcontinue=${continueString}`
+            `https://en.wikipedia.org/w/api.php?action=query&format=json&prop=revisions&titles=${title}&formatversion=2&rvprop=timestamp&rvslots=*&rvlimit=500&rvcontinue=${continueString}`
         );
 
         curJsonResponse = await continueResponse.json();
