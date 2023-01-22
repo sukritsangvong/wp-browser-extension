@@ -249,6 +249,11 @@ const highlightContentWithContext = (json, color) => {
 const highlightContentUsingNodes = (context, color) => {
     context.highlight = context.highlight.trim();
 
+    if (context.highlight.length == 0) {
+        // This will make it faster, it was picking up a lot of empty highlighting
+        return;
+    }
+
     let textNodes = [];
     let walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
 
@@ -267,27 +272,40 @@ const highlightContentUsingNodes = (context, color) => {
         );
 
         if (newValue !== value) {
-            if (value.includes(context.content_after) || value.includes(context.content_before)) {
+            // Clean up the context.content_after and context.content_before from wiki markup
+            let content_after = context.content_after.replace(/[|=\[\]{}]+|<[^>]*>/g, "");
+            let content_before = context.content_before.replace(/[|=\[\]{}]+|<[^>]*>/g, "");
+            if (value.includes(content_after) || value.includes(content_before)) {
                 // Or because of edge cases, if good context this will almost always work
                 let newNode = document.createElement("span");
                 newNode.innerHTML = newValue;
                 parent.replaceChild(newNode, node);
                 return false;
             } else {
-                // maybe it is a link, check parent's previous and next siblings
+                // Maybe it is a link, check parent's previous and next siblings
                 if (
                     node.parentNode != null &&
                     node.parentNode.nextSibling != null &&
                     node.parentNode.nextSibling.nodeValue != null &&
                     node.parentNode.previousSibling != null &&
                     node.parentNode.previousSibling.nodeValue != null &&
-                    (node.parentNode.nextSibling.nodeValue.includes(context.content_after) ||
-                        node.parentNode.previousSibling.nodeValue.includes(context.content_before))
+                    (node.parentNode.nextSibling.nodeValue.includes(content_after) ||
+                        node.parentNode.previousSibling.nodeValue.includes(content_before))
                 ) {
                     let newNode = document.createElement("span");
                     newNode.innerHTML = newValue;
                     parent.replaceChild(newNode, node);
                     return false;
+                }
+
+                // We can try matching with smaller context, as links or html may be further along blocking
+                let short_content_after = content_after.substring(content_after.length - Math.round(content_after.length*0.1));
+                let short_content_before = content_before.substring(Math.round(content_before.length*0.9));
+                if (value.includes(short_content_after) || value.includes(short_content_before)) {
+                    let newNode = document.createElement("span");
+                    newNode.innerHTML = newValue;
+                    parent.replaceChild(newNode, node);
+                    return false
                 }
             }
         }
