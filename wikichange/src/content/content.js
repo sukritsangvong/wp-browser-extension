@@ -110,7 +110,7 @@ const renderSlider = async (creationDate) => {
                             <div style= "padding-left: 3%; padding-top: 3%; text-align: center;">
                                 <div class="card" style="border-style: solid;">
                                     <div class="card-body" style="text-align: center;">
-                                    <p class="card-text" id="revisionDate"> Comparing the current Wikipedia page to the <a href=${(getRevisionPageLink(title, curRevisionId, oldRevisionId))} target="_blank">${(await fetchRevisionFromDate(title, initialDate))[1].toLocaleDateString().slice(0, 10)} version</a> (the closest revision to your chosen time)</p>
+                                    <p class="card-text" id="revisionDate"> Comparing the current Wikipedia page to the <a href=${getRevisionPageLink(title, curRevisionId, oldRevisionId).replace(/\s/g, "_")} target="_blank">${(await fetchRevisionFromDate(title, initialDate))[1].toLocaleDateString().slice(0, 10)} version</a> (the closest revision to your chosen time)</p>
                                     <p class="card-text"> Newly added texts are highlighted in green, but the deletions are not included </p>
                                     </div>
                                 </div>
@@ -154,8 +154,9 @@ const renderSlider = async (creationDate) => {
         oldRevisionId = (await fetchRevisionFromDate(title, date))[0];
 
         // Change the revision context box
+        console.log(getRevisionPageLink(title, curRevisionId, oldRevisionId))
         const revisionDate = document.getElementById("revisionDate");
-        revisionDate.innerHTML = `Comparing the current Wikipedia page to the <a href=${(getRevisionPageLink(title, curRevisionId, oldRevisionId))} target="_blank">${(await fetchRevisionFromDate(title, date))[1].toLocaleDateString().slice(0, 10)} version</a> (the closest revision to your chosen time)`;
+        revisionDate.innerHTML = `Comparing the current Wikipedia page to the <a href=${getRevisionPageLink(title, curRevisionId, oldRevisionId).replace(/\s/g, "_")} target="_blank">${(await fetchRevisionFromDate(title, date))[1].toLocaleDateString().slice(0, 10)} version</a> (the closest revision to your chosen time)`;
         highlightRevisionBetweenRevisionIds(title, curRevisionId, oldRevisionId);
         revisionButton.disabled = false;
     });
