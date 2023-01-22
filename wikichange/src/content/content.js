@@ -300,7 +300,7 @@ const highlightContentUsingNodes = (context, color) => {
 
                 // We can try matching with smaller context, as links or html may be further along blocking
                 let short_content_after = content_after.substring(content_after.length - Math.round(content_after.length*0.1));
-                let short_content_before = content_before.substring(Math.round(content_before.length*0.8));
+                let short_content_before = content_before.substring(Math.round(content_before.length*0.9));
                 if (value.includes(short_content_after) || value.includes(short_content_before)) {
                     let newNode = document.createElement("span");
                     newNode.innerHTML = newValue;
