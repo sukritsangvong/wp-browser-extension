@@ -112,7 +112,9 @@ const pastaRevisionResponse = await getPageRevisionCountTimeseries(
 ```
 
 ### How to use the highlight functions
+
 ## The Char Version vs Word Version
+
 To run the char version import the following in root.js or a file that is eventually imported in root.js to get the marks created in the html.
 ```javascript
 import { text } from "./tagEveryChar";

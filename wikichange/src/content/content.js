@@ -1,6 +1,7 @@
 import { getPageCreationDate } from "./timeSeriesService.js";
 import injectGraphToPage from "./graph.js";
 import { fetchChangeWithHTML, fetchRevisionFromDate, getRevisionPageLink } from "./compareRevisionService.js";
+import { markPageWord, removeMarks } from "./markPageWord";
 
 /**
  * Inserts a new node after an existing node
@@ -431,6 +432,37 @@ const highlightRevisionBetweenRevisionIds = async (title, curRevisionId, oldRevi
 };
 
 /**
+ * Highlight taking advantage of the page tagging
+ * Right now I don't even use contex, because highlights are suppose to be in order
+ * @param {array of dictionary} context_array 
+ * @param {string} color 
+ */
+const highlightByMatchingMarks = async (context_array, color) => {
+    let foundIndex = -1;
+    let controlIndex = 0;
+    let count = 0;
+    context_array.some(function(context) {
+        console.log(context);
+        let highlight = context["highlight"].trim();
+        if (highlight) {
+            count++;
+            let words = highlight.split(/[|\[\]]+/).filter(Boolean);
+            console.log(words);
+            for (const word in words) {
+                foundIndex = innerHTML.indexOf(word, controlIndex);
+                console.log(foundIndex);
+                markPageWord(foundIndex, word.length);
+                controlIndex = foundIndex + word.length;
+            }
+            if (count == 10) {
+                return true;
+            }
+        }
+    });
+}
+
+
+/**
  * Highlight a page by comparing two revisions
  *
  * @param {int} revisionId of the page that contains highlights
@@ -438,9 +470,10 @@ const highlightRevisionBetweenRevisionIds = async (title, curRevisionId, oldRevi
  */
 const highlight = async (revisionId, oldRevisionId) => {
     const arr = await fetchChangeWithHTML(oldRevisionId, revisionId);
-    arr.forEach((element) => {
-        highlightContentUsingNodes(element, "#AFE1AF");
-    });
+    highlightByMatchingMarks(arr);
+    // arr.forEach((element) => {
+    //     highlightContentUsingNodes(element, "#AFE1AF");
+    // });
     let button = document.getElementById("highlightButton");
     button.disabled = false;
     document.getElementById("loader").style.display = "none";
