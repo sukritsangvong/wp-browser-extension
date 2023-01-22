@@ -66,7 +66,7 @@ const renderGraphOverlay = async () => {
         ctx.arc(width / 2, height /2, radius, angle *270, diff / 10 + angle *270, false);
         ctx.stroke();
 
-        if (percentage >= 100) {
+        if (percentage >= 86) {
             clearTimeout(sim);
         } 
         percentage++;
@@ -104,9 +104,9 @@ const renderSlider = async (creationDate) => {
                             <input type="date" value="${initialDate
                                 .toISOString()
                                 .slice(0, 10)}" id="dateOutput" name="dateOutput" style="text-align: center;"> 
-                                <button id = "highlightButton" style="background-color: white; color: #3366CC; border: 2px solid #3366CC; cursor: pointer;">Highlight</button> <div id="loader"></div>
+                                <button id = "highlightButton">Highlight</button> <div id="loader"></div>
                                 <p></p>
-                                <button id = "revisionButton" style="background-color: white; color: #3366CC; border: 2px solid #3366CC; cursor: pointer;">Go To Revision Page</button>
+                                <button id = "revisionButton">Go To Revision Page</button>
                             <div style= "padding-left: 3%; padding-top: 3%; text-align: center;">
                                 <div class="card" style="border-style: solid;">
                                     <div class="card-body" style="text-align: center;">
@@ -154,7 +154,6 @@ const renderSlider = async (creationDate) => {
         oldRevisionId = (await fetchRevisionFromDate(title, date))[0];
 
         // Change the revision context box
-        console.log(getRevisionPageLink(title, curRevisionId, oldRevisionId))
         const revisionDate = document.getElementById("revisionDate");
         revisionDate.innerHTML = `Comparing the current Wikipedia page to the <a href=${getRevisionPageLink(title, curRevisionId, oldRevisionId).replace(/\s/g, "_")} target="_blank">${(await fetchRevisionFromDate(title, date))[1].toLocaleDateString().slice(0, 10)} version</a> (the closest revision to your chosen time)`;
         highlightRevisionBetweenRevisionIds(title, curRevisionId, oldRevisionId);
