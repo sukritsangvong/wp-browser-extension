@@ -46,36 +46,42 @@ const renderGraphOverlay = async () => {
     let p = document.createElement("p");
     graphContainer.appendChild(p);
 
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     let percentage = 0;
     let diff;
-    
+
     function progressBar() {
-        const { canvas: { width, height}} = ctx;
+        const {
+            canvas: { width, height },
+        } = ctx;
         const angle = Math.PI / 180;
-        diff = ((percentage/100) * angle * 360 * 10).toFixed(2);
+        diff = ((percentage / 100) * angle * 360 * 10).toFixed(2);
         ctx.clearRect(0, 0, width, height);
-        ctx.fillStyle = 'rgb(54, 162, 235)';
-        ctx.font = 'bold 20px sans-serif';
-        ctx.fillText(`${percentage} %`, 0.425*width, 0.525*height);
+        ctx.fillStyle = "rgb(54, 162, 235)";
+        ctx.font = "bold 20px sans-serif";
+        ctx.fillText(`${percentage} %`, 0.425 * width, 0.525 * height);
 
         ctx.beginPath();
-        const radius = height*0.4;
-        ctx.strokeStyle = 'rgb(54, 162, 235)';
+        const radius = height * 0.4;
+        ctx.strokeStyle = "rgb(54, 162, 235)";
         ctx.lineWidth = 10;
-        ctx.arc(width / 2, height /2, radius, angle *270, diff / 10 + angle *270, false);
+        ctx.arc(width / 2, height / 2, radius, angle * 270, diff / 10 + angle * 270, false);
         ctx.stroke();
 
         if (percentage >= 86) {
             clearTimeout(sim);
-        } 
+        }
         percentage++;
-    };
+    }
     let siteSub = document.getElementById("siteSub");
     insertAfter(floatContainer, siteSub);
     const creationDate = await getPageCreationDate(title);
     const sim = setInterval(progressBar, 3);
     injectGraphToPage(title, creationDate, new Date(Date.now()));
+};
+
+const getRevisionToClosestDateText = (pageLink, oldRevisionDate) => {
+    return `Comparing the current Wikipedia page to the <a href=${pageLink} target="_blank">${oldRevisionDate} version</a> (the closest revision to your chosen time)`;
 };
 
 /**
@@ -95,7 +101,9 @@ const renderSlider = async (creationDate) => {
     initialDate.setDate(now.getDate() - totalDaysDiff * 0.5);
 
     let curRevisionId = (await fetchRevisionFromDate(title, now))[0];
-    let oldRevisionId = (await fetchRevisionFromDate(title, initialDate))[0];
+    const oldRevision = await fetchRevisionFromDate(title, initialDate);
+    let oldRevisionId = oldRevision[0];
+    const oldRevisionDate = oldRevision[1].toLocaleDateString().slice(0, 10);
     highlightRevisionBetweenRevisionIds(title, curRevisionId, oldRevisionId);
 
     sliderDiv.innerHTML = `<div style="padding-left:5%; direction: rtl;">  
@@ -110,7 +118,10 @@ const renderSlider = async (creationDate) => {
                             <div style= "padding-left: 3%; padding-top: 3%; text-align: center;">
                                 <div class="card" style="border-style: solid;">
                                     <div class="card-body" style="text-align: center;">
-                                    <p class="card-text" id="revisionDate"> Comparing the current Wikipedia page to the <a href=${getRevisionPageLink(title, curRevisionId, oldRevisionId).replace(/\s/g, "_")} target="_blank">${(await fetchRevisionFromDate(title, initialDate))[1].toLocaleDateString().slice(0, 10)} version</a> (the closest revision to your chosen time)</p>
+                                    <p class="card-text" id="revisionDate"> ${getRevisionToClosestDateText(
+                                        getRevisionPageLink(title, curRevisionId, oldRevisionId).replace(/\s/g, "_"),
+                                        oldRevisionDate
+                                    )} version</a> (the closest revision to your chosen time)</p>
                                     <p class="card-text"> Newly added texts are highlighted in green, but the deletions are not included </p>
                                     </div>
                                 </div>
@@ -151,11 +162,17 @@ const renderSlider = async (creationDate) => {
 
         // update revision ids
         curRevisionId = (await fetchRevisionFromDate(title, now))[0];
-        oldRevisionId = (await fetchRevisionFromDate(title, date))[0];
+        const oldRevision = await fetchRevisionFromDate(title, date);
+        oldRevisionId = oldRevision[0];
+        const oldRevisionDate = oldRevision[1].toLocaleDateString().slice(0, 10);
 
         // Change the revision context box
         const revisionDate = document.getElementById("revisionDate");
-        revisionDate.innerHTML = `Comparing the current Wikipedia page to the <a href=${getRevisionPageLink(title, curRevisionId, oldRevisionId).replace(/\s/g, "_")} target="_blank">${(await fetchRevisionFromDate(title, date))[1].toLocaleDateString().slice(0, 10)} version</a> (the closest revision to your chosen time)`;
+        revisionDate.innerHTML = getRevisionToClosestDateText(
+            getRevisionPageLink(title, curRevisionId, oldRevisionId).replace(/\s/g, "_"),
+            oldRevisionDate
+        );
+
         highlightRevisionBetweenRevisionIds(title, curRevisionId, oldRevisionId);
         revisionButton.disabled = false;
     });
@@ -282,7 +299,7 @@ const highlightContentUsingNodes = (context, color) => {
         // This will make it faster, it was picking up a lot of empty highlighting
         return;
     }
-    
+
     let textNodes = [];
     let walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
 
@@ -329,10 +346,14 @@ const highlightContentUsingNodes = (context, color) => {
                 }
 
                 // We can try matching with smaller context, as links or html may be further along blocking
-                let short_content_after = content_after.slice(0, Math.round(content_after.length*0.1))
-                                            .replace("Cite news", "").trim();
-                let short_content_before = content_before.substring(Math.round(content_before.length*0.9))
-                                            .replace("Cite news", "").trim();
+                let short_content_after = content_after
+                    .slice(0, Math.round(content_after.length * 0.1))
+                    .replace("Cite news", "")
+                    .trim();
+                let short_content_before = content_before
+                    .substring(Math.round(content_before.length * 0.9))
+                    .replace("Cite news", "")
+                    .trim();
                 // As it is short context, we match both after and before for accuracy
                 if (value.includes(short_content_after) && value.includes(short_content_before)) {
                     let newNode = document.createElement("span");
