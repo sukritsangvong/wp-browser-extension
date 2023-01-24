@@ -121,7 +121,7 @@ const renderSlider = async (creationDate) => {
                                     <p class="card-text" id="revisionDate"> ${getRevisionToClosestDateText(
                                         getRevisionPageLink(title, curRevisionId, oldRevisionId).replace(/\s/g, "_"),
                                         oldRevisionDate
-                                    )} version</a> (the closest revision to your chosen time)</p>
+                                    )}</p>
                                     <p class="card-text"> Newly added texts are highlighted in green, but the deletions are not included </p>
                                     </div>
                                 </div>
