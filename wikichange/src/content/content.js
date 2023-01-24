@@ -2,6 +2,7 @@ import { getPageCreationDate } from "./timeSeriesService.js";
 import injectGraphToPage from "./graph.js";
 import { fetchChangeWithHTML, fetchRevisionFromDate, getRevisionPageLink } from "./compareRevisionService.js";
 import { markPageChar, removeMarks  } from "./markPageChar";
+import { text } from "./tagEveryChar";
 
 /**
  * Inserts a new node after an existing node
@@ -444,14 +445,18 @@ const highlightByMatchingMarks = async (context_array, color) => {
         let highlight = context["highlight"].trim();
         if (highlight) {
             let words = highlight.split(" ").filter(Boolean);
-            // for (const word in words) {
-            //     foundIndex = innerHTML.indexOf(word, controlIndex);
-            //     if (foundIndex != -1) {
-            //         markPageChar(foundIndex, foundIndex+word.length);
-            //         controlIndex = foundIndex + word.length;
-            //     }
-            // }
+            for (const word of words) {
+                foundIndex = text.indexOf(word, controlIndex);
+                if (foundIndex != -1) {
+                    markPageChar(foundIndex, foundIndex+word.length);
+                    console.log("Word:", word);
+                    console.log("Text to high", text.substring(foundIndex, foundIndex+word.length));
+                    console.log("Found index:", foundIndex);
+                    controlIndex = foundIndex + word.length;
+                }
+            }
         }
+        return true;
     });
 }
 
