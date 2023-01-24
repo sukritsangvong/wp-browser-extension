@@ -444,7 +444,8 @@ const highlightByMatchingMarks = async (context_array, color) => {
     context_array.forEach(function(context) {
         let highlight = context["highlight"].trim();
         if (highlight) {
-            let words = highlight.split(" ").filter(Boolean);
+            let filter = highlight.replace(/<ref>.*<\/ref>/g, "").replace(/\{\{Cite.*?\}\}/g, "")
+            let words = filter.split(" ").filter(Boolean);
             for (const word of words) {
                 foundIndex = text.indexOf(word, controlIndex);
                 if (foundIndex != -1) {
