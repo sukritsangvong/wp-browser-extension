@@ -1,7 +1,7 @@
 import { getPageCreationDate } from "./timeSeriesService.js";
 import injectGraphToPage from "./graph.js";
 import { fetchChangeWithHTML, fetchRevisionFromDate, getRevisionPageLink } from "./compareRevisionService.js";
-import { markPageWord, removeMarks } from "./markPageWord";
+import { markPageChar, removeMarks  } from "./markPageChar";
 
 /**
  * Inserts a new node after an existing node
@@ -440,23 +440,17 @@ const highlightRevisionBetweenRevisionIds = async (title, curRevisionId, oldRevi
 const highlightByMatchingMarks = async (context_array, color) => {
     let foundIndex = -1;
     let controlIndex = 0;
-    let count = 0;
-    context_array.some(function(context) {
-        console.log(context);
+    context_array.forEach(function(context) {
         let highlight = context["highlight"].trim();
         if (highlight) {
-            count++;
-            let words = highlight.split(/[|\[\]]+/).filter(Boolean);
-            console.log(words);
-            for (const word in words) {
-                foundIndex = innerHTML.indexOf(word, controlIndex);
-                console.log(foundIndex);
-                markPageWord(foundIndex, word.length);
-                controlIndex = foundIndex + word.length;
-            }
-            if (count == 10) {
-                return true;
-            }
+            let words = highlight.split(" ").filter(Boolean);
+            // for (const word in words) {
+            //     foundIndex = innerHTML.indexOf(word, controlIndex);
+            //     if (foundIndex != -1) {
+            //         markPageChar(foundIndex, foundIndex+word.length);
+            //         controlIndex = foundIndex + word.length;
+            //     }
+            // }
         }
     });
 }
