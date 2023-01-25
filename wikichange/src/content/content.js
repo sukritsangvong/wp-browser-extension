@@ -18,8 +18,12 @@ const insertAfter = (newNode, existingNode) => {
  */
 const title = (() => {
     let titleSpan = document.getElementsByClassName("mw-page-title-main");
-    let title = titleSpan[0].innerHTML;
-    return title;
+    if (titleSpan.length == 0) {
+        let url = document.URL.split("/");
+        return url[url.length - 1].replace("_", " ");
+    } else {
+        return titleSpan[0].innerHTML;
+    }
 })();
 
 /**
