@@ -10,7 +10,7 @@ document.head.append(stylesheet);
 const markPageWord = (start, end) => {
     let prevStart = 0;
     let intermediary = [];
-    for(let index in map){
+    for(let index of map){
         if(index <= start){
             prevStart = index;
         } else {
@@ -21,7 +21,6 @@ const markPageWord = (start, end) => {
             break;
         }
     }
-    console.info(intermediary);
     let style = intermediary.reduce((accumulator, index) => `${accumulator}, mark#mark-${index}`, `mark#mark-${prevStart}`);
     style = `${style} {
             background-color: yellow;

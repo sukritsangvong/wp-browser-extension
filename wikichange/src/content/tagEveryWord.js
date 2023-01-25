@@ -3,7 +3,7 @@
  * @return {string} Returns a the concatenated text where each character index matches the mark id 
  */
 const tagEveryWord = () => {
-    const bodyContent = document.getElementById('bodyContent');
+    const bodyContent = document.getElementById('mw-content-text').getElementsByClassName('mw-parser-output')[0];
     const treeWalker = document.createTreeWalker(
         bodyContent,
         NodeFilter.SHOW_TEXT,
@@ -11,6 +11,7 @@ const tagEveryWord = () => {
             if (node.parentElement.tagName === 'STYLE') {
                 return NodeFilter.FILTER_REJECT;
             }
+            // Skip the references
             if (node.parentElement.closest('.reflist')){
                 return NodeFilter.FILTER_REJECT;
             }
