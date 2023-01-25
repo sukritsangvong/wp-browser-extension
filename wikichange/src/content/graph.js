@@ -30,7 +30,7 @@ const injectGraphToPage = async (title, startDate, endDate) => {
             {
                 label: "Views",
                 data: pageViews["y"],
-                borderColor: CHART_COLORS.red,
+                borderColor: CHART_COLORS.grey,
                 yAxisID: "y",
                 borderWidth: 2,
             },
@@ -48,6 +48,11 @@ const injectGraphToPage = async (title, startDate, endDate) => {
         type: "line",
         data: data,
         options: {
+            plugins: {
+                tooltip: {
+                    position: 'nearest'
+                }
+            },
             scales: {
                 y: {
                     type: "linear",
