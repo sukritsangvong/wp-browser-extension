@@ -21,10 +21,11 @@ const title = (() => {
     let title;
     if (titleSpan.length == 0) {
         let url = document.URL.split("/");
-        title = url[url.length - 1];
+        title = url[url.length - 1].replace("_", " ");
     } else {
         title = titleSpan[0].innerHTML;
     }
+    console.log(title);
     return title;
 })();
 
