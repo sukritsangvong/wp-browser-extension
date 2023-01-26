@@ -283,7 +283,7 @@ const returnCleanLink = (text_with_link) => {
  *  context and highlight are links. Loops through the DOM tree text nodes, and if no patial
  *  match, checks if it's a link (parent's siblings may contain the needed text)
  *  Note: Walker code idea and sample use (eg.: document.createTreeWalker and walker.nextNode())
- *  is courtesy of ChatGPT
+ *  and the regex /[|=\[\]{}]+|<[^>]*>/g are courtesy of ChatGPT
  *
  * @param {dictionary} context dictionary entry with keys "content_before", "highlight" and "content_after"
  * @param {string} color of the highlight
@@ -302,7 +302,7 @@ const highlightContentUsingNodes = (context, color) => {
     while (walker.nextNode()) {
         textNodes.push(walker.currentNode);
     }
-    let done = true;
+
     let newValue, node, parent;
     textNodes.every((textNode) => {
         node = textNode;
@@ -310,12 +310,12 @@ const highlightContentUsingNodes = (context, color) => {
         let value = node.nodeValue;
         let filter_highlight = context.highlight.replace(/<ref>.*<\/ref>/g, "").replace(/\{\{Cite.*?\}\}/g, "");
         if (context.highlight.includes("[[") && context.highlight.includes("]]")) {
-            // This includes a link in the content it is supposed to highlight
+            // This includes a link in the content it is supposed to highlight. 
+            // Will highlight only first sentence
             newValue = value.replace(
                 filter_highlight,
-                `<mark style='background-color: orange' class='extension-highlight'>${value}</mark>`
+                `<mark style='background-color: ${color}' class='extension-highlight'>${value}</mark>`
             );
-            done = false; // We still need to highlight the rest of the content after the link
         } else {
             newValue = value.replace(
                 filter_highlight,
