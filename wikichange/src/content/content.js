@@ -1,5 +1,5 @@
 import { getPageCreationDate } from "./timeSeriesService.js";
-import injectGraphToPage from "./graph.js";
+import { injectGraphToPage, injectScaledCurrentGraphToPage } from "./graph.js";
 import { fetchChangeWithHTML, fetchRevisionFromDate, getRevisionPageLink } from "./compareRevisionService.js";
 
 /**
@@ -82,6 +82,45 @@ const renderGraphOverlay = async () => {
     const creationDate = await getPageCreationDate(title);
     const sim = setInterval(progressBar, 3);
     injectGraphToPage(title, creationDate, new Date(Date.now()));
+
+    renderScaleButtons();
+};
+
+const setUpScaleButton = (scaleButtonsDiv, buttonId, buttonText, duration) => {
+    const button = document.createElement("button");
+    button.setAttribute("id", buttonId);
+    button.setAttribute("style", "margin-right: 5px;");
+    button.innerHTML = buttonText;
+    scaleButtonsDiv.appendChild(button);
+
+    button.addEventListener("click", () => {
+        injectScaledCurrentGraphToPage(duration);
+    });
+};
+
+const getDateObjectFromNow = (monthsFromCurrent) => {
+    const date = new Date();
+    date.setMonth(date.getMonth() - monthsFromCurrent);
+    return date;
+};
+
+/**
+ * Render buttons to scale the graph.
+ */
+const renderScaleButtons = () => {
+    const viewsEditsChart = document.getElementById("viewsEditsChart");
+    const scaleButtonsDiv = document.createElement("div");
+    scaleButtonsDiv.setAttribute("id", "scaleButtonsDiv");
+    scaleButtonsDiv.setAttribute("style", "text-align: start;");
+
+    setUpScaleButton(scaleButtonsDiv, "all", "ALL", null); // null represents shows everything
+    setUpScaleButton(scaleButtonsDiv, "3y", "3Y", getDateObjectFromNow(3 * 12));
+    setUpScaleButton(scaleButtonsDiv, "1y", "1Y", getDateObjectFromNow(12));
+    setUpScaleButton(scaleButtonsDiv, "6m", "6M", getDateObjectFromNow(6));
+    setUpScaleButton(scaleButtonsDiv, "3m", "3M", getDateObjectFromNow(3));
+
+    // inserts buttons above graph
+    viewsEditsChart.parentNode.insertBefore(scaleButtonsDiv, viewsEditsChart);
 };
 
 const getRevisionToClosestDateText = (pageLink, oldRevisionDate) => {
