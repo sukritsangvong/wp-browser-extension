@@ -7,4 +7,12 @@ const AggregateType = {
     DAILY: "daily",
 };
 
-export { WIKI_CREATION_DATE, WIKI_PAGE_VIEW_DATA_AVAILABLE_DATE, AggregateType };
+const HighlightType = {
+    NODE: 0,
+    TAGGING_CHAR: 1,
+    TAGGING_WORD: 2
+}
+
+const HIGHLIGHT_TYPE = HighlightType.NODE;
+
+export { WIKI_CREATION_DATE, WIKI_PAGE_VIEW_DATA_AVAILABLE_DATE, AggregateType, HIGHLIGHT_TYPE, HighlightType };

@@ -1,8 +1,9 @@
 import { getPageCreationDate } from "./timeSeriesService.js";
 import injectGraphToPage from "./graph.js";
 import { fetchChangeWithHTML, fetchRevisionFromDate, getRevisionPageLink } from "./compareRevisionService.js";
+import { HighlightType, HIGHLIGHT_TYPE } from "./enums";
 import { markPageChar, removeMarks  } from "./markPageChar";
-import { text } from "./tagEveryChar";
+import { text } from "./root";
 
 /**
  * Inserts a new node after an existing node
@@ -470,10 +471,13 @@ const highlightByMatchingMarks = async (context_array, color) => {
  */
 const highlight = async (revisionId, oldRevisionId) => {
     const arr = await fetchChangeWithHTML(oldRevisionId, revisionId);
-    highlightByMatchingMarks(arr);
-    // arr.forEach((element) => {
-    //     highlightContentUsingNodes(element, "#AFE1AF");
-    // });
+    if (HIGHLIGHT_TYPE == HighlightType.NODE) {
+        arr.forEach((element) => {
+            highlightContentUsingNodes(element, "#AFE1AF");
+        });
+    } else if (HIGHLIGHT_TYPE == HighlightType.TAGGING_CHAR) {
+        highlightByMatchingMarks(arr);
+    }
     let button = document.getElementById("highlightButton");
     button.disabled = false;
     document.getElementById("loader").style.display = "none";
