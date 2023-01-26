@@ -114,6 +114,7 @@ const renderScaleButtons = () => {
     scaleButtonsDiv.setAttribute("style", "text-align: start;");
 
     setUpScaleButton(scaleButtonsDiv, "all", "ALL", null); // null represents shows everything
+    setUpScaleButton(scaleButtonsDiv, "5y", "5Y", getDateObjectFromNow(5 * 12));
     setUpScaleButton(scaleButtonsDiv, "3y", "3Y", getDateObjectFromNow(3 * 12));
     setUpScaleButton(scaleButtonsDiv, "1y", "1Y", getDateObjectFromNow(12));
     setUpScaleButton(scaleButtonsDiv, "6m", "6M", getDateObjectFromNow(6));
@@ -335,7 +336,7 @@ const returnCleanLink = (text_with_link) => {
         return p2 || p1;
     });
     return result;
-}
+};
 
 /**
  *  Highlights the words that are given with context. Support for links,
@@ -370,7 +371,7 @@ const highlightContentUsingNodes = (context, color) => {
         let value = node.nodeValue;
         let filter_highlight = context.highlight.replace(/<ref>.*<\/ref>/g, "").replace(/\{\{Cite.*?\}\}/g, "");
         if (context.highlight.includes("[[") && context.highlight.includes("]]")) {
-            // This includes a link in the content it is supposed to highlight. 
+            // This includes a link in the content it is supposed to highlight.
             // Will highlight only first sentence
             newValue = value.replace(
                 filter_highlight,
