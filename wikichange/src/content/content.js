@@ -325,12 +325,25 @@ const highlightContentWithContext = (json, color) => {
 };
 
 /**
+ * Will clean links. Works with links with different and same titles, for instance
+ * [[text]] and [[text|text]] and return the clean version "text"
+ * @param {string} text_with_link
+ */
+const returnCleanLink = (text_with_link) => {
+    let pattern = /\[\[([^\|]+)\|?([^\]]+)\]\]/g;
+    let result = text_with_link.replace(pattern, (_, p1, p2) => {
+        return p2 || p1;
+    });
+    return result;
+}
+
+/**
  *  Highlights the words that are given with context. Support for links,
  *  there are some edge cases that don't work yet (highlight is link + no link) or
  *  context and highlight are links. Loops through the DOM tree text nodes, and if no patial
  *  match, checks if it's a link (parent's siblings may contain the needed text)
  *  Note: Walker code idea and sample use (eg.: document.createTreeWalker and walker.nextNode())
- *  is courtesy of ChatGPT
+ *  and the regex /[|=\[\]{}]+|<[^>]*>/g are courtesy of ChatGPT
  *
  * @param {dictionary} context dictionary entry with keys "content_before", "highlight" and "content_after"
  * @param {string} color of the highlight
@@ -356,10 +369,19 @@ const highlightContentUsingNodes = (context, color) => {
         parent = node.parentNode;
         let value = node.nodeValue;
         let filter_highlight = context.highlight.replace(/<ref>.*<\/ref>/g, "").replace(/\{\{Cite.*?\}\}/g, "");
-        newValue = value.replace(
-            filter_highlight,
-            `<mark style='background-color: ${color}' class='extension-highlight'>${filter_highlight}</mark>`
-        );
+        if (context.highlight.includes("[[") && context.highlight.includes("]]")) {
+            // This includes a link in the content it is supposed to highlight. 
+            // Will highlight only first sentence
+            newValue = value.replace(
+                filter_highlight,
+                `<mark style='background-color: ${color}' class='extension-highlight'>${value}</mark>`
+            );
+        } else {
+            newValue = value.replace(
+                filter_highlight,
+                `<mark style='background-color: ${color}' class='extension-highlight'>${filter_highlight}</mark>`
+            );
+        }
 
         if (newValue !== value) {
             // Clean up the context.content_after and context.content_before from wiki markup
