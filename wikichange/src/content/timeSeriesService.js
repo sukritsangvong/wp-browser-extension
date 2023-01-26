@@ -1,4 +1,4 @@
-import { AggregateType } from "./enums.js";
+import { WIKI_PAGE_VIEW_DATA_AVAILABLE_DATE, AggregateType } from "./enums.js";
 
 const formatDateToYYYYMMDD = (date) =>
     `${date.getFullYear()}${("0" + (date.getMonth() + 1)).slice(-2)}${("0" + date.getDate()).slice(-2)}`;
@@ -17,11 +17,23 @@ const getDatesBetweenTwoDates = (date1, date2) => {
         .map(() => new Date(currentDate.setDate(currentDate.getDate() + 1)));
 };
 
-const formatResponseToTimeseries = (response, startDate, endDate) => {
+const isDateWhenPageViewDataBecameAvailable = (isPageViewTimeSeries, date) => {
+    return isPageViewTimeSeries && date < WIKI_PAGE_VIEW_DATA_AVAILABLE_DATE;
+};
+
+/**
+ * Format data into Chart.js' input format. If the data is a timeseries for page views, it will
+ * set all the y values of the dates before the API started collecting page views' data to null
+ */
+const formatResponseToTimeseries = (response, startDate, endDate, isPageViewTimeSeries) => {
     const allDates = getDatesBetweenTwoDates(startDate, endDate);
     return {
         x: allDates.map((date) => date.toLocaleDateString()),
-        y: allDates.map((date) => response.get(date.toLocaleDateString()) ?? null),
+        y: allDates.map((date) =>
+            isDateWhenPageViewDataBecameAvailable(isPageViewTimeSeries, date)
+                ? null
+                : response.get(date.toLocaleDateString()) ?? 0
+        ),
     };
 };
 
@@ -179,7 +191,7 @@ const getPageRevisionCount = async (title, startDate, endDate, aggregateType) =>
 const getPageViewTimeseries = async (title, startDate, endDate) => {
     try {
         const pageViewsResponse = await getPageViews(title, startDate, endDate, AggregateType.DAILY);
-        return formatResponseToTimeseries(pageViewsResponse, startDate, endDate);
+        return formatResponseToTimeseries(pageViewsResponse, startDate, endDate, true);
     } catch (err) {
         console.error(
             `Error getting page view timeseries data on title:${title} startDate:${startDate} endDate:${endDate}\nError: ${err.message}`
@@ -199,7 +211,7 @@ const getPageViewTimeseries = async (title, startDate, endDate) => {
 const getPageRevisionCountTimeseries = async (title, startDate, endDate) => {
     try {
         const pageRevisionCountResponse = await getPageRevisionCount(title, startDate, endDate, AggregateType.DAILY);
-        return formatResponseToTimeseries(pageRevisionCountResponse, startDate, endDate);
+        return formatResponseToTimeseries(pageRevisionCountResponse, startDate, endDate, false);
     } catch (err) {
         console.error(
             `Error getting page revision count timeseries data on title:${title} startDate:${startDate} endDate:${endDate}\nError: ${err.message}`
