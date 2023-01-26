@@ -22,7 +22,7 @@ const isDateWhenPageViewDataBecameAvailable = (isPageViewTimeSeries, date) => {
 };
 
 /**
- * Format data into Chart.js' input format. If the data is a timeseries for page views, it will
+ * Formats data into Chart.js' input format. If the data is a timeseries for page views, it will
  * set all the y values of the dates before the API started collecting page views' data to null
  */
 const formatResponseToTimeseries = (response, startDate, endDate, isPageViewTimeSeries) => {
