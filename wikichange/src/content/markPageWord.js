@@ -1,6 +1,14 @@
-import { map } from "./tagEveryWord";
+import { tagEveryWord } from "./tagEveryWord";
+import { HighlightType, HIGHLIGHT_TYPE } from "./enums";
+
 const stylesheet = document.createElement('style');
 document.head.append(stylesheet);
+
+let map = new Map();
+if (HIGHLIGHT_TYPE == HighlightType.TAGGING_WORD) {
+    const results = tagEveryWord();
+    map = results.map;
+}
 
 /**
  * Add a highlight over an index range
