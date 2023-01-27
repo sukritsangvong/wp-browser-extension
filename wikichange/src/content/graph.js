@@ -42,6 +42,17 @@ const makePageViewAndReivisionGraphFromData = (pageViewsData, revisionsData) => 
         type: "line",
         data: data,
         options: {
+            onClick: (e) => {
+                let points = e.chart.getElementsAtEventForMode(e, "nearest", { intersect: true }, true);
+                if (points.length) {
+                    let firstPoint = points[0];
+                    let date = e.chart.data.labels[firstPoint.index];
+                    if (date) {
+                        const slider = document.getElementById("graphSlider");
+                        const dateInput = document.getElementById("dateOutput");
+                    }
+                }
+            },
             plugins: {
                 tooltip: {
                     position: "nearest",
@@ -75,6 +86,9 @@ const makePageViewAndReivisionGraphFromData = (pageViewsData, revisionsData) => 
                 point: {
                     radius: 0,
                 },
+            },
+            interaction: {
+                mode: "nearest",
             },
         },
     };
