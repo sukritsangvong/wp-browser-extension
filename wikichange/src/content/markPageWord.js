@@ -1,21 +1,15 @@
-import { tagEveryWord } from "./tagEveryWord";
-import { HighlightType, HIGHLIGHT_TYPE } from "./enums";
+import { map } from "./tagEveryWord";
 
 const stylesheet = document.createElement('style');
 document.head.append(stylesheet);
-
-let map = new Map();
-if (HIGHLIGHT_TYPE == HighlightType.TAGGING_WORD) {
-    const results = tagEveryWord();
-    map = results.map;
-}
 
 /**
  * Add a highlight over an index range
  * @param {int} start of the indexes to highlight
  * @param {int} end of the indexes to highligh (inclusive)
+ * @param {string} color of the highlight mark
  */
-const markPageWord = (start, end) => {
+const markPageWord = (start, end, color) => {
     let prevStart = 0;
     let intermediary = [];
     for(let index of map){
@@ -31,7 +25,7 @@ const markPageWord = (start, end) => {
     }
     let style = intermediary.reduce((accumulator, index) => `${accumulator}, mark#mark-${index}`, `mark#mark-${prevStart}`);
     style = `${style} {
-            background-color: yellow;
+            background-color: ${color};
         }
         `;
     stylesheet.innerText += style;

@@ -41,5 +41,6 @@ const tagEveryChar = () => {
     }, {"text":'', "index":0}).text;
 }
 
+const text = tagEveryChar();
 
-export { tagEveryChar };
+export { text };

@@ -2,8 +2,7 @@ import { getPageCreationDate } from "./timeSeriesService.js";
 import { injectGraphToPage, injectScaledCurrentGraphToPage } from "./graph.js";
 import { fetchChangeWithHTML, fetchRevisionFromDate, getRevisionPageLink } from "./compareRevisionService.js";
 import { HighlightType, HIGHLIGHT_TYPE } from "./enums";
-import { markPageChar, removeMarks } from "./markPageChar";
-import { text } from "./root";
+import { markContent  } from "./markContent.js";
 
 /**
  * Inserts a new node after an existing node
@@ -391,9 +390,11 @@ const returnCleanLink = (text_with_link) => {
 const highlightContentUsingNodes = (context, color) => {
     context.highlight = context.highlight.trim();
 
+    let highlightSucceeded = false;
+
     if (context.highlight.length == 0) {
         // This will make it faster, it was picking up a lot of empty highlighting
-        return;
+        return highlightSucceeded;
     }
 
     let textNodes = [];
@@ -432,6 +433,7 @@ const highlightContentUsingNodes = (context, color) => {
                 let newNode = document.createElement("span");
                 newNode.innerHTML = newValue;
                 parent.replaceChild(newNode, node);
+                highlightSucceeded = true;
                 return false;
             } else {
                 // Maybe it is a link, check parent's previous and next siblings
@@ -447,6 +449,7 @@ const highlightContentUsingNodes = (context, color) => {
                     let newNode = document.createElement("span");
                     newNode.innerHTML = newValue;
                     parent.replaceChild(newNode, node);
+                    highlightSucceeded = true;
                     return false;
                 }
 
@@ -464,12 +467,14 @@ const highlightContentUsingNodes = (context, color) => {
                     let newNode = document.createElement("span");
                     newNode.innerHTML = newValue;
                     parent.replaceChild(newNode, node);
+                    highlightSucceeded = true;
                     return false;
                 }
             }
         }
         return true;
     });
+    return highlightSucceeded;
 };
 
 /** The page id can be found as the last part of the link to
@@ -509,43 +514,6 @@ const highlightRevisionBetweenRevisionIds = async (title, curRevisionId, oldRevi
     }
 };
 
-/**
- * Highlight taking advantage of the page tagging
- * Right now I don't even use context, because highlights are suppose to be in order
- * @param {array of dictionary} context_array
- * @param {string} color
- */
-const highlightByMatchingMarks = async (context_array, color) => {
-    let foundIndex = -1;
-    let controlIndex = 0;
-    context_array.forEach((context) => {
-        let highlight = context["highlight"].trim();
-        if (highlight) {
-            let filter = highlight.replace(/<ref>.*<\/ref>/g, "").replace(/\{\{Cite.*?\}\}/g, "");
-            let words = filter.split(" ").filter(Boolean);
-            for (const word of words) {
-                foundIndex = text.indexOf(word, controlIndex);
-                if (foundIndex != -1 && highlight.length > 5) {
-                    markPageChar(foundIndex, foundIndex + word.length);
-                    controlIndex = foundIndex + word.length;
-                } else if (foundIndex != -1) {
-                    let before = context["content_before"];
-                    let after = context["content_after"];
-                    let afterText = text.substring(
-                        foundIndex + highlight.length,
-                        foundIndex + highlight.length + after.length
-                    );
-                    let beforeText = text.substring(foundIndex - before.length, foundIndex);
-                    if (afterText === after && beforeText === before) {
-                        markPageChar(foundIndex, foundIndex + word.length);
-                        controlIndex = foundIndex + word.length;
-                    }
-                }
-            }
-        }
-        return true;
-    });
-};
 
 /**
  * Highlight a page by comparing two revisions
@@ -556,11 +524,34 @@ const highlightByMatchingMarks = async (context_array, color) => {
 const highlight = async (revisionId, oldRevisionId) => {
     const arr = await fetchChangeWithHTML(oldRevisionId, revisionId);
     if (HIGHLIGHT_TYPE == HighlightType.NODE) {
-        arr.forEach((element) => {
-            highlightContentUsingNodes(element, "#AFE1AF");
+        const succeed = [];
+        const fail = [];
+        for(let element of arr){
+            if(highlightContentUsingNodes(element, "#AFE1AF")){
+                succeed.push(element);
+            } else {
+                fail.push(element);
+            }
+        }
+        console.info(succeed.length);
+        console.groupCollapsed('succeed');
+        console.info(succeed);
+        console.groupEnd();
+
+        console.groupCollapsed('fail');
+        console.info(fail);
+        console.groupEnd();
+    } else {
+        markContent(arr, "#AFE1AF").then(({ succeed, fail }) => {
+            console.info(succeed.length);
+            console.groupCollapsed('succeed');
+            console.info(succeed);
+            console.groupEnd();
+
+            console.groupCollapsed('fail');
+            console.info(fail);
+            console.groupEnd();
         });
-    } else if (HIGHLIGHT_TYPE == HighlightType.TAGGING_CHAR) {
-        highlightByMatchingMarks(arr);
     }
     let button = document.getElementById("highlightButton");
     button.disabled = false;
