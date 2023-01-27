@@ -1,4 +1,4 @@
-mark{
+mark {
     background-color: transparent;
     color: inherit;
 }
@@ -13,12 +13,12 @@ button {
 button:hover {
     background-color: #3366CC;
     color: white;
-  }
+}
 
-button:disabled{
+button:disabled {
     cursor: not-allowed;
     pointer-events: none;
     border: 2px solid #999999;
     background-color: #cccccc;
     color: #999999;
-  }
+}

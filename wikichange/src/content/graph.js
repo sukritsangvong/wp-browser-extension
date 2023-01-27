@@ -30,7 +30,8 @@ const injectGraphToPage = async (title, startDate, endDate) => {
             {
                 label: "Views",
                 data: pageViews["y"],
-                borderColor: CHART_COLORS.grey,
+                borderColor: "#a9a9a9",
+                backgroundColor: "#a9a9a9",
                 yAxisID: "y",
                 borderWidth: 2,
             },
@@ -38,6 +39,7 @@ const injectGraphToPage = async (title, startDate, endDate) => {
                 label: "Edits",
                 data: revisions["y"],
                 borderColor: CHART_COLORS.blue,
+                backgroundColor: CHART_COLORS.blue,
                 yAxisID: "y1",
                 borderWidth: 2,
             },

@@ -119,7 +119,7 @@ const renderSlider = async (creationDate) => {
                                 <button id = "highlightButton">Highlight</button> <div id="loader"></div>
                                 <p></p>
                                 <button id = "revisionButton">Go To Revision Page</button>
-                            <div style= "padding-left: 3%; padding-top: 3%; text-align: center;">
+                            <div style="padding-left: 3%; padding-top: 3%; text-align: center;">
                                 <div class="card" style="border-style: solid;">
                                     <div class="card-body" style="text-align: center;">
                                     <p class="card-text" id="revisionDate"> ${getRevisionToClosestDateText(
