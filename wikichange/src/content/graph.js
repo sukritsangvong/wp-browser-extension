@@ -11,6 +11,8 @@ const CHART_COLORS = {
     grey: "rgb(201, 203, 207)",
 };
 
+let chart;
+
 /**
  * Injects a graph of a given article's page views and edits data.
  *
@@ -48,6 +50,17 @@ const injectGraphToPage = async (title, startDate, endDate) => {
         type: "line",
         data: data,
         options: {
+            onClick: (e) => {
+                let points = e.chart.getElementsAtEventForMode(e, 'nearest', { intersect: true }, true)
+                if (points.length) {
+                    let firstPoint = points[0];
+                    let date = e.chart.data.labels[firstPoint.index];
+                    if (date) {
+                        const slider = document.getElementById("graphSlider");
+                        const dateInput = document.getElementById("dateOutput");
+                    }
+                }
+            },
             plugins: {
                 tooltip: {
                     position: 'nearest'
@@ -82,10 +95,12 @@ const injectGraphToPage = async (title, startDate, endDate) => {
                     radius: 0,
                 },
             },
+            interaction: {
+                mode: 'nearest'
+            }
         },
     };
-
-    new Chart(document.getElementById("viewsEditsChart"), config);
+    chart = new Chart(document.getElementById("viewsEditsChart"), config);
 };
 
 export default injectGraphToPage;
