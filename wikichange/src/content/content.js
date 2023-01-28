@@ -84,12 +84,12 @@ const renderGraphOverlay = async () => {
     insertAfter(floatContainer, siteSub);
     const creationDate = await getPageCreationDate(title);
     const sim = setInterval(progressBar, 3);
-    injectGraphToPage(title, creationDate, new Date(Date.now()));
+    injectGraphToPage(title, creationDate, new Date(Date.now())).then(() => document.getElementById("5y").click());
 
     renderScaleButtons();
 };
 
-const setUpScaleButton = (scaleButtonsDiv, buttonId, buttonText, duration) => {
+const setUpScaleButton = (scaleButtonsDiv, buttonId, buttonText, duration, scaleButtonInputs) => {
     const button = document.createElement("button");
     button.setAttribute("id", buttonId);
     button.setAttribute("style", "margin-right: 5px;");
@@ -98,6 +98,19 @@ const setUpScaleButton = (scaleButtonsDiv, buttonId, buttonText, duration) => {
 
     button.addEventListener("click", () => {
         injectScaledCurrentGraphToPage(duration);
+
+        // remove hover effect from all scale buttons
+        scaleButtonInputs.forEach((input) => {
+            document.getElementById(input.id).className = "buttonNoHoverEffect";
+        });
+
+        button.className = "buttonHoverEffect";
+    });
+};
+
+const setUpScaleButtons = (scaleButtonsDiv, scaleButtonInputs) => {
+    scaleButtonInputs.forEach((input) => {
+        setUpScaleButton(scaleButtonsDiv, input.id, input.name, input.duration, scaleButtonInputs);
     });
 };
 
@@ -116,12 +129,16 @@ const renderScaleButtons = () => {
     scaleButtonsDiv.setAttribute("id", "scaleButtonsDiv");
     scaleButtonsDiv.setAttribute("style", "text-align: start;");
 
-    setUpScaleButton(scaleButtonsDiv, "all", "ALL", null); // null represents shows everything
-    setUpScaleButton(scaleButtonsDiv, "5y", "5Y", getDateObjectFromNow(5 * 12));
-    setUpScaleButton(scaleButtonsDiv, "3y", "3Y", getDateObjectFromNow(3 * 12));
-    setUpScaleButton(scaleButtonsDiv, "1y", "1Y", getDateObjectFromNow(12));
-    setUpScaleButton(scaleButtonsDiv, "6m", "6M", getDateObjectFromNow(6));
-    setUpScaleButton(scaleButtonsDiv, "3m", "3M", getDateObjectFromNow(3));
+    const scaleButtonInputs = [
+        { id: "all", name: "ALL", duration: null }, // null represents shows everything
+        { id: "5y", name: "5Y", duration: getDateObjectFromNow(5 * 12) },
+        { id: "3y", name: "3Y", duration: getDateObjectFromNow(3 * 12) },
+        { id: "1y", name: "1Y", duration: getDateObjectFromNow(12) },
+        { id: "6m", name: "6M", duration: getDateObjectFromNow(6) },
+        { id: "3m", name: "3M", duration: getDateObjectFromNow(3) },
+    ];
+
+    setUpScaleButtons(scaleButtonsDiv, scaleButtonInputs);
 
     // inserts buttons above graph
     viewsEditsChart.parentNode.insertBefore(scaleButtonsDiv, viewsEditsChart);
