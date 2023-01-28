@@ -80,11 +80,25 @@ const renderGraphOverlay = async () => {
         }
         percentage++;
     };
-    let siteSub = document.getElementById("siteSub");
+
+    const siteSub = document.getElementById("siteSub");
     insertAfter(floatContainer, siteSub);
     const creationDate = await getPageCreationDate(title);
     const sim = setInterval(progressBar, 3);
-    injectGraphToPage(title, creationDate, new Date(Date.now())).then(() => document.getElementById("5y").click());
+
+    const popupDiv = document.createElement("div");
+    popupDiv.setAttribute("id", "popupDiv");
+    popupDiv.setAttribute("class", "popup");
+    popupDiv.innerHTML = `<span class="popuptext" id="graphPopup">Clicking on graph will change the date in this box!</span>`;
+
+    injectGraphToPage(title, creationDate, new Date(Date.now())).then(() => {
+        document.getElementById("5y").click();
+
+        const dateOutput = document.getElementById("dateOutput");
+        dateOutput.parentNode.insertBefore(popupDiv, dateOutput);
+
+        document.getElementById("graphPopup").classList.toggle("show");
+    });
 
     renderScaleButtons();
 };
