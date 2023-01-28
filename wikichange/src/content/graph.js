@@ -156,12 +156,12 @@ const injectScaledCurrentGraphToPage = (startDate) => {
     // restore to unscaled graph
     if (startDate == null) {
         makePageViewAndReivisionGraphFromData(pageViews, revisions);
+    } else {
+        const filteredPageViews = getFilterGraphDataThatComeAfterStartDate(pageViews, startDate);
+        const filteredRevisions = getFilterGraphDataThatComeAfterStartDate(revisions, startDate);
+
+        makePageViewAndReivisionGraphFromData(filteredPageViews, filteredRevisions);
     }
-
-    const filteredPageViews = getFilterGraphDataThatComeAfterStartDate(pageViews, startDate);
-    const filteredRevisions = getFilterGraphDataThatComeAfterStartDate(revisions, startDate);
-
-    makePageViewAndReivisionGraphFromData(filteredPageViews, filteredRevisions);
 };
 
 export { injectGraphToPage, injectScaledCurrentGraphToPage };
