@@ -21,8 +21,9 @@ const CHART_COLORS = {
 const injectGraphToPage = async (title, startDate, endDate) => {
     const pageViews = await getPageViewTimeseries(title, startDate, endDate);
     const revisions = await getPageRevisionCountTimeseries(title, startDate, endDate);
-
     const xLabels = pageViews["x"];
+
+    const ctx = document.getElementById("viewsEditsChart");
 
     const data = {
         labels: xLabels,
@@ -47,13 +48,32 @@ const injectGraphToPage = async (title, startDate, endDate) => {
     };
 
     const config = {
+        plugins: [
+            {
+                afterDraw: (chart) => {
+                    if (chart.tooltip?._active?.length) {
+                        let x = chart.tooltip._active[0].element.x;
+                        let yAxis = chart.scales.y;
+                        let ctx = chart.ctx;
+                        ctx.save();
+                        ctx.beginPath();
+                        ctx.moveTo(x, yAxis.top);
+                        ctx.lineTo(x, yAxis.bottom);
+                        ctx.lineWidth = 1;
+                        ctx.strokeStyle = "#FF69B4";
+                        ctx.stroke();
+                        ctx.restore();
+                    }
+                },
+            },
+        ],
         type: "line",
         data: data,
         options: {
             plugins: {
                 tooltip: {
-                    position: 'nearest'
-                }
+                    position: "nearest",
+                },
             },
             scales: {
                 y: {
@@ -84,10 +104,15 @@ const injectGraphToPage = async (title, startDate, endDate) => {
                     radius: 0,
                 },
             },
+            interaction: {
+                intersect: false,
+                mode: "index",
+            },
+            spanGaps: true,
         },
     };
 
-    new Chart(document.getElementById("viewsEditsChart"), config);
+    new Chart(ctx, config);
 };
 
 export default injectGraphToPage;
