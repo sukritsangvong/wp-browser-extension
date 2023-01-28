@@ -1,8 +1,8 @@
 import { getPageCreationDate } from "./timeSeriesService.js";
-import injectGraphToPage from "./graph.js";
+import { injectGraphToPage, injectScaledCurrentGraphToPage } from "./graph.js";
 import { fetchChangeWithHTML, fetchRevisionFromDate, getRevisionPageLink } from "./compareRevisionService.js";
 import { HighlightType, HIGHLIGHT_TYPE } from "./enums";
-import { markPageChar, removeMarks  } from "./markPageChar";
+import { markPageChar, removeMarks } from "./markPageChar";
 import { text } from "./root";
 
 /**
@@ -57,7 +57,7 @@ const renderGraphOverlay = async () => {
     let percentage = 0;
     let diff;
 
-    function progressBar() {
+    const progressBar = () => {
         const {
             canvas: { width, height },
         } = ctx;
@@ -79,12 +79,69 @@ const renderGraphOverlay = async () => {
             clearTimeout(sim);
         }
         percentage++;
-    }
+    };
     let siteSub = document.getElementById("siteSub");
     insertAfter(floatContainer, siteSub);
     const creationDate = await getPageCreationDate(title);
     const sim = setInterval(progressBar, 3);
-    injectGraphToPage(title, creationDate, new Date(Date.now()));
+    injectGraphToPage(title, creationDate, new Date(Date.now())).then(() => document.getElementById("5y").click());
+
+    renderScaleButtons();
+};
+
+const setUpScaleButton = (scaleButtonsDiv, buttonId, buttonText, duration, scaleButtonInputs) => {
+    const button = document.createElement("button");
+    button.setAttribute("id", buttonId);
+    button.setAttribute("style", "margin-right: 5px;");
+    button.innerHTML = buttonText;
+    scaleButtonsDiv.appendChild(button);
+
+    button.addEventListener("click", () => {
+        injectScaledCurrentGraphToPage(duration);
+
+        // remove hover effect from all scale buttons
+        scaleButtonInputs.forEach((input) => {
+            document.getElementById(input.id).classList.remove("buttonHoverEffect");
+        });
+
+        button.className = "buttonHoverEffect";
+    });
+};
+
+const setUpScaleButtons = (scaleButtonsDiv, scaleButtonInputs) => {
+    scaleButtonInputs.forEach((input) => {
+        setUpScaleButton(scaleButtonsDiv, input.id, input.name, input.duration, scaleButtonInputs);
+    });
+};
+
+const getDateObjectFromNow = (monthsFromCurrent) => {
+    const date = new Date();
+    date.setMonth(date.getMonth() - monthsFromCurrent);
+    return date;
+};
+
+/**
+ * Render buttons to scale the graph.
+ */
+const renderScaleButtons = () => {
+    const viewsEditsChart = document.getElementById("viewsEditsChart");
+    const scaleButtonsDiv = document.createElement("div");
+    scaleButtonsDiv.setAttribute("id", "scaleButtonsDiv");
+    scaleButtonsDiv.setAttribute("style", "text-align: start;");
+
+    const scaleButtonInputs = [
+        { id: "all", name: "ALL", duration: null }, // null represents shows everything
+        { id: "5y", name: "5Y", duration: getDateObjectFromNow(5 * 12) },
+        { id: "3y", name: "3Y", duration: getDateObjectFromNow(3 * 12) },
+        { id: "1y", name: "1Y", duration: getDateObjectFromNow(12) },
+        { id: "6m", name: "6M", duration: getDateObjectFromNow(6) },
+        { id: "3m", name: "3M", duration: getDateObjectFromNow(3) },
+    ];
+
+    setUpScaleButtons(scaleButtonsDiv, scaleButtonInputs);
+
+    // inserts buttons above graph
+    viewsEditsChart.parentNode.insertBefore(scaleButtonsDiv, viewsEditsChart);
 };
 
 const getRevisionToClosestDateText = (pageLink, oldRevisionDate) => {
@@ -92,18 +149,16 @@ const getRevisionToClosestDateText = (pageLink, oldRevisionDate) => {
 };
 
 /**
- * Add slider and date input to container, below the graph. Slider and date input are connected
- * Equivalency between dates and integers: 0: today, 100: creation date
- * When slider changes, date input also changes, upon clicking highlight and closest revision date appears
+ * Add date input and buttons, below the graph. Upon clicking highlight and closest revision date appears
  *
  * @param {Date} creationDate of a Wiki page
  */
-const renderSlider = async (creationDate) => {
+const renderItemsBelowGraph = async (creationDate) => {
     let now = new Date();
     let totalDaysDiff = (now.getTime() - creationDate.getTime()) / (1000 * 3600 * 24);
     let viewsEditsChart = document.getElementById("viewsEditsChart");
-    let sliderDiv = document.createElement("div");
-    sliderDiv.setAttribute("id", "sliderDiv");
+    let belowGraphDiv = document.createElement("div");
+    belowGraphDiv.setAttribute("id", "belowGraphDiv");
     let initialDate = new Date();
     initialDate.setDate(now.getDate() - totalDaysDiff * 0.5);
 
@@ -113,12 +168,9 @@ const renderSlider = async (creationDate) => {
     const oldRevisionDate = oldRevision[1].toLocaleDateString().slice(0, 10);
     highlightRevisionBetweenRevisionIds(title, curRevisionId, oldRevisionId);
 
-    sliderDiv.innerHTML = `<div style="padding-left:5%; direction: rtl;">  
-                                <input type="range" id="graphSlider" value="50" min="0" max="100" style="width:90%;">  
-                            </div>
-                            <input type="date" value="${initialDate
-                                .toISOString()
-                                .slice(0, 10)}" id="dateOutput" name="dateOutput" style="text-align: center;"> 
+    belowGraphDiv.innerHTML = `<input type="date" value="${initialDate
+        .toISOString()
+        .slice(0, 10)}" id="dateOutput" name="dateOutput" style="text-align: center;"> 
                                 <button id = "highlightButton">Highlight</button> <div id="loader"></div>
                                 <p></p>
                                 <button id = "revisionButton">Go To Revision Page</button>
@@ -133,36 +185,22 @@ const renderSlider = async (creationDate) => {
                                     </div>
                                 </div>
                             </div>`;
-    sliderDiv.style.cssText = "text-align:center;";
-    insertAfter(sliderDiv, viewsEditsChart);
+    belowGraphDiv.style.cssText = "text-align:center;";
+    insertAfter(belowGraphDiv, viewsEditsChart);
     renderLoader();
 
-    const slider = document.getElementById("graphSlider");
     const dateInput = document.getElementById("dateOutput");
     const highlightButton = document.getElementById("highlightButton");
     const revisionButton = document.getElementById("revisionButton");
 
-    slider.addEventListener("change", function (ev) {
-        let numDays = parseInt((totalDaysDiff * this.value) / 100);
-        let date = new Date();
-        date.setDate(now.getDate() - numDays);
-        dateInput.value = date.toISOString().slice(0, 10);
-    });
-
-    dateInput.addEventListener("change", function (ev) {
-        let daysDiff = (new Date(this.value).getTime() - creationDate.getTime()) / (1000 * 3600 * 24);
-        let sliderVal = 100 - (daysDiff / totalDaysDiff) * 100;
-        slider.value = sliderVal;
-    });
-
-    highlightButton.addEventListener("click", async function (ev) {
+    highlightButton.addEventListener("click", async () => {
         document.getElementById("loader").style.display = "inline-block";
         highlightButton.disabled = true;
         revisionButton.disabled = true; // disable until we get new set of revIds
         const date = new Date(dateInput.value);
 
         const oldHighlights = document.getElementsByClassName("extension-highlight");
-        Array.from(oldHighlights).forEach(function (oldHighlights) {
+        Array.from(oldHighlights).forEach((oldHighlights) => {
             oldHighlights.style.backgroundColor = "inherit";
             oldHighlights.style.color = "inherit";
         });
@@ -184,7 +222,7 @@ const renderSlider = async (creationDate) => {
         revisionButton.disabled = false;
     });
 
-    revisionButton.addEventListener("click", async function (ev) {
+    revisionButton.addEventListener("click", async () => {
         try {
             window.open(getRevisionPageLink(title, curRevisionId, oldRevisionId), "_blank");
         } catch (err) {
@@ -225,10 +263,10 @@ const renderLoader = () => {
 };
 
 /**
- * Once we have the Wikipedia's page creation date, we render the slider
+ * Once we have the Wikipedia's page creation date, we render items below graph
  */
-getPageCreationDate(title).then(function (date) {
-    renderSlider(date);
+getPageCreationDate(title).then((date) => {
+    renderItemsBelowGraph(date);
 });
 
 // Get wikipedia text, global as we shouldn't get it every time we highlight a word
@@ -299,7 +337,7 @@ const returnCleanLink = (text_with_link) => {
         return p2 || p1;
     });
     return result;
-}
+};
 
 /**
  *  Highlights the words that are given with context. Support for links,
@@ -334,7 +372,7 @@ const highlightContentUsingNodes = (context, color) => {
         let value = node.nodeValue;
         let filter_highlight = context.highlight.replace(/<ref>.*<\/ref>/g, "").replace(/\{\{Cite.*?\}\}/g, "");
         if (context.highlight.includes("[[") && context.highlight.includes("]]")) {
-            // This includes a link in the content it is supposed to highlight. 
+            // This includes a link in the content it is supposed to highlight.
             // Will highlight only first sentence
             newValue = value.replace(
                 filter_highlight,
@@ -436,21 +474,21 @@ const highlightRevisionBetweenRevisionIds = async (title, curRevisionId, oldRevi
 /**
  * Highlight taking advantage of the page tagging
  * Right now I don't even use context, because highlights are suppose to be in order
- * @param {array of dictionary} context_array 
- * @param {string} color 
+ * @param {array of dictionary} context_array
+ * @param {string} color
  */
 const highlightByMatchingMarks = async (context_array, color) => {
     let foundIndex = -1;
     let controlIndex = 0;
-    context_array.forEach(function(context) {
+    context_array.forEach((context) => {
         let highlight = context["highlight"].trim();
         if (highlight) {
-            let filter = highlight.replace(/<ref>.*<\/ref>/g, "").replace(/\{\{Cite.*?\}\}/g, "")
+            let filter = highlight.replace(/<ref>.*<\/ref>/g, "").replace(/\{\{Cite.*?\}\}/g, "");
             let words = filter.split(" ").filter(Boolean);
             for (const word of words) {
                 foundIndex = text.indexOf(word, controlIndex);
                 if (foundIndex != -1 && highlight.length > 5) {
-                    markPageChar(foundIndex, foundIndex+word.length);
+                    markPageChar(foundIndex, foundIndex + word.length);
                     controlIndex = foundIndex + word.length;
                 } else if (foundIndex != -1) {
                     let before = context["content_before"];
@@ -461,7 +499,7 @@ const highlightByMatchingMarks = async (context_array, color) => {
                     );
                     let beforeText = text.substring(foundIndex - before.length, foundIndex);
                     if (afterText === after && beforeText === before) {
-                        markPageChar(foundIndex, foundIndex+word.length);
+                        markPageChar(foundIndex, foundIndex + word.length);
                         controlIndex = foundIndex + word.length;
                     }
                 }
@@ -469,8 +507,7 @@ const highlightByMatchingMarks = async (context_array, color) => {
         }
         return true;
     });
-}
-
+};
 
 /**
  * Highlight a page by comparing two revisions

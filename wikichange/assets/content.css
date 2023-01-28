@@ -15,6 +15,15 @@ button:hover {
     color: white;
 }
 
+/* 
+these hover effect classes should be similar 
+to those of the actual button above 
+*/
+.buttonHoverEffect {
+    background-color: #3366CC;
+    color: white;
+}
+
 button:disabled {
     cursor: not-allowed;
     pointer-events: none;

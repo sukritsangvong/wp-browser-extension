@@ -78,6 +78,7 @@ const addJsonToResultAndReset = (result, contentBefore, highlight, contentAfter)
  */
 const fetchRevisionFromDate = async (title, date) => {
     // Try fetch a revision id that comes right after the given date
+    let firstTryError = null;
     try {
         const response = await fetch(
             `https://en.wikipedia.org/w/api.php?action=query&format=json&prop=revisions&titles=${title}&formatversion=2&rvprop=ids%7Ctimestamp&rvlimit=1&rvstart=${date.toISOString()}&rvdir=newer`
@@ -88,9 +89,7 @@ const fetchRevisionFromDate = async (title, date) => {
             new Date(data["query"]["pages"][0]["revisions"][0]["timestamp"]),
         ];
     } catch (err) {
-        console.error(
-            `Error getting revision for newers inputs on title:${title} date:${date}\nError: ${err}\nTrying to fetch for older dates...`
-        );
+        firstTryError = err;
     }
 
     // Try fetch with older dates in case there is nothing newer than the given date
@@ -104,7 +103,9 @@ const fetchRevisionFromDate = async (title, date) => {
             new Date(data["query"]["pages"][0]["revisions"][0]["timestamp"]),
         ];
     } catch (err) {
-        console.error(`Error getting revision for older inputs on title:${title} date:${date}\nError: ${err}`);
+        console.error(
+            `Error getting revision for newer and older inputs on title:${title} date:${date}\nFirst Try's Error: ${firstTryError}\nError: ${err}`
+        );
         return -1;
     }
 };
