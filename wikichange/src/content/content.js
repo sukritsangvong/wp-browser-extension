@@ -93,6 +93,7 @@ const setUpScaleButton = (scaleButtonsDiv, buttonId, buttonText, duration, scale
     const button = document.createElement("button");
     button.setAttribute("id", buttonId);
     button.setAttribute("style", "margin-right: 5px;");
+    button.setAttribute("class", "extension-button");
     button.innerHTML = buttonText;
     scaleButtonsDiv.appendChild(button);
 
@@ -104,7 +105,7 @@ const setUpScaleButton = (scaleButtonsDiv, buttonId, buttonText, duration, scale
             document.getElementById(input.id).classList.remove("buttonHoverEffect");
         });
 
-        button.className = "buttonHoverEffect";
+        button.classList.add("buttonHoverEffect");
     });
 };
 
@@ -171,9 +172,9 @@ const renderItemsBelowGraph = async (creationDate) => {
     belowGraphDiv.innerHTML = `<input type="date" value="${initialDate
         .toISOString()
         .slice(0, 10)}" id="dateOutput" name="dateOutput" style="text-align: center;"> 
-                                <button id="highlightButton">Highlight</button><div id="loader"></div>
+                                <button class="extension-button" id="highlightButton">Highlight</button><div id="loader"></div>
                                 <p></p>
-                                <button id = "revisionButton">Go To Revision Page</button>
+                                <button class="extension-button" id="revisionButton">Go To Revision Page</button>
                             <div style="padding-left: 3%; padding-top: 3%; text-align: center;">
                                 <div class="card" style="border-style: solid;">
                                     <div class="card-body" style="text-align: center;">

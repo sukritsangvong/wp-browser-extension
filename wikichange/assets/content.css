@@ -3,16 +3,16 @@ mark {
     color: inherit;
 }
 
-button {
+button.extension-button {
     background-color: white;
     color: #3366CC; 
     border: 2px solid #3366CC; 
     cursor: pointer;
-    border-radius: 800px;
+    border-radius: 3px;
     transition: all 0.3s ease-in-out 0s;
 }
 
-button:hover {
+button:hover.extension-button {
     background-color: #3366CC;
     color: white;
 }
@@ -22,11 +22,11 @@ these hover effect classes should be similar
 to those of the actual button above 
 */
 .buttonHoverEffect {
-    background-color: #3366CC;
-    color: white;
+    background-color: #3366CC !important;
+    color: white !important;
 }
 
-button:disabled {
+button:disabled.extension-button {
     cursor: not-allowed;
     pointer-events: none;
     border: 2px solid #999999;
