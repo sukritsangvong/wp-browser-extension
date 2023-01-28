@@ -79,13 +79,12 @@ const makePageViewAndReivisionGraphFromData = (pageViewsData, revisionsData) => 
         type: "line",
         data: data,
         options: {
-            onClick: () => {
+            onClick: (e) => {
                 const date = e.chart.tooltip.dataPoints[0].label;
                 updateDateSelector(date);
                 const highlightButton = document.getElementById("highlightButton");
-                let original_font = highlightButton.style.fontSize;
                 highlightButton.style.fontSize = "130%";
-                delay(1000).then(() => highlightButton.style.fontSize = original_font);
+                delay(500).then(() => highlightButton.style.fontSize = "100%");
             },
             plugins: {
                 tooltip: {
