@@ -11,6 +11,15 @@ const CHART_COLORS = {
     grey: "rgb(201, 203, 207)",
 };
 
+/**
+ *
+ * @param {*} time in milliseconds
+ * @returns a promise that will delay
+ */
+const delay = (time) => {
+    return new Promise((resolve) => setTimeout(resolve, time));
+};
+
 let pageViews = null;
 let revisions = null;
 let currentChart = null;
@@ -73,6 +82,9 @@ const makePageViewAndReivisionGraphFromData = (pageViewsData, revisionsData) => 
             onClick: (e) => {
                 const date = e.chart.tooltip.dataPoints[0].label;
                 updateDateSelector(date);
+                const highlightButton = document.getElementById("highlightButton");
+                highlightButton.classList.add("wiggleAnimation");
+                delay(500).then(() => highlightButton.classList.remove("wiggleAnimation"));
             },
             plugins: {
                 tooltip: {
