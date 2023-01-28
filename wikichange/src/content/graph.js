@@ -18,13 +18,16 @@ let currentChart = null;
 const makePageViewAndReivisionGraphFromData = (pageViewsData, revisionsData) => {
     const xLabels = pageViewsData["x"];
 
+    const ctx = document.getElementById("viewsEditsChart");
+
     const data = {
         labels: xLabels,
         datasets: [
             {
                 label: "Views",
                 data: pageViewsData["y"],
-                borderColor: CHART_COLORS.grey,
+                borderColor: "#a9a9a9",
+                backgroundColor: "#a9a9a9",
                 yAxisID: "y",
                 borderWidth: 2,
             },
@@ -32,6 +35,7 @@ const makePageViewAndReivisionGraphFromData = (pageViewsData, revisionsData) => 
                 label: "Edits",
                 data: revisionsData["y"],
                 borderColor: CHART_COLORS.blue,
+                backgroundColor: CHART_COLORS.blue,
                 yAxisID: "y1",
                 borderWidth: 2,
             },
@@ -39,6 +43,25 @@ const makePageViewAndReivisionGraphFromData = (pageViewsData, revisionsData) => 
     };
 
     const config = {
+        plugins: [
+            {
+                afterDraw: (chart) => {
+                    if (chart.tooltip?._active?.length) {
+                        let x = chart.tooltip._active[0].element.x;
+                        let yAxis = chart.scales.y;
+                        let ctx = chart.ctx;
+                        ctx.save();
+                        ctx.beginPath();
+                        ctx.moveTo(x, yAxis.top);
+                        ctx.lineTo(x, yAxis.bottom);
+                        ctx.lineWidth = 1;
+                        ctx.strokeStyle = "#FF69B4";
+                        ctx.stroke();
+                        ctx.restore();
+                    }
+                },
+            },
+        ],
         type: "line",
         data: data,
         options: {
@@ -88,12 +111,14 @@ const makePageViewAndReivisionGraphFromData = (pageViewsData, revisionsData) => 
                 },
             },
             interaction: {
-                mode: "nearest",
+                intersect: false,
+                mode: "index",
             },
+            spanGaps: true,
         },
     };
 
-    currentChart = new Chart(document.getElementById("viewsEditsChart"), config);
+    currentChart = new Chart(ctx, config);
 };
 
 /**
