@@ -21,6 +21,7 @@ const CHART_COLORS = {
 const injectGraphToPage = async (title, startDate, endDate) => {
     const pageViews = await getPageViewTimeseries(title, startDate, endDate);
     const revisions = await getPageRevisionCountTimeseries(title, startDate, endDate);
+
     const xLabels = pageViews["x"];
 
     const ctx = document.getElementById("viewsEditsChart");
