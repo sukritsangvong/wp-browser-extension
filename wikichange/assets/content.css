@@ -3,7 +3,7 @@ mark {
     color: inherit;
 }
 
-button.extension-button {
+button.extensionButton {
     background-color: white;
     color: #3366cc;
     border: 2px solid #3366cc;
@@ -11,7 +11,7 @@ button.extension-button {
     border-radius: 3px;
 }
 
-button:hover.extension-button {
+button:hover.extensionButton {
     background-color: #3366cc;
     color: white;
 }
@@ -25,7 +25,7 @@ to those of the actual button above
     color: white !important;
 }
 
-button:disabled.extension-button {
+button:disabled.extensionButton {
     cursor: not-allowed;
     pointer-events: none;
     border: 2px solid #999999;
