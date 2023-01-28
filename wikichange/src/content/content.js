@@ -57,7 +57,7 @@ const renderGraphOverlay = async () => {
     let percentage = 0;
     let diff;
 
-    function progressBar() {
+    const progressBar = () => {
         const {
             canvas: { width, height },
         } = ctx;
@@ -79,7 +79,7 @@ const renderGraphOverlay = async () => {
             clearTimeout(sim);
         }
         percentage++;
-    }
+    };
     let siteSub = document.getElementById("siteSub");
     insertAfter(floatContainer, siteSub);
     const creationDate = await getPageCreationDate(title);
@@ -132,18 +132,16 @@ const getRevisionToClosestDateText = (pageLink, oldRevisionDate) => {
 };
 
 /**
- * Add slider and date input to container, below the graph. Slider and date input are connected
- * Equivalency between dates and integers: 0: today, 100: creation date
- * When slider changes, date input also changes, upon clicking highlight and closest revision date appears
+ * Add date input and buttons, below the graph. Upon clicking highlight and closest revision date appears
  *
  * @param {Date} creationDate of a Wiki page
  */
-const renderSlider = async (creationDate) => {
+const renderItemsBelowGraph = async (creationDate) => {
     let now = new Date();
     let totalDaysDiff = (now.getTime() - creationDate.getTime()) / (1000 * 3600 * 24);
     let viewsEditsChart = document.getElementById("viewsEditsChart");
-    let sliderDiv = document.createElement("div");
-    sliderDiv.setAttribute("id", "sliderDiv");
+    let belowGraphDiv = document.createElement("div");
+    belowGraphDiv.setAttribute("id", "belowGraphDiv");
     let initialDate = new Date();
     initialDate.setDate(now.getDate() - totalDaysDiff * 0.5);
 
@@ -153,12 +151,9 @@ const renderSlider = async (creationDate) => {
     const oldRevisionDate = oldRevision[1].toLocaleDateString().slice(0, 10);
     highlightRevisionBetweenRevisionIds(title, curRevisionId, oldRevisionId);
 
-    sliderDiv.innerHTML = `<div style="padding-left:5%; direction: rtl;">  
-                                <input type="range" id="graphSlider" value="50" min="0" max="100" style="width:90%;">  
-                            </div>
-                            <input type="date" value="${initialDate
-                                .toISOString()
-                                .slice(0, 10)}" id="dateOutput" name="dateOutput" style="text-align: center;"> 
+    belowGraphDiv.innerHTML = `<input type="date" value="${initialDate
+        .toISOString()
+        .slice(0, 10)}" id="dateOutput" name="dateOutput" style="text-align: center;"> 
                                 <button id = "highlightButton">Highlight</button> <div id="loader"></div>
                                 <p></p>
                                 <button id = "revisionButton">Go To Revision Page</button>
@@ -173,36 +168,22 @@ const renderSlider = async (creationDate) => {
                                     </div>
                                 </div>
                             </div>`;
-    sliderDiv.style.cssText = "text-align:center;";
-    insertAfter(sliderDiv, viewsEditsChart);
+    belowGraphDiv.style.cssText = "text-align:center;";
+    insertAfter(belowGraphDiv, viewsEditsChart);
     renderLoader();
 
-    const slider = document.getElementById("graphSlider");
     const dateInput = document.getElementById("dateOutput");
     const highlightButton = document.getElementById("highlightButton");
     const revisionButton = document.getElementById("revisionButton");
 
-    slider.addEventListener("change", function (ev) {
-        let numDays = parseInt((totalDaysDiff * this.value) / 100);
-        let date = new Date();
-        date.setDate(now.getDate() - numDays);
-        dateInput.value = date.toISOString().slice(0, 10);
-    });
-
-    dateInput.addEventListener("change", function (ev) {
-        let daysDiff = (new Date(this.value).getTime() - creationDate.getTime()) / (1000 * 3600 * 24);
-        let sliderVal = 100 - (daysDiff / totalDaysDiff) * 100;
-        slider.value = sliderVal;
-    });
-
-    highlightButton.addEventListener("click", async function (ev) {
+    highlightButton.addEventListener("click", async () => {
         document.getElementById("loader").style.display = "inline-block";
         highlightButton.disabled = true;
         revisionButton.disabled = true; // disable until we get new set of revIds
         const date = new Date(dateInput.value);
 
         const oldHighlights = document.getElementsByClassName("extension-highlight");
-        Array.from(oldHighlights).forEach(function (oldHighlights) {
+        Array.from(oldHighlights).forEach((oldHighlights) => {
             oldHighlights.style.backgroundColor = "inherit";
             oldHighlights.style.color = "inherit";
         });
@@ -224,7 +205,7 @@ const renderSlider = async (creationDate) => {
         revisionButton.disabled = false;
     });
 
-    revisionButton.addEventListener("click", async function (ev) {
+    revisionButton.addEventListener("click", async () => {
         try {
             window.open(getRevisionPageLink(title, curRevisionId, oldRevisionId), "_blank");
         } catch (err) {
@@ -265,10 +246,10 @@ const renderLoader = () => {
 };
 
 /**
- * Once we have the Wikipedia's page creation date, we render the slider
+ * Once we have the Wikipedia's page creation date, we render items below graph
  */
-getPageCreationDate(title).then(function (date) {
-    renderSlider(date);
+getPageCreationDate(title).then((date) => {
+    renderItemsBelowGraph(date);
 });
 
 // Get wikipedia text, global as we shouldn't get it every time we highlight a word
@@ -482,7 +463,7 @@ const highlightRevisionBetweenRevisionIds = async (title, curRevisionId, oldRevi
 const highlightByMatchingMarks = async (context_array, color) => {
     let foundIndex = -1;
     let controlIndex = 0;
-    context_array.forEach(function (context) {
+    context_array.forEach((context) => {
         let highlight = context["highlight"].trim();
         if (highlight) {
             let filter = highlight.replace(/<ref>.*<\/ref>/g, "").replace(/\{\{Cite.*?\}\}/g, "");
