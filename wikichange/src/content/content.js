@@ -101,7 +101,7 @@ const setUpScaleButton = (scaleButtonsDiv, buttonId, buttonText, duration, scale
 
         // remove hover effect from all scale buttons
         scaleButtonInputs.forEach((input) => {
-            document.getElementById(input.id).className = "buttonNoHoverEffect";
+            document.getElementById(input.id).classList.remove("buttonHoverEffect");
         });
 
         button.className = "buttonHoverEffect";

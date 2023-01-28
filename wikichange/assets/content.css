@@ -17,13 +17,8 @@ button:hover {
 
 /* 
 these hover effect classes should be similar 
-to those of the actuall button above 
+to those of the actual button above 
 */
-.buttonNoHoverEffect {
-    background-color: white;
-    color: #3366CC; 
-}
-
 .buttonHoverEffect {
     background-color: #3366CC;
     color: white;
