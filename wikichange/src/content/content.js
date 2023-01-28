@@ -1,6 +1,9 @@
 import { getPageCreationDate } from "./timeSeriesService.js";
 import injectGraphToPage from "./graph.js";
 import { fetchChangeWithHTML, fetchRevisionFromDate, getRevisionPageLink } from "./compareRevisionService.js";
+import { HighlightType, HIGHLIGHT_TYPE } from "./enums";
+import { markPageChar, removeMarks  } from "./markPageChar";
+import { text } from "./root";
 
 /**
  * Inserts a new node after an existing node
@@ -431,6 +434,45 @@ const highlightRevisionBetweenRevisionIds = async (title, curRevisionId, oldRevi
 };
 
 /**
+ * Highlight taking advantage of the page tagging
+ * Right now I don't even use context, because highlights are suppose to be in order
+ * @param {array of dictionary} context_array 
+ * @param {string} color 
+ */
+const highlightByMatchingMarks = async (context_array, color) => {
+    let foundIndex = -1;
+    let controlIndex = 0;
+    context_array.forEach(function(context) {
+        let highlight = context["highlight"].trim();
+        if (highlight) {
+            let filter = highlight.replace(/<ref>.*<\/ref>/g, "").replace(/\{\{Cite.*?\}\}/g, "")
+            let words = filter.split(" ").filter(Boolean);
+            for (const word of words) {
+                foundIndex = text.indexOf(word, controlIndex);
+                if (foundIndex != -1 && highlight.length > 5) {
+                    markPageChar(foundIndex, foundIndex+word.length);
+                    controlIndex = foundIndex + word.length;
+                } else if (foundIndex != -1) {
+                    let before = context["content_before"];
+                    let after = context["content_after"];
+                    let afterText = text.substring(
+                        foundIndex + highlight.length,
+                        foundIndex + highlight.length + after.length
+                    );
+                    let beforeText = text.substring(foundIndex - before.length, foundIndex);
+                    if (afterText === after && beforeText === before) {
+                        markPageChar(foundIndex, foundIndex+word.length);
+                        controlIndex = foundIndex + word.length;
+                    }
+                }
+            }
+        }
+        return true;
+    });
+}
+
+
+/**
  * Highlight a page by comparing two revisions
  *
  * @param {int} revisionId of the page that contains highlights
@@ -438,9 +480,13 @@ const highlightRevisionBetweenRevisionIds = async (title, curRevisionId, oldRevi
  */
 const highlight = async (revisionId, oldRevisionId) => {
     const arr = await fetchChangeWithHTML(oldRevisionId, revisionId);
-    arr.forEach((element) => {
-        highlightContentUsingNodes(element, "#AFE1AF");
-    });
+    if (HIGHLIGHT_TYPE == HighlightType.NODE) {
+        arr.forEach((element) => {
+            highlightContentUsingNodes(element, "#AFE1AF");
+        });
+    } else if (HIGHLIGHT_TYPE == HighlightType.TAGGING_CHAR) {
+        highlightByMatchingMarks(arr);
+    }
     let button = document.getElementById("highlightButton");
     button.disabled = false;
     document.getElementById("loader").style.display = "none";

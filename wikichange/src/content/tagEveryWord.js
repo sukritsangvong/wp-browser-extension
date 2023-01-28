@@ -74,7 +74,5 @@ const tagEveryWord = () => {
     }, {"text":'', "index":0, "map":[]});
 }
 
-const { text, map } = tagEveryWord();
-
-export { text, map };
+export { tagEveryWord };
 
