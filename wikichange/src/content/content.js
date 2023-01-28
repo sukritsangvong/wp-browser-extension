@@ -435,7 +435,7 @@ const highlightRevisionBetweenRevisionIds = async (title, curRevisionId, oldRevi
 
 /**
  * Highlight taking advantage of the page tagging
- * Right now I don't even use contex, because highlights are suppose to be in order
+ * Right now I don't even use context, because highlights are suppose to be in order
  * @param {array of dictionary} context_array 
  * @param {string} color 
  */
@@ -449,12 +449,21 @@ const highlightByMatchingMarks = async (context_array, color) => {
             let words = filter.split(" ").filter(Boolean);
             for (const word of words) {
                 foundIndex = text.indexOf(word, controlIndex);
-                if (foundIndex != -1) {
+                if (foundIndex != -1 && highlight.length > 5) {
                     markPageChar(foundIndex, foundIndex+word.length);
-                    console.log("Word:", word);
-                    console.log("Text to high", text.substring(foundIndex, foundIndex+word.length));
-                    console.log("Found index:", foundIndex);
                     controlIndex = foundIndex + word.length;
+                } else if (foundIndex != -1) {
+                    let before = context["content_before"];
+                    let after = context["content_after"];
+                    let afterText = text.substring(
+                        foundIndex + highlight.length,
+                        foundIndex + highlight.length + after.length
+                    );
+                    let beforeText = text.substring(foundIndex - before.length, foundIndex);
+                    if (afterText === after && beforeText === before) {
+                        markPageChar(foundIndex, foundIndex+word.length);
+                        controlIndex = foundIndex + word.length;
+                    }
                 }
             }
         }
