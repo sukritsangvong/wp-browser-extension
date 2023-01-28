@@ -5,15 +5,14 @@ mark {
 
 button.extension-button {
     background-color: white;
-    color: #3366CC; 
-    border: 2px solid #3366CC; 
+    color: #3366cc;
+    border: 2px solid #3366cc;
     cursor: pointer;
     border-radius: 3px;
-    transition: all 0.3s ease-in-out 0s;
 }
 
 button:hover.extension-button {
-    background-color: #3366CC;
+    background-color: #3366cc;
     color: white;
 }
 
@@ -22,7 +21,7 @@ these hover effect classes should be similar
 to those of the actual button above 
 */
 .buttonHoverEffect {
-    background-color: #3366CC !important;
+    background-color: #3366cc !important;
     color: white !important;
 }
 
@@ -32,4 +31,32 @@ button:disabled.extension-button {
     border: 2px solid #999999;
     background-color: #cccccc;
     color: #999999;
+}
+
+/* wiggle animation from https://codepen.io/jeryj/pen/LzPjdJ */
+.wiggleAnimation {
+    animation: 0.3s wiggle ease;
+}
+
+@keyframes wiggle {
+    0% {
+        transform: rotate(-1.75deg);
+        box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
+    }
+    20% {
+        transform: rotate(12deg);
+    }
+    40% {
+        transform: rotate(-6deg);
+    }
+    60% {
+        transform: rotate(4.25deg);
+    }
+    90% {
+        transform: rotate(-1deg);
+    }
+    100% {
+        transform: rotate(0);
+        box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
+    }
 }

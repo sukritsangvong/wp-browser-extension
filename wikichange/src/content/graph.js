@@ -12,13 +12,13 @@ const CHART_COLORS = {
 };
 
 /**
- * 
+ *
  * @param {*} time in milliseconds
  * @returns a promise that will delay
  */
 const delay = (time) => {
-    return new Promise(resolve => setTimeout(resolve, time));
-}
+    return new Promise((resolve) => setTimeout(resolve, time));
+};
 
 let pageViews = null;
 let revisions = null;
@@ -83,8 +83,8 @@ const makePageViewAndReivisionGraphFromData = (pageViewsData, revisionsData) => 
                 const date = e.chart.tooltip.dataPoints[0].label;
                 updateDateSelector(date);
                 const highlightButton = document.getElementById("highlightButton");
-                highlightButton.style.fontSize = "130%";
-                delay(500).then(() => highlightButton.style.fontSize = "100%");
+                highlightButton.classList.add("wiggleAnimation");
+                delay(500).then(() => highlightButton.classList.remove("wiggleAnimation"));
             },
             plugins: {
                 tooltip: {
