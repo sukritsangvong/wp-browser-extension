@@ -2,7 +2,7 @@ import { getPageCreationDate } from "./timeSeriesService.js";
 import { injectGraphToPage, injectScaledCurrentGraphToPage } from "./graph.js";
 import { fetchChangeWithHTML, fetchRevisionFromDate, getRevisionPageLink } from "./compareRevisionService.js";
 import { HighlightType, HIGHLIGHT_TYPE } from "./enums";
-import { markPageChar, removeMarks  } from "./markPageChar";
+import { markPageChar, removeMarks } from "./markPageChar";
 import { text } from "./root";
 
 /**
@@ -476,21 +476,21 @@ const highlightRevisionBetweenRevisionIds = async (title, curRevisionId, oldRevi
 /**
  * Highlight taking advantage of the page tagging
  * Right now I don't even use context, because highlights are suppose to be in order
- * @param {array of dictionary} context_array 
- * @param {string} color 
+ * @param {array of dictionary} context_array
+ * @param {string} color
  */
 const highlightByMatchingMarks = async (context_array, color) => {
     let foundIndex = -1;
     let controlIndex = 0;
-    context_array.forEach(function(context) {
+    context_array.forEach(function (context) {
         let highlight = context["highlight"].trim();
         if (highlight) {
-            let filter = highlight.replace(/<ref>.*<\/ref>/g, "").replace(/\{\{Cite.*?\}\}/g, "")
+            let filter = highlight.replace(/<ref>.*<\/ref>/g, "").replace(/\{\{Cite.*?\}\}/g, "");
             let words = filter.split(" ").filter(Boolean);
             for (const word of words) {
                 foundIndex = text.indexOf(word, controlIndex);
                 if (foundIndex != -1 && highlight.length > 5) {
-                    markPageChar(foundIndex, foundIndex+word.length);
+                    markPageChar(foundIndex, foundIndex + word.length);
                     controlIndex = foundIndex + word.length;
                 } else if (foundIndex != -1) {
                     let before = context["content_before"];
@@ -501,7 +501,7 @@ const highlightByMatchingMarks = async (context_array, color) => {
                     );
                     let beforeText = text.substring(foundIndex - before.length, foundIndex);
                     if (afterText === after && beforeText === before) {
-                        markPageChar(foundIndex, foundIndex+word.length);
+                        markPageChar(foundIndex, foundIndex + word.length);
                         controlIndex = foundIndex + word.length;
                     }
                 }
@@ -509,8 +509,7 @@ const highlightByMatchingMarks = async (context_array, color) => {
         }
         return true;
     });
-}
-
+};
 
 /**
  * Highlight a page by comparing two revisions

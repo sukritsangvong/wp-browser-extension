@@ -15,6 +15,11 @@ let pageViews = null;
 let revisions = null;
 let currentChart = null;
 
+const updateDateSelector = (newDate) => {
+    const dateSelector = document.getElementById("dateOutput");
+    dateSelector.value = new Date(newDate).toISOString().slice(0, 10);
+};
+
 const makePageViewAndReivisionGraphFromData = (pageViewsData, revisionsData) => {
     const xLabels = pageViewsData["x"];
 
@@ -66,15 +71,8 @@ const makePageViewAndReivisionGraphFromData = (pageViewsData, revisionsData) => 
         data: data,
         options: {
             onClick: (e) => {
-                let points = e.chart.getElementsAtEventForMode(e, "nearest", { intersect: true }, true);
-                if (points.length) {
-                    let firstPoint = points[0];
-                    let date = e.chart.data.labels[firstPoint.index];
-                    if (date) {
-                        const slider = document.getElementById("graphSlider");
-                        const dateInput = document.getElementById("dateOutput");
-                    }
-                }
+                const date = e.chart.tooltip.dataPoints[0].label;
+                updateDateSelector(date);
             },
             plugins: {
                 tooltip: {
