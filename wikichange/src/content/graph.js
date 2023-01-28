@@ -12,6 +12,15 @@ const CHART_COLORS = {
 };
 
 /**
+ * 
+ * @param {*} time in milliseconds
+ * @returns a promise that will delay
+ */
+const delay = (time) => {
+    return new Promise(resolve => setTimeout(resolve, time));
+}
+
+/**
  * Injects a graph of a given article's page views and edits data.
  *
  * @param {string} title of the article
@@ -71,6 +80,12 @@ const injectGraphToPage = async (title, startDate, endDate) => {
         type: "line",
         data: data,
         options: {
+            onClick: () => {
+                const highlightButton = document.getElementById("highlightButton");
+                let original_font = highlightButton.style.fontSize;
+                highlightButton.style.fontSize = "130%";
+                delay(1000).then(() => highlightButton.style.fontSize = original_font);
+            },
             plugins: {
                 tooltip: {
                     position: "nearest",

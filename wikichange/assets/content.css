@@ -8,6 +8,8 @@ button {
     color: #3366CC; 
     border: 2px solid #3366CC; 
     cursor: pointer;
+    border-radius: 800px;
+    transition: all 0.3s ease-in-out 0s;
 }
 
 button:hover {

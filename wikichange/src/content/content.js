@@ -119,7 +119,7 @@ const renderSlider = async (creationDate) => {
                             <input type="date" value="${initialDate
                                 .toISOString()
                                 .slice(0, 10)}" id="dateOutput" name="dateOutput" style="text-align: center;"> 
-                                <button id = "highlightButton">Highlight</button> <div id="loader"></div>
+                                <button id="highlightButton">Highlight</button><div id="loader"></div>
                                 <p></p>
                                 <button id = "revisionButton">Go To Revision Page</button>
                             <div style="padding-left: 3%; padding-top: 3%; text-align: center;">
