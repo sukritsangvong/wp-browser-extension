@@ -89,7 +89,7 @@ const renderGraphOverlay = async () => {
     const popupDiv = document.createElement("div");
     popupDiv.setAttribute("id", "popupDiv");
     popupDiv.setAttribute("class", "popup");
-    popupDiv.innerHTML = `<span class="popuptext" id="graphPopup">Clicking on graph will change the date in this box!</span>`;
+    popupDiv.innerHTML = `<span class="popuptext" id="graphPopup">Clicking on the graph will change the date in this box!</span>`;
 
     injectGraphToPage(title, creationDate, new Date(Date.now())).then(() => {
         document.getElementById("5y").click();

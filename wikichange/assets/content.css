@@ -65,8 +65,8 @@ button:disabled.extensionButton {
 /* Popup container - can be anything you want */
 .popup {
     position: relative;
-    bottom: 100%;
-    margin-top: -20px;
+    display: inline-block;
+    bottom: 25px;
     cursor: pointer;
     -webkit-user-select: none;
     -moz-user-select: none;
