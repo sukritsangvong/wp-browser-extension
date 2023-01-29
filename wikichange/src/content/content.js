@@ -86,21 +86,12 @@ const renderGraphOverlay = async () => {
     const creationDate = await getPageCreationDate(title);
     const sim = setInterval(progressBar, 3);
 
-    const popupDiv = document.createElement("div");
-    popupDiv.setAttribute("id", "popupDiv");
-    popupDiv.setAttribute("class", "popup");
-    popupDiv.innerHTML = `<span class="popuptext" id="graphPopup">Clicking on the graph will change the date in this box!</span>`;
-
-    injectGraphToPage(title, creationDate, new Date(Date.now())).then(() => {
+    const graphPromise = injectGraphToPage(title, creationDate, new Date(Date.now())).then(async () => {
         document.getElementById("5y").click();
-
-        const dateOutput = document.getElementById("dateOutput");
-        dateOutput.parentNode.insertBefore(popupDiv, dateOutput);
-
-        document.getElementById("graphPopup").classList.toggle("show");
     });
 
     renderScaleButtons();
+    return graphPromise; // Promise of whether the graph is injected
 };
 
 const setUpScaleButton = (scaleButtonsDiv, buttonId, buttonText, duration, scaleButtonInputs) => {
@@ -248,7 +239,34 @@ const renderItemsBelowGraph = async (creationDate) => {
     });
 };
 
-renderGraphOverlay();
+const toggleShowOnPopup = () => {
+    document.getElementById("graphPopup").classList.toggle("show");
+};
+
+const renderPopup = () => {
+    const popupDiv = document.createElement("div");
+    popupDiv.setAttribute("id", "popupDiv");
+    popupDiv.setAttribute("class", "popup");
+    popupDiv.innerHTML = `<span class="popuptext" id="graphPopup">Clicking on the graph will change the date in this box!</span>`;
+
+    const dateOutput = document.getElementById("dateOutput");
+    dateOutput.parentNode.insertBefore(popupDiv, dateOutput);
+
+    toggleShowOnPopup();
+
+    let hasUnshown = false;
+    popupDiv.addEventListener("mouseover", () => {
+        toggleShowOnPopup();
+        hasUnshown = true;
+    });
+
+    // disable popup after 10 seconds
+    new Promise((resolve) => setTimeout(resolve, 10000)).then(() => {
+        if (!hasUnshown) {
+            toggleShowOnPopup();
+        }
+    });
+};
 
 /**
  * Render a simple JS loader by the highlight button
@@ -281,7 +299,12 @@ const renderLoader = () => {
  * Once we have the Wikipedia's page creation date, we render items below graph
  */
 getPageCreationDate(title).then((date) => {
-    renderItemsBelowGraph(date);
+    const promises = [];
+    promises.push(renderGraphOverlay());
+    promises.push(renderItemsBelowGraph(date));
+
+    // Render popups only when graph and buttons are loaded
+    Promise.all(promises).then(() => renderPopup());
 });
 
 // Get wikipedia text, global as we shouldn't get it every time we highlight a word

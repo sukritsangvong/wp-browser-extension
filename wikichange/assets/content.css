@@ -102,14 +102,12 @@ button:disabled.extensionButton {
     border-color: #555 transparent transparent transparent;
 }
 
-/* Toggle this class - hide and show the popup */
 .popup .show {
     visibility: visible;
     -webkit-animation: fadeIn 1s;
     animation: fadeIn 1s;
 }
 
-/* Add animation (fade in the popup) */
 @-webkit-keyframes fadeIn {
     from {
         opacity: 0;
