@@ -9,8 +9,8 @@
     "default_locale": "en",
     "minimum_chrome_version": "88",
     "icons": {
-        "16": "assets/icons/icon16.png",
-        "48": "assets/icons/icon16.png"
+        "16": "assets/icons/icon_16.png",
+        "48": "assets/icons/icon_16.png"
     },
     "action": {
         "default_icon": {
