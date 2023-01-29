@@ -125,3 +125,19 @@ button:disabled.extensionButton {
         opacity: 1;
     }
 }
+
+#belowGraphDiv {
+  padding-top: 10px;
+}
+
+input[type="date"] {
+  appearance: none;
+  -webkit-appearance: none;
+  color: #2b2b2b;
+  font-family: sans-serif;
+  border:1px solid #b4b4b4;
+  background:#ecf0f1;
+  padding:3px;
+  display: inline-block !important;
+  visibility: visible !important;
+}
