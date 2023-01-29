@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <title>Comps</title>
+        <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
+        <link href="css/styles.css" rel="stylesheet" />
+    </head>
+    <body class="d-flex flex-column">
+        <main class="flex-shrink-0">
+            <!-- Navigation-->
+            <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+                <div class="container px-5">
+                    <a class="navbar-brand" href="index.html">Wikipedia Browser Extension</a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                            <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+                            <li class="nav-item"><a class="nav-link" href="install.html">Installation</a></li>
+                            <li class="nav-item"><a class="nav-link" href="description.html">Project Description</a></li>
+                            <li class="nav-item"><a class="nav-link" href="literature.html">Literature Review</a></li>
+                            <li class="nav-item"><a class="nav-link" href="team.html">Comps team</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+            <!-- Header-->
+            <header class="py-5">
+                <div class="container px-5">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-12 col-xxl-8">
+                            <div class="text-center my-5">
+                                <h1 class="fw-bolder mb-3">Let's install our Wikipedia Browser Extension</h1>
+                                <p class="lead fw-normal text-muted mb-4">You should have everything up and running in under 10 minutes</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            <!-- Team members section-->
+            <section class="py-5 bg-light">
+                <div class="container">
+                    <div class="text-center">
+                        <h2 class="fw-bolder">Steps</h2>
+                    </div>
+                    <div class="container px-6 my-5">
+                        <div class="accordion">
+                            <div class="accordion-item">
+                              <h2 class="accordion-header" id="headingOne">
+                                <button class="accordion-button bg-secondary text-light" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                    <b>1. Clone the code from our Github</b>
+                                </button>
+                              </h2>
+                              <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                                <div class="accordion-body">
+                                    Open the terminal and type <code>git clone https://github.com/sukritsangvong/wp-browser-extension.git</code>.
+                                    You can also go to <a href="https://github.com/sukritsangvong/wp-browser-extension">wp-browser-extension</a> and click on the green button code. <br>
+                                    <img class="rounded mx-auto d-block" style="max-width: 50%" src="./assets/step1.png" alt="..." />
+                                </div>
+                              </div>
+                            </div>
+                            <div class="accordion-item">
+                              <h2 class="accordion-header" id="headingTwo">
+                                <button class="accordion-button collapsed bg-secondary text-light" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                    <b>2. Install node 16.18.0</b>
+                                </button>
+                              </h2>
+                              <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
+                                <div class="accordion-body">
+                                    Go to <a href="https://nodejs.org/en/download/current/">nodejs.org</a> download page and find the correct version for your machine. 
+                                </div>
+                              </div>
+                            </div>
+                            <div class="accordion-item">
+                              <h2 class="accordion-header" id="headingThree">
+                                <button class="accordion-button collapsed bg-secondary text-light" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                    <b>3. Run some commands in the terminal</b>
+                                </button>
+                              </h2>
+                              <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
+                                <div class="accordion-body">
+                                    First, go to the folder you cloned the repo, then type <code>cd wikichange</code> followed by <code>npm install</code>. This command will take a while to run. 
+                                    Finally, type <code>npm run start</code>.
+                                </div>
+                              </div>
+                            </div>
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="headingFour">
+                                  <button class="accordion-button collapsed bg-secondary text-light" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                                      <b>4. Add the extension to Chrome</b>
+                                  </button>
+                                </h2>
+                                <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#accordionExample">
+                                  <div class="accordion-body">
+                                      Open Chrome and visit <a href="chrome://extensions/">extensions</a>. Toggle developer mode to be on. 
+                                      Click on "Load unpacked" and select the wikichange/dist folder. <br>
+                                      <b>Congratulations!</b> WikiChange is on and running. Now go to any english Wikipedia page and have fun. <br>
+                                      <img class="rounded mx-auto d-block" style="max-width: 50%" src="./assets/step4.png" alt="..." />
+                                  </div>
+                                </div>
+                              </div>
+                          </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+        <!-- Footer-->
+        <footer class="bg-dark py-4 mt-auto">
+            <div class="container px-5">
+                <div class="row align-items-center justify-content-between flex-column flex-sm-row">
+                    <div class="col-auto"><div class="small m-0 text-white">Copyright &copy; Wikipedia Browser Extension 2022</div></div>
+                </div>
+            </div>
+        </footer>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="js/scripts.js"></script>
+    </body>
+</html>
