@@ -118,9 +118,9 @@ const pastaRevisionResponse = await getPageRevisionCountTimeseries(
 */
 ```
 
-### How to use the highlight functions
+## How to use the highlight functions
 
-## The Char Version vs Word Version
+### The Char Version vs Word Version
 
 To run the char version import the following in root.js or a file that is eventually imported in root.js to get the marks created in the html.
 ```javascript
@@ -139,6 +139,27 @@ Make sure that not both are being used at the same time and for best performance
 import "./content";
 ```
 in root.js. Note, this will disable the graph as well.
+
+## How to get highlight count
+
+### Node Version
+The highlight node code in content.js keeps track of the changes that it managed to highlight and the changes that it failed to highlight. You can get the length attribute of the arrays to get a count. 
+
+### Mark Version
+The markContent funciton reutrns an object of with a succeed and fail array of the content. You can get the length attribute of the arrays to get a count. 
+
+```javascript
+markContent(arr, "#AFE1AF").then(({ succeed, fail }) => {
+            console.info(succeed.length);
+            console.groupCollapsed('succeed');
+            console.info(succeed);
+            console.groupEnd();
+
+            console.groupCollapsed('fail');
+            console.info(fail);
+            console.groupEnd();
+        });
+```
 
 ## Testing Code
 

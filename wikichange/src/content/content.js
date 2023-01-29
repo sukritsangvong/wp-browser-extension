@@ -533,25 +533,8 @@ const highlight = async (revisionId, oldRevisionId) => {
                 fail.push(element);
             }
         }
-        console.info(succeed.length);
-        console.groupCollapsed('succeed');
-        console.info(succeed);
-        console.groupEnd();
-
-        console.groupCollapsed('fail');
-        console.info(fail);
-        console.groupEnd();
     } else {
-        markContent(arr, "#AFE1AF").then(({ succeed, fail }) => {
-            console.info(succeed.length);
-            console.groupCollapsed('succeed');
-            console.info(succeed);
-            console.groupEnd();
-
-            console.groupCollapsed('fail');
-            console.info(fail);
-            console.groupEnd();
-        });
+        markContent(arr, "#AFE1AF").then(({ succeed, fail }) => {});
     }
     let button = document.getElementById("highlightButton");
     button.disabled = false;
