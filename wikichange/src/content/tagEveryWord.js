@@ -12,9 +12,9 @@ const tagEveryWord = () => {
                 return NodeFilter.FILTER_REJECT;
             }
             // Skip the references
-            if (node.parentElement.closest('.reflist')){
-                return NodeFilter.FILTER_REJECT;
-            }
+            // if (node.parentElement.closest('.reflist')){
+            //     return NodeFilter.FILTER_REJECT;
+            // }
             if (node.nodeValue.trim()){
                 return NodeFilter.FILTER_ACCEPT;
             } 
@@ -74,5 +74,7 @@ const tagEveryWord = () => {
     }, {"text":'', "index":0, "map":[]});
 }
 
-export { tagEveryWord };
+const { text, map } = tagEveryWord();
+
+export { text, map };
 
