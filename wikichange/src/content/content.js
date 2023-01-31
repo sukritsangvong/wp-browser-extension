@@ -4,6 +4,7 @@ import { fetchChangeWithHTML, fetchRevisionFromDate, getRevisionPageLink } from 
 import { HighlightType, HIGHLIGHT_TYPE, DEBUG } from "./enums";
 import { markContent  } from "./markContent.js";
 import { cleanText, splitElementNode } from "./cleanText";
+import { title } from "./globals.js";
 
 /**
  * Inserts a new node after an existing node
@@ -15,19 +16,6 @@ const insertAfter = (newNode, existingNode) => {
     existingNode.parentNode.insertBefore(newNode, existingNode.nextSibling);
 };
 
-/**
- * Get the title of a Wikipedia page by inspecting the html
- * @returns a string with title of a page
- */
-const title = (() => {
-    let titleSpan = document.getElementsByClassName("mw-page-title-main");
-    if (titleSpan.length == 0) {
-        let url = document.URL.split("/");
-        return url[url.length - 1].replace("_", " ");
-    } else {
-        return titleSpan[0].innerHTML;
-    }
-})();
 
 /**
  * Creates the div for the graph overlay by first creating a container
@@ -427,28 +415,6 @@ const highlightContentUsingNodes = (context, color) => {
     });
     return highlightSucceeded;
 };
-
-/** The page id can be found as the last part of the link to
- * the wikidata item on the left side of wikipedia pages.
- * If no page id is found throws an error.
- * @returns the page id of a Wikipedia page
- */
-(() => {
-    let wiki_data_url;
-    try {
-        wiki_data_url = document.getElementById("t-wikibase").getElementsByTagName("a")[0].href;
-    } catch {
-        throw new Error("Can't find page id!");
-    }
-    const wiki_page_id = wiki_data_url.split("/").slice(-1)[0];
-    if(DEBUG) {
-        console.info({
-            wiki_data_url: wiki_data_url,
-            wiki_page_id: wiki_page_id,
-        });
-    }
-    return wiki_page_id;
-})();
 
 /**
  * Highlight the current page to a revision on a given date
