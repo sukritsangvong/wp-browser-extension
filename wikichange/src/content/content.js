@@ -149,8 +149,19 @@ const renderScaleButtons = () => {
     viewsEditsChart.parentNode.insertBefore(scaleButtonsDiv, viewsEditsChart);
 };
 
+const updateClosestDate = (pageLink, oldRevisionDate) => {
+    const revisionDate = document.getElementById("revisionDate");
+    revisionDate.innerHTML = getRevisionToClosestDateText(pageLink, oldRevisionDate);
+    const revisionButton = document.getElementById("revisionButton");
+    revisionButton.innerHTML = getTextForRevisionButton(oldRevisionDate);
+};
+
 const getRevisionToClosestDateText = (pageLink, oldRevisionDate) => {
     return `Comparing the current Wikipedia page to the <a href=${pageLink} target="_blank">${oldRevisionDate} version</a> (the closest revision to your chosen time)`;
+};
+
+const getTextForRevisionButton = (oldRevisionDate) => {
+    return `See Differences From ${oldRevisionDate}'s Version`;
 };
 
 /**
@@ -173,12 +184,14 @@ const renderItemsBelowGraph = async (creationDate) => {
     const oldRevisionDate = oldRevision[1].toLocaleDateString().slice(0, 10);
     highlightRevisionBetweenRevisionIds(title, curRevisionId, oldRevisionId);
 
-    belowGraphDiv.innerHTML = `<input type="date" value="${initialDate
+    belowGraphDiv.innerHTML = `<div id="loader"></div><button class="extensionButton" id="highlightButton">Highlight Changes From</button>
+    <input type="date" value="${initialDate
         .toISOString()
         .slice(0, 10)}" id="dateOutput" name="dateOutput" style="text-align: center;"> 
-                                <button class="extensionButton" id="highlightButton">Highlight</button><div id="loader"></div>
                                 <p></p>
-                                <button class="extensionButton" id="revisionButton">Go To Revision Page</button>
+                                <button class="extensionButton" id="revisionButton">${getTextForRevisionButton(
+                                    oldRevisionDate
+                                )}</button>
                             <div style="padding-left: 3%; padding-top: 3%; text-align: center;">
                                 <div class="card" style="border-style: solid;">
                                     <div class="card-body" style="text-align: center;">
@@ -217,8 +230,7 @@ const renderItemsBelowGraph = async (creationDate) => {
         const oldRevisionDate = oldRevision[1].toLocaleDateString().slice(0, 10);
 
         // Change the revision context box
-        const revisionDate = document.getElementById("revisionDate");
-        revisionDate.innerHTML = getRevisionToClosestDateText(
+        updateClosestDate(
             getRevisionPageLink(title, curRevisionId, oldRevisionId).replace(/\s/g, "_"),
             oldRevisionDate
         );
@@ -281,7 +293,7 @@ const renderLoader = () => {
     loader.style.width = "15px";
     loader.style.height = "15px";
     loader.style.position = "absolute";
-    loader.style.marginLeft = "4px";
+    loader.style.marginLeft = "-30px";
     loader.style.display = "inline-block";
     loader.style.animation = "spin 2s linear infinite";
 
