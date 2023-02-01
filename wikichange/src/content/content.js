@@ -318,63 +318,6 @@ getPageCreationDate(title).then((date) => {
     Promise.all(promises).then(() => renderPopup());
 });
 
-// Get wikipedia text, global as we shouldn't get it every time we highlight a word
-let wikiText = document.getElementById("mw-content-text");
-let innerHTML = wikiText.innerHTML;
-
-/**
- * Simple highlighter with no context. Highlights the first word that matches text
- *
- * @param {string} text that we want to highlight
- * @param {string} color of the highlighting
- */
-const highlightContent = (text, color) => {
-    let index = innerHTML.indexOf(text);
-    if (index >= 0) {
-        innerHTML =
-            innerHTML.substring(0, index) +
-            `<mark style='background-color: ${color}' class='extension-highlight'>` +
-            innerHTML.substring(index, index + text.length) +
-            "</mark>" +
-            innerHTML.substring(index + text.length);
-        wikiText.innerHTML = innerHTML;
-    }
-};
-
-/**
- * Highlights the words that are given with context. No support for links
- * Loops through the page until it finds a match, does this based on indexes.
- *
- * @param {dictionary} json dictionary entry with keys "content_before", "highlight" and "content_after"
- * @param {string} color of the highlight
- */
-const highlightContentWithContext = (json, color) => {
-    let foundIndex = -1;
-    let controlIndex = 0;
-    let highlight = json["highlight"];
-    let before = json["content_before"];
-    let after = json["content_after"];
-    while ((foundIndex = innerHTML.indexOf(highlight, controlIndex)) != -1) {
-        let afterText = innerHTML.substring(
-            foundIndex + highlight.length,
-            foundIndex + highlight.length + after.length
-        );
-        let beforeText = innerHTML.substring(foundIndex - before.length, foundIndex);
-
-        if (afterText === after && beforeText === before) {
-            innerHTML =
-                innerHTML.substring(0, foundIndex) +
-                `<mark style='background-color: ${color}' class='extension-highlight'>` +
-                innerHTML.substring(foundIndex, foundIndex + highlight.length) +
-                "</mark>" +
-                innerHTML.substring(foundIndex + highlight.length);
-            wikiText.innerHTML = innerHTML;
-            break;
-        }
-        controlIndex = foundIndex + highlight.length;
-    }
-};
-
 /**
  * Will clean links. Works with links with different and same titles, for instance
  * [[text]] and [[text|text]] and return the clean version "text"
@@ -525,7 +468,6 @@ const highlightRevisionBetweenRevisionIds = async (title, curRevisionId, oldRevi
         );
     }
 };
-
 
 /**
  * Highlight a page by comparing two revisions
