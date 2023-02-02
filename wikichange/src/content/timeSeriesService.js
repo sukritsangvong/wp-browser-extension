@@ -80,7 +80,6 @@ const fetchPageRevisionsParallel = async (title, startDate, endDate, numPartitio
 
     return Promise.all(promises)
         .then((results) => results.reduce((acc, res) => acc.concat(res), []))
-        .then((combinedResults) => combinedResults)
         .catch((error) =>
             console.error(
                 `$Error parallel fetching revisions for title:${title} startDate:${startDate} endDate:${endDate} \nErrror:${error}`
