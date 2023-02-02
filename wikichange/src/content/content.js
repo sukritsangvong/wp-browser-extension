@@ -3,6 +3,7 @@ import { injectGraphToPage, injectScaledCurrentGraphToPage } from "./graph.js";
 import { fetchChangeWithHTML, fetchRevisionFromDate, getRevisionPageLink } from "./compareRevisionService.js";
 import { HighlightType, HIGHLIGHT_TYPE } from "./enums";
 import { markContent  } from "./markContent.js";
+import { cleanText } from "./cleanText";
 
 /**
  * Inserts a new node after an existing node
@@ -319,19 +320,6 @@ getPageCreationDate(title).then((date) => {
 });
 
 /**
- * Will clean links. Works with links with different and same titles, for instance
- * [[text]] and [[text|text]] and return the clean version "text"
- * @param {string} text_with_link
- */
-const returnCleanLink = (text_with_link) => {
-    let pattern = /\[\[([^\|]+)\|?([^\]]+)\]\]/g;
-    let result = text_with_link.replace(pattern, (_, p1, p2) => {
-        return p2 || p1;
-    });
-    return result;
-};
-
-/**
  *  Highlights the words that are given with context. Support for links,
  *  there are some edge cases that don't work yet (highlight is link + no link) or
  *  context and highlight are links. Loops through the DOM tree text nodes, and if no patial
@@ -481,6 +469,7 @@ const highlight = async (revisionId, oldRevisionId) => {
         const succeed = [];
         const fail = [];
         for(let element of arr){
+            cleanText(element);
             if(highlightContentUsingNodes(element, "#AFE1AF")){
                 succeed.push(element);
             } else {

@@ -13,6 +13,6 @@ const HighlightType = {
     TAGGING_WORD: 2
 }
 
-const HIGHLIGHT_TYPE = HighlightType.NODE;
+const HIGHLIGHT_TYPE = HighlightType.TAGGING_CHAR;
 
 export { WIKI_CREATION_DATE, WIKI_PAGE_VIEW_DATA_AVAILABLE_DATE, AggregateType, HIGHLIGHT_TYPE, HighlightType };
