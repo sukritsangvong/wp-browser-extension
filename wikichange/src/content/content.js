@@ -2,7 +2,7 @@ import { getPageCreationDate } from "./timeSeriesService.js";
 import { injectGraphToPage, injectScaledCurrentGraphToPage } from "./graph.js";
 import { fetchChangeWithHTML, fetchRevisionFromDate, getRevisionPageLink } from "./compareRevisionService.js";
 import { HighlightType, HIGHLIGHT_TYPE } from "./enums";
-import { markContent  } from "./markContent.js";
+import { markContent } from "./markContent.js";
 
 /**
  * Inserts a new node after an existing node
@@ -480,8 +480,8 @@ const highlight = async (revisionId, oldRevisionId) => {
     if (HIGHLIGHT_TYPE == HighlightType.NODE) {
         const succeed = [];
         const fail = [];
-        for(let element of arr){
-            if(highlightContentUsingNodes(element, "#AFE1AF")){
+        for (let element of arr) {
+            if (highlightContentUsingNodes(element, "#AFE1AF")) {
                 succeed.push(element);
             } else {
                 fail.push(element);
