@@ -164,6 +164,11 @@ const getTextForRevisionButton = (oldRevisionDate) => {
     return `See Differences From ${oldRevisionDate}'s Version`;
 };
 
+const getCurAndOldRevisionsParallel = async (title, curDate, oldDate) => {
+    const revisionPromises = [fetchRevisionFromDate(title, curDate), fetchRevisionFromDate(title, oldDate)];
+    return Promise.all(revisionPromises);
+};
+
 /**
  * Add date input and buttons, below the graph. Upon clicking highlight and closest revision date appears
  *
@@ -178,8 +183,9 @@ const renderItemsBelowGraph = async (creationDate) => {
     let initialDate = new Date();
     initialDate.setDate(now.getDate() - totalDaysDiff * 0.5);
 
-    let curRevisionId = (await fetchRevisionFromDate(title, now))[0];
-    const oldRevision = await fetchRevisionFromDate(title, initialDate);
+    const revisions = await getCurAndOldRevisionsParallel(title, now, initialDate);
+    let curRevisionId = revisions[0][0];
+    const oldRevision = revisions[1];
     let oldRevisionId = oldRevision[0];
     const oldRevisionDate = oldRevision[1].toLocaleDateString().slice(0, 10);
     highlightRevisionBetweenRevisionIds(title, curRevisionId, oldRevisionId);
@@ -224,9 +230,10 @@ const renderItemsBelowGraph = async (creationDate) => {
         });
 
         // update revision ids
-        curRevisionId = (await fetchRevisionFromDate(title, now))[0];
-        const oldRevision = await fetchRevisionFromDate(title, date);
-        oldRevisionId = oldRevision[0];
+        const revisions = await getCurAndOldRevisionsParallel(title, now, date);
+        let curRevisionId = revisions[0][0];
+        const oldRevision = revisions[1];
+        let oldRevisionId = oldRevision[0];
         const oldRevisionDate = oldRevision[1].toLocaleDateString().slice(0, 10);
 
         // Change the revision context box

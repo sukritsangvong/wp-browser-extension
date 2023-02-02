@@ -10,8 +10,8 @@ const AggregateType = {
 const HighlightType = {
     NODE: 0,
     TAGGING_CHAR: 1,
-    TAGGING_WORD: 2
-}
+    TAGGING_WORD: 2,
+};
 
 const HIGHLIGHT_TYPE = HighlightType.NODE;
 
