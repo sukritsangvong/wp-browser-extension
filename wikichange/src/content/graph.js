@@ -11,6 +11,11 @@ const CHART_COLORS = {
     grey: "rgb(201, 203, 207)",
 };
 
+const decimation = {
+    enabled: false,
+    algorithm: 'min-max',
+  };
+
 /**
  * Injects a graph of a given article's page views and edits data.
  *
@@ -48,6 +53,9 @@ const injectGraphToPage = async (title, startDate, endDate) => {
         type: "line",
         data: data,
         options: {
+            plugins: {
+                decimation: decimation,
+              },
             scales: {
                 y: {
                     type: "linear",
@@ -82,5 +90,16 @@ const injectGraphToPage = async (title, startDate, endDate) => {
 
     new Chart(document.getElementById("viewsEditsChart"), config);
 };
+
+const actions = [
+    {
+      name: 'min-max decimation',
+      handler(chart) {
+        chart.options.plugins.decimation.algorithm = 'min-max';
+        chart.options.plugins.decimation.enabled = true;
+        chart.update();
+      },
+    }
+  ];
 
 export default injectGraphToPage;
