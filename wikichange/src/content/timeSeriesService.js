@@ -57,6 +57,38 @@ const fetchPageViews = async (title, startDate, endDate, aggregateType) => {
 };
 
 /**
+ * Split given range of dates into multiple portions and call fetchPageRevisions on each of them then combine
+ * the results together
+ *
+ * @param {string} title of a wikipedia article
+ * @param {Date} startDate
+ * @param {Date} endDate
+ * @param {int} numPartition number to split the call into
+ * @returns An array containing all revisions' timestamps
+ */
+const fetchPageRevisionsParallel = async (title, startDate, endDate, numPartition) => {
+    const interval = (endDate - startDate) / numPartition;
+    let datePortions = Array.from({ length: numPartition + 1 }, (_, i) => new Date(startDate.getTime() + interval * i));
+    const promises = [];
+
+    datePortions.forEach((date, i) => {
+        if (i == 0) {
+            return;
+        }
+        promises.push(fetchPageRevisions(title, datePortions[i - 1], date));
+    });
+
+    return Promise.all(promises)
+        .then((results) => results.reduce((acc, res) => acc.concat(res), []))
+        .then((combinedResults) => combinedResults)
+        .catch((error) =>
+            console.error(
+                `$Error parallel fetching revisions for title:${title} startDate:${startDate} endDate:${endDate} \nErrror:${error}`
+            )
+        );
+};
+
+/**
  * Get all the revision objects on a given wikipedia title.
  *
  * The api only gives us at most 500 reivision objects per request. However, it does give us a svcontinue to
@@ -87,7 +119,7 @@ const fetchPageRevisions = async (title, startDate, endDate) => {
     while (curJsonResponse.hasOwnProperty("continue")) {
         let continueString = curJsonResponse.continue.rvcontinue;
         const continueResponse = await fetch(
-            `https://en.wikipedia.org/w/api.php?action=query&format=json&prop=revisions&titles=${title}&formatversion=2&rvprop=timestamp&rvslots=*&rvlimit=500&rvcontinue=${continueString}`
+            `https://en.wikipedia.org/w/api.php?action=query&format=json&prop=revisions&titles=${title}&formatversion=2&rvprop=timestamp&rvslots=*&rvlimit=500&rvstart=${endDate.toISOString()}&rvend=${startDate.toISOString()}&rvcontinue=${continueString}`
         );
 
         curJsonResponse = await continueResponse.json();
@@ -169,7 +201,7 @@ const getPageViews = async (title, startDate, endDate, aggregateType) => {
  */
 const getPageRevisionCount = async (title, startDate, endDate, aggregateType) => {
     try {
-        let result = await fetchPageRevisions(title, startDate, endDate);
+        let result = await fetchPageRevisionsParallel(title, startDate, endDate, 10);
         let formattedResult = formatPageRevisions(result, aggregateType);
         return formattedResult;
     } catch (err) {
