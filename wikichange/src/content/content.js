@@ -89,16 +89,17 @@ const renderGraphOverlay = async () => {
         document.getElementById("5y").click();
     });
 
-    renderScaleButtons();
+    renderScaleButtons(creationDate);
     return graphPromise; // Promise of whether the graph is injected
 };
 
-const setUpScaleButton = (scaleButtonsDiv, buttonId, buttonText, duration, scaleButtonInputs) => {
+const setUpScaleButton = (scaleButtonsDiv, buttonId, buttonText, duration, scaleButtonInputs, isDisable) => {
     const button = document.createElement("button");
     button.setAttribute("id", buttonId);
     button.setAttribute("style", "margin-right: 5px;");
     button.setAttribute("class", "extensionButton");
     button.innerHTML = buttonText;
+    button.disabled = isDisable;
     scaleButtonsDiv.appendChild(button);
 
     button.addEventListener("click", () => {
@@ -113,22 +114,33 @@ const setUpScaleButton = (scaleButtonsDiv, buttonId, buttonText, duration, scale
     });
 };
 
-const setUpScaleButtons = (scaleButtonsDiv, scaleButtonInputs) => {
-    scaleButtonInputs.forEach((input) => {
-        setUpScaleButton(scaleButtonsDiv, input.id, input.name, input.duration, scaleButtonInputs);
-    });
-};
-
 const getDateObjectFromNow = (monthsFromCurrent) => {
+    if (monthsFromCurrent == null) {
+        return null;
+    }
     const date = new Date();
     date.setMonth(date.getMonth() - monthsFromCurrent);
     return date;
 };
 
+const setUpScaleButtons = (scaleButtonsDiv, scaleButtonInputs, creationDate) => {
+    const pageAgeInMonths = (new Date().getTime() - creationDate.getTime()) / (1000 * 3600 * 24 * 30);
+    scaleButtonInputs.forEach((input) => {
+        setUpScaleButton(
+            scaleButtonsDiv,
+            input.id,
+            input.name,
+            getDateObjectFromNow(input.duration),
+            scaleButtonInputs,
+            input.duration && pageAgeInMonths < input.duration
+        );
+    });
+};
+
 /**
  * Render buttons to scale the graph.
  */
-const renderScaleButtons = () => {
+const renderScaleButtons = (creationDate) => {
     const viewsEditsChart = document.getElementById("viewsEditsChart");
     const scaleButtonsDiv = document.createElement("div");
     scaleButtonsDiv.setAttribute("id", "scaleButtonsDiv");
@@ -136,14 +148,14 @@ const renderScaleButtons = () => {
 
     const scaleButtonInputs = [
         { id: "all", name: "ALL", duration: null }, // null represents shows everything
-        { id: "5y", name: "5Y", duration: getDateObjectFromNow(5 * 12) },
-        { id: "3y", name: "3Y", duration: getDateObjectFromNow(3 * 12) },
-        { id: "1y", name: "1Y", duration: getDateObjectFromNow(12) },
-        { id: "6m", name: "6M", duration: getDateObjectFromNow(6) },
-        { id: "3m", name: "3M", duration: getDateObjectFromNow(3) },
+        { id: "5y", name: "5Y", duration: 5 * 12 },
+        { id: "3y", name: "3Y", duration: 3 * 12 },
+        { id: "1y", name: "1Y", duration: 12 },
+        { id: "6m", name: "6M", duration: 6 },
+        { id: "3m", name: "3M", duration: 3 },
     ];
 
-    setUpScaleButtons(scaleButtonsDiv, scaleButtonInputs);
+    setUpScaleButtons(scaleButtonsDiv, scaleButtonInputs, creationDate);
 
     // inserts buttons above graph
     viewsEditsChart.parentNode.insertBefore(scaleButtonsDiv, viewsEditsChart);
