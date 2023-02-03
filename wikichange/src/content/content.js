@@ -86,7 +86,11 @@ const renderGraphOverlay = async () => {
     const sim = setInterval(progressBar, 3);
 
     const graphPromise = injectGraphToPage(title, creationDate, new Date(Date.now())).then(async () => {
-        document.getElementById("5y").click();
+        if (document.getElementById("5y").disabled) {
+            document.getElementById("all").click();
+        } else {
+            document.getElementById("5y").click();
+        }
     });
 
     renderScaleButtons(creationDate);
