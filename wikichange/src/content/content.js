@@ -192,7 +192,6 @@ const renderItemsBelowGraph = async (creationDate) => {
     let belowGraphDiv = document.createElement("div");
     belowGraphDiv.setAttribute("id", "belowGraphDiv");
     let initialDate = new Date();
-    console.log(totalDaysDiff);
 
     // set to half on small page, else set to 2.5 years
     if (totalDaysDiff < 365 * 5) {
