@@ -176,7 +176,14 @@ const renderItemsBelowGraph = async (creationDate) => {
     let belowGraphDiv = document.createElement("div");
     belowGraphDiv.setAttribute("id", "belowGraphDiv");
     let initialDate = new Date();
-    initialDate.setDate(now.getDate() - totalDaysDiff * 0.5);
+    console.log(totalDaysDiff);
+
+    // set to half on small page, else set to 2.5 years
+    if (totalDaysDiff < 365 * 5) {
+        initialDate.setDate(now.getDate() - totalDaysDiff * 0.5);
+    } else {
+        initialDate.setDate(now.getDate() - 365 * 2.5);
+    }
 
     let curRevisionId = (await fetchRevisionFromDate(title, now))[0];
     const oldRevision = await fetchRevisionFromDate(title, initialDate);
