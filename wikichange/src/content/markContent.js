@@ -1,5 +1,5 @@
 import { HighlightType, HIGHLIGHT_TYPE } from "./enums";
-import { escapeRegex } from "./oustideCode";
+import { cleanText, escapeRegex } from "./cleanText";
 
 /**
  * 
@@ -20,9 +20,10 @@ const markContentHelper = (_text, _mark, _remove_mark) => {
      * and the last is the end index of the item found
      */
     const textMatching = (context) => {
+        context = cleanText(context);
         const {content_before, highlight, content_after } = context;
         const start = [..._text.matchAll(new RegExp(escapeRegex(highlight), 'g'))];
-        if (start.length > 0){
+        if (start.length > 0) {
             return [true, start[0]['index'], start[0]['index'] + highlight.length];
         } else {
             return [false];
