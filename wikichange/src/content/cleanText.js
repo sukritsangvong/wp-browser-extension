@@ -10,18 +10,13 @@ function escapeRegex(string) {
 
 /**
  * Will clean links. Works with links with different and same titles, for instance
- * [[text]] and [[text|text]] and return the clean version "text"
+ * [[text]], [[text something|text]], ''[text]'' and return the clean version "text"
  * @param {string} content
  */
 const returnCleanLink = (content) => {
-    if (content.includes("[[") && content.includes("]]")) {
-        let pattern = /\[\[([^\|]+)\|?([^\]]+)\]\]/g;
-        let result = content.replace(pattern, (_, p1, p2) => {
-            return p2 || p1;
-        });
-        return result;
-    }
-    return content;
+    return content.replace(/\[\[[^\]]+\|([^\]]+)\]\]/g, '$1')
+            .replace(/\[\[[^\]]+\]\]/g, (match) => match.replace(/\[\[|\]\]/g, ''))
+            .replace(/''(.+)''/g, '$1');
 };
 
 const cleanText = (context) => {
