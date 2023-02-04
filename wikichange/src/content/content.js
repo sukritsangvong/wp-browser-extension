@@ -87,19 +87,24 @@ const renderGraphOverlay = async () => {
     const sim = setInterval(progressBar, 3);
 
     const graphPromise = injectGraphToPage(title, creationDate, new Date(Date.now())).then(async () => {
-        document.getElementById("5y").click();
+        if (document.getElementById("5y").disabled) {
+            document.getElementById("all").click();
+        } else {
+            document.getElementById("5y").click();
+        }
     });
 
-    renderScaleButtons();
+    renderScaleButtons(creationDate);
     return graphPromise; // Promise of whether the graph is injected
 };
 
-const setUpScaleButton = (scaleButtonsDiv, buttonId, buttonText, duration, scaleButtonInputs) => {
+const setUpScaleButton = (scaleButtonsDiv, buttonId, buttonText, duration, scaleButtonInputs, isDisable) => {
     const button = document.createElement("button");
     button.setAttribute("id", buttonId);
     button.setAttribute("style", "margin-right: 5px;");
     button.setAttribute("class", "extensionButton");
     button.innerHTML = buttonText;
+    button.disabled = isDisable;
     scaleButtonsDiv.appendChild(button);
 
     button.addEventListener("click", () => {
@@ -114,22 +119,33 @@ const setUpScaleButton = (scaleButtonsDiv, buttonId, buttonText, duration, scale
     });
 };
 
-const setUpScaleButtons = (scaleButtonsDiv, scaleButtonInputs) => {
-    scaleButtonInputs.forEach((input) => {
-        setUpScaleButton(scaleButtonsDiv, input.id, input.name, input.duration, scaleButtonInputs);
-    });
-};
-
 const getDateObjectFromNow = (monthsFromCurrent) => {
+    if (monthsFromCurrent == null) {
+        return null;
+    }
     const date = new Date();
     date.setMonth(date.getMonth() - monthsFromCurrent);
     return date;
 };
 
+const setUpScaleButtons = (scaleButtonsDiv, scaleButtonInputs, creationDate) => {
+    const pageAgeInMonths = (new Date().getTime() - creationDate.getTime()) / (1000 * 3600 * 24 * 30);
+    scaleButtonInputs.forEach((input) => {
+        setUpScaleButton(
+            scaleButtonsDiv,
+            input.id,
+            input.name,
+            getDateObjectFromNow(input.duration),
+            scaleButtonInputs,
+            input.duration && pageAgeInMonths < input.duration
+        );
+    });
+};
+
 /**
  * Render buttons to scale the graph.
  */
-const renderScaleButtons = () => {
+const renderScaleButtons = (creationDate) => {
     const viewsEditsChart = document.getElementById("viewsEditsChart");
     const scaleButtonsDiv = document.createElement("div");
     scaleButtonsDiv.setAttribute("id", "scaleButtonsDiv");
@@ -137,14 +153,14 @@ const renderScaleButtons = () => {
 
     const scaleButtonInputs = [
         { id: "all", name: "ALL", duration: null }, // null represents shows everything
-        { id: "5y", name: "5Y", duration: getDateObjectFromNow(5 * 12) },
-        { id: "3y", name: "3Y", duration: getDateObjectFromNow(3 * 12) },
-        { id: "1y", name: "1Y", duration: getDateObjectFromNow(12) },
-        { id: "6m", name: "6M", duration: getDateObjectFromNow(6) },
-        { id: "3m", name: "3M", duration: getDateObjectFromNow(3) },
+        { id: "5y", name: "5Y", duration: 5 * 12 },
+        { id: "3y", name: "3Y", duration: 3 * 12 },
+        { id: "1y", name: "1Y", duration: 12 },
+        { id: "6m", name: "6M", duration: 6 },
+        { id: "3m", name: "3M", duration: 3 },
     ];
 
-    setUpScaleButtons(scaleButtonsDiv, scaleButtonInputs);
+    setUpScaleButtons(scaleButtonsDiv, scaleButtonInputs, creationDate);
 
     // inserts buttons above graph
     viewsEditsChart.parentNode.insertBefore(scaleButtonsDiv, viewsEditsChart);
@@ -165,6 +181,11 @@ const getTextForRevisionButton = (oldRevisionDate) => {
     return `See Differences From ${oldRevisionDate}'s Version`;
 };
 
+const getCurAndOldRevisionsParallel = async (title, curDate, oldDate) => {
+    const revisionPromises = [fetchRevisionFromDate(title, curDate), fetchRevisionFromDate(title, oldDate)];
+    return Promise.all(revisionPromises);
+};
+
 /**
  * Add date input and buttons, below the graph. Upon clicking highlight and closest revision date appears
  *
@@ -177,10 +198,17 @@ const renderItemsBelowGraph = async (creationDate) => {
     let belowGraphDiv = document.createElement("div");
     belowGraphDiv.setAttribute("id", "belowGraphDiv");
     let initialDate = new Date();
-    initialDate.setDate(now.getDate() - totalDaysDiff * 0.5);
 
-    let curRevisionId = (await fetchRevisionFromDate(title, now))[0];
-    const oldRevision = await fetchRevisionFromDate(title, initialDate);
+    // set to half on small page, else set to 2.5 years
+    if (totalDaysDiff < 365 * 5) {
+        initialDate.setDate(now.getDate() - totalDaysDiff * 0.5);
+    } else {
+        initialDate.setDate(now.getDate() - 365 * 2.5);
+    }
+
+    const revisions = await getCurAndOldRevisionsParallel(title, now, initialDate);
+    let curRevisionId = revisions[0][0];
+    const oldRevision = revisions[1];
     let oldRevisionId = oldRevision[0];
     const oldRevisionDate = oldRevision[1].toLocaleDateString().slice(0, 10);
     highlightRevisionBetweenRevisionIds(title, curRevisionId, oldRevisionId);
@@ -225,9 +253,10 @@ const renderItemsBelowGraph = async (creationDate) => {
         });
 
         // update revision ids
-        curRevisionId = (await fetchRevisionFromDate(title, now))[0];
-        const oldRevision = await fetchRevisionFromDate(title, date);
-        oldRevisionId = oldRevision[0];
+        const revisions = await getCurAndOldRevisionsParallel(title, now, date);
+        let curRevisionId = revisions[0][0];
+        const oldRevision = revisions[1];
+        let oldRevisionId = oldRevision[0];
         const oldRevisionDate = oldRevision[1].toLocaleDateString().slice(0, 10);
 
         // Change the revision context box

@@ -22,9 +22,9 @@ const fetchChangeWithHTML = async (startID, endID) => {
     );
 
     // Construct result array of maps
-    let contentBefore = "";
-    let highlight = "";
-    let contentAfter = "";
+    let contentBefore = null;
+    let highlight = null;
+    let contentAfter = null;
     const result = [];
     divsWithIns.forEach((element) => {
         element.childNodes.forEach((child) => {
@@ -32,26 +32,30 @@ const fetchChangeWithHTML = async (startID, endID) => {
             const content = child.textContent.replaceAll(/(<ref.*?>.*?<\/ref>)/g, "");
 
             if (nodeName == "#text") {
-                if (contentBefore == "") {
+                if (highlight == null && contentBefore == null) {
                     contentBefore = content;
                 } else {
                     contentAfter = content;
 
                     addJsonToResultAndReset(result, contentBefore, highlight, contentAfter);
-                    contentBefore = "";
-                    highlight = "";
-                    contentAfter = "";
+                    contentBefore = null;
+                    highlight = null;
+                    contentAfter = null;
                 }
             } else if (nodeName == "INS") {
-                highlight += ` ${content}`;
+                if (highlight == null) {
+                    highlight = content;
+                } else {
+                    highlight += ` ${content}`;
+                }
             }
         });
 
-        if (contentBefore != "" || highlight || ("" && contentAfter) || "") {
+        if (contentBefore != null || highlight || contentAfter != null) {
             addJsonToResultAndReset(result, contentBefore, highlight, contentAfter);
-            contentBefore = "";
-            highlight = "";
-            contentAfter = "";
+            contentBefore = null;
+            highlight = null;
+            contentAfter = null;
         }
     });
 
@@ -63,9 +67,9 @@ const fetchChangeWithHTML = async (startID, endID) => {
 
 const addJsonToResultAndReset = (result, contentBefore, highlight, contentAfter) => {
     result.push({
-        content_before: contentBefore,
+        content_before: contentBefore == null ? "" : contentBefore,
         highlight: highlight,
-        content_after: contentAfter,
+        content_after: contentAfter == null ? "" : contentAfter,
     });
 };
 
