@@ -22,7 +22,7 @@ const returnCleanLink = (text_with_link) => {
 };
 
 const getContentWithoutTags = (content) => {
-    return content.replace(/<ref>.*<\/ref>/g, "").replace(/\{\{Cite.*?\}\}/g, "");
+    return content.replace(/<ref>.*<\/ref>/g, "").replace(/\{\{Cite.*?\}\}/g, "").replace(/cite web/g, "");
 }
 
 const cleanTitle = (content) => {
@@ -30,17 +30,21 @@ const cleanTitle = (content) => {
 }
 
 const cleanCategory = (content) => {
-    return content.replace("{{", "").replace("}}", "");
+    return content.replace(/{{/g, "").replace(/}}/g, "");
 }
 
 const cleanText = (context) => {
-    if (context.highlight.includes("[[") && context.highlight.includes("]]")) {
-        context.highlight = returnCleanLink(context.highlight);
+    if (context.highlight) {
+        context.highlight = context.highlight.trim();
+        if (context.highlight.includes("[[") && context.highlight.includes("]]")) {
+            context.highlight = returnCleanLink(context.highlight);
+        }
+        context.highlight = getContentWithoutTags(context.highlight);
+        context.highlight = cleanTitle(context.highlight);
+        context.highlight = cleanCategory(context.highlight);
+        return context.highlight;
     }
-    context.highlight = getContentWithoutTags(context.highlight);
-    context.highlight = cleanTitle(context.highlight);
-    context.highlight = cleanCategory(context.highlight);
-    return context.highlight;
+    return;
 }
 
 export { escapeRegex, cleanText };

@@ -24,7 +24,7 @@ const markContentHelper = (_text, _mark, _remove_mark) => {
         console.log(context.highlight);
         const {content_before, highlight, content_after } = context;
         const start = [..._text.matchAll(new RegExp(escapeRegex(highlight), 'g'))];
-        if (start.length > 0){
+        if (start.length > 0) {
             return [true, start[0]['index'], start[0]['index'] + highlight.length];
         } else {
             return [false];
