@@ -498,7 +498,7 @@ const highlight = async (revisionId, oldRevisionId) => {
         const succeed = [];
         const fail = [];
         for(let element of arr){
-            cleanText(element);
+            element = cleanText(element);
             if(highlightContentUsingNodes(element, "#AFE1AF")){
                 succeed.push(element);
             } else {

@@ -20,7 +20,7 @@ const markContentHelper = (_text, _mark, _remove_mark) => {
      * and the last is the end index of the item found
      */
     const textMatching = (context) => {
-        cleanText(context);
+        context = cleanText(context);
         console.log(context.highlight);
         const {content_before, highlight, content_after } = context;
         const start = [..._text.matchAll(new RegExp(escapeRegex(highlight), 'g'))];

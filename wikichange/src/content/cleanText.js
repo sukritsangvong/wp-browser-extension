@@ -11,40 +11,33 @@ function escapeRegex(string) {
 /**
  * Will clean links. Works with links with different and same titles, for instance
  * [[text]] and [[text|text]] and return the clean version "text"
- * @param {string} text_with_link
+ * @param {string} content
  */
-const returnCleanLink = (text_with_link) => {
-    let pattern = /\[\[([^\|]+)\|?([^\]]+)\]\]/g;
-    let result = text_with_link.replace(pattern, (_, p1, p2) => {
-        return p2 || p1;
-    });
-    return result;
+const returnCleanLink = (content) => {
+    if (content.includes("[[") && content.includes("]]")) {
+        let pattern = /\[\[([^\|]+)\|?([^\]]+)\]\]/g;
+        let result = content.replace(pattern, (_, p1, p2) => {
+            return p2 || p1;
+        });
+        return result;
+    }
+    return content;
 };
 
-const getContentWithoutTags = (content) => {
-    return content.replace(/<ref>.*<\/ref>/g, "").replace(/\{\{Cite.*?\}\}/g, "").replace(/cite web/g, "");
-}
-
-const cleanTitle = (content) => {
-    return content.replace(/=/g, "");
-}
-
-const cleanCategory = (content) => {
-    return content.replace(/{{/g, "").replace(/}}/g, "");
-}
-
 const cleanText = (context) => {
-    if (context.highlight) {
-        context.highlight = context.highlight.trim();
-        if (context.highlight.includes("[[") && context.highlight.includes("]]")) {
-            context.highlight = returnCleanLink(context.highlight);
+    for (const [type, value] of Object.entries(context)) {
+        if (context[type]) {
+            let clean = value.trim();
+            clean = returnCleanLink(value);
+            clean = clean.replace(/<ref>.*<\/ref>/g, "")
+                 .replace(/\{\{Cite.*?\}\}/g, "")
+                 .replace(/cite web/g, "")
+                 .replace(/=/g, "")
+                 .replace(/{{/g, "").replace(/}}/g, "");
+            context[type] = clean;
         }
-        context.highlight = getContentWithoutTags(context.highlight);
-        context.highlight = cleanTitle(context.highlight);
-        context.highlight = cleanCategory(context.highlight);
-        return context.highlight;
     }
-    return;
+    return context;
 }
 
 export { escapeRegex, cleanText };
