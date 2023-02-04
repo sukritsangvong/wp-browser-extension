@@ -48,7 +48,7 @@ const fetchChangeWithHTML = async (startID, endID) => {
 
 /**
  * @param {string} content
- * @returns cleaned up content that has no {{...}} and <ref>...</ref>
+ * @returns cleaned up content that has no {{...}}, <ref>...</ref>, <ref>..., and ...</ref>
  */
 const cleanUpContent = (content) => {
     return content.replace(/{{.*?}}|<ref.*?<\/ref>/g, "").replace(/<ref>.*$|.*$<\/ref>/g, "");
