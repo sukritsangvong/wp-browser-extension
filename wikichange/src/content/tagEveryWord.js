@@ -27,10 +27,6 @@ const tagEveryWord = () => {
     }
 
     return nodesToChange.reduce((accumulator, node) => {
-        if(accumulator['text'].length !== 0){
-            accumulator['text'] += ' ';
-            accumulator['index']++;
-        }
         accumulator['text'] += node.textContent;
         
         const isAlphanumeric = new RegExp('[a-zA-Z0-9]');

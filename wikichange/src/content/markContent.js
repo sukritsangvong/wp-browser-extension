@@ -1,5 +1,7 @@
-import { HighlightType, HIGHLIGHT_TYPE, DEBUG } from "./enums";
+import { HighlightType, HIGHLIGHT_TYPE } from "./enums";
 import { cleanText, escapeRegex, splitElementNode } from "./cleanText";
+import textMatching from "./textMatching";
+import { debug_info } from "./helper";
 
 /**
  * 
@@ -9,11 +11,10 @@ import { cleanText, escapeRegex, splitElementNode } from "./cleanText";
  * @returns markContent function
  */
 const markContentHelper = (_text, _track, _remove_mark, _apply) => {
-    if(DEBUG){
-        console.groupCollapsed('Text');
-        console.info(_text);
-        console.groupEnd();
-    }
+    console.groupCollapsed('Text');
+    debug_info(_text);
+    console.groupEnd();
+    
 
     /**
      * Checks if the text found it is the correct one to highlight based
@@ -36,25 +37,7 @@ const markContentHelper = (_text, _track, _remove_mark, _apply) => {
         return false;
     }
 
-    /**
-     * @param {object} context Object containing the context_before, context_after and highlight portions
-     * @returns an array where the first item is a boolean if a match was found
-     * , the second is the start index of the item found
-     * and the last is the end index of the item found
-     */
-    const textMatching = (context) => {
-        context = cleanText(context);
-        const {content_before, highlight, content_after} = context;
-        const matches = [..._text.matchAll(new RegExp(escapeRegex(highlight), 'g'))];
-        // Now we need to highlight the correct segment
-        for (let i = 0; i < matches.length; i++) {
-            let index = matches[i]['index'];
-            if (matchContext(content_before, content_after, matches[i])) {
-                return [true, index, index + highlight.length];
-            }
-        }
-        return [false];
-    };
+    const textMatcher = new textMatching(_text);
 
     /**
      * @param {object} context_array 
@@ -62,27 +45,20 @@ const markContentHelper = (_text, _track, _remove_mark, _apply) => {
      * @returns an object where succeeds is an array of all the context_array elements matched
      * and fail in an array of all the context_array elements not matched
      */
-    const markContent = async (context_array, color) => {
+    return async (context_array, color) => {
         _remove_mark();
         let succeed = [];
         let fail = [];
         let startTime = Date.now();
         context_array.forEach((element) => splitElementNode(element).forEach((context) => {
             const [ found, start, end ] = textMatching(context);
-            if (found) {
-                _track(start, end);
-                succeed.push(context);
-            } else {
-                fail.push(context);
-            }
-        }));    
-        _apply(color);
-        if(DEBUG){
-            console.info((Date.now() - startTime)/1000);
-        }
+            _apply(color);
+            
+        }));
+        if(DEBUG)
+        console.groupEnd();
         return { succeed, fail };
     };
-    return markContent;
 }
 
 /**

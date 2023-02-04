@@ -35,9 +35,9 @@ const title = (() => {
 /**
  * Get the Wikipedia page wikitext
  *
- * @param {string} title of a wikipedia article
+ * @return {string} wikitext of the article
  */
-const getPageWikitext = async (title) => {
+const getPageWikitext = async () => {
     const response = await fetch(
         `https://en.wikipedia.org/w/api.php?action=parse&page=${title}&prop=wikitext&format=json`
     );
@@ -45,7 +45,5 @@ const getPageWikitext = async (title) => {
     return json["parse"]["wikitext"]["*"];
 };
 
-const wikitext = getPageWikitext(title).then((wikitext) => wikitext);
-
-export { title, wikitext, page_id };
+export { title, getPageWikitext, page_id };
 

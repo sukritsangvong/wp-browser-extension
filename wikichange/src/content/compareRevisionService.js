@@ -1,3 +1,5 @@
+import { HighlightType, HIGHLIGHT_TYPE } from "./enums";
+
 const fetchChangeWithHTML = async (startID, endID) => {
     const response = await fetch(
         `https://en.wikipedia.org/w/api.php?action=compare&format=json&fromrev=${startID}&torev=${endID}&prop=diff%7Cids%7Ctitle%7Ctimestamp&formatversion=2`
@@ -26,13 +28,13 @@ const fetchChangeWithHTML = async (startID, endID) => {
                 const nodeName = child.nodeName;
                 const content = child.textContent;
 
-                if (nodeName == "INS") {
+                if (nodeName === "INS") {
                     const contentBefore =
-                        i > 0 && curDiv.childNodes[i - 1].nodeName == "#text"
+                        i > 0 && curDiv.childNodes[i - 1].nodeName === "#text"
                             ? curDiv.childNodes[i - 1].textContent
                             : "";
                     const contentAfter =
-                        i + 1 < curDiv.childNodes.length && curDiv.childNodes[i + 1].nodeName == "#text"
+                        i + 1 < curDiv.childNodes.length && curDiv.childNodes[i + 1].nodeName === "#text"
                             ? curDiv.childNodes[i + 1].textContent
                             : "";
 
@@ -43,9 +45,9 @@ const fetchChangeWithHTML = async (startID, endID) => {
             const combinedResult = [];
             localResult.forEach((child) => {
                 if (
-                    combinedResult.length != 0 &&
+                    combinedResult.length !== 0 &&
                     isOnlyContainsSymbols(child.content_before) &&
-                    combinedResult.at(-1).content_after == child.content_before
+                    combinedResult.at(-1).content_after === child.content_before
                 ) {
                     const previouslyAddedResult = combinedResult.at(-1);
                     previouslyAddedResult.highlight =
@@ -59,15 +61,16 @@ const fetchChangeWithHTML = async (startID, endID) => {
         }
     });
 
-    result = result
-        .map((res) => {
+
+    if(HIGHLIGHT_TYPE === HighlightType.NODE){
+        result = result.map((res) => {
             return {
                 content_before: cleanUpContent(res.content_before),
                 highlight: cleanUpContent(res.highlight),
                 content_after: cleanUpContent(res.content_after),
             };
-        })
-        .filter((res) => !isOnlyContainsSymbols(res.highlight) && !res.highlight == "");
+        }).filter((res) => !isOnlyContainsSymbols(res.highlight) && !res.highlight === "");
+    }
 
     return result;
 };
