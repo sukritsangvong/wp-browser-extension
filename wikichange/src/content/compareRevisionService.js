@@ -21,55 +21,50 @@ const fetchChangeWithHTML = async (startID, endID) => {
         (v, i, a) => a.findIndex((v2) => v2.innerHTML === v.innerHTML) === i
     );
 
-    // Construct result array of maps
-    let contentBefore = null;
-    let highlight = null;
-    let contentAfter = null;
     const result = [];
     divsWithIns.forEach((element) => {
-        element.childNodes.forEach((child) => {
+        element.childNodes.forEach((child, i) => {
             const nodeName = child.nodeName;
-            const content = child.textContent.replaceAll(/(<ref.*?>.*?<\/ref>)/g, "");
+            const content = child.textContent;
 
-            if (nodeName == "#text") {
-                if (highlight == null && contentBefore == null) {
-                    contentBefore = content;
-                } else {
-                    contentAfter = content;
+            if (nodeName == "INS") {
+                const contentBefore =
+                    i > 0 && element.childNodes[i - 1].nodeName == "#text" ? element.childNodes[i - 1].textContent : "";
+                const contentAfter =
+                    i + 1 < element.childNodes.length && element.childNodes[i + 1].nodeName == "#text"
+                        ? element.childNodes[i + 1].textContent
+                        : "";
 
-                    addJsonToResultAndReset(result, contentBefore, highlight, contentAfter);
-                    contentBefore = null;
-                    highlight = null;
-                    contentAfter = null;
-                }
-            } else if (nodeName == "INS") {
-                if (highlight == null) {
-                    highlight = content;
-                } else {
-                    highlight += ` ${content}`;
-                }
+                addJsonToResult(result, contentBefore, content, contentAfter);
             }
         });
-
-        if (contentBefore != null || highlight || contentAfter != null) {
-            addJsonToResultAndReset(result, contentBefore, highlight, contentAfter);
-            contentBefore = null;
-            highlight = null;
-            contentAfter = null;
-        }
     });
 
     divsWithNoInsOuts.forEach((curDiv) => {
-        addJsonToResultAndReset(result, "", curDiv.innerText, "");
+        addJsonToResult(result, "", curDiv.innerText, "");
     });
     return result;
 };
 
-const addJsonToResultAndReset = (result, contentBefore, highlight, contentAfter) => {
+/**
+ * @param {string} content
+ * @returns cleaned up content that has no {{...}} and <ref>...</ref>
+ */
+const cleanUpContent = (content) => {
+    return content.replace(/{{.*?}}|<ref.*?<\/ref>|\[\[|\]\]/g, "").replace(/<ref>.*$|.*$<\/ref>/g, "");
+};
+
+const isOnlyContainsSymbols = (text) => /^[\W\s]+$/.test(text);
+
+const addJsonToResult = (result, contentBefore, highlight, contentAfter) => {
+    // don't add to json if highlight is empty or only contains symbols
+    const cleanUpHighlight = cleanUpContent(highlight);
+    if (cleanUpHighlight == "" || isOnlyContainsSymbols(cleanUpHighlight)) return;
+
     result.push({
-        content_before: contentBefore == null ? "" : contentBefore,
-        highlight: highlight,
-        content_after: contentAfter == null ? "" : contentAfter,
+        content_before: cleanUpContent(contentBefore),
+        highlight: cleanUpHighlight,
+        content_after: cleanUpContent(contentAfter),
     });
 };
 
