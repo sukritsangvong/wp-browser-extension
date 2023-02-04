@@ -21,7 +21,6 @@ const markContentHelper = (_text, _mark, _remove_mark) => {
      */
     const textMatching = (context) => {
         context = cleanText(context);
-        console.log(context.highlight);
         const {content_before, highlight, content_after } = context;
         const start = [..._text.matchAll(new RegExp(escapeRegex(highlight), 'g'))];
         if (start.length > 0) {
