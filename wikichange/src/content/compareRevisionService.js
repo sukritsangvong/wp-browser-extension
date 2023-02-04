@@ -51,7 +51,7 @@ const fetchChangeWithHTML = async (startID, endID) => {
  * @returns cleaned up content that has no {{...}} and <ref>...</ref>
  */
 const cleanUpContent = (content) => {
-    return content.replace(/{{.*?}}|<ref.*?<\/ref>|\[\[|\]\]/g, "").replace(/<ref>.*$|.*$<\/ref>/g, "");
+    return content.replace(/{{.*?}}|<ref.*?<\/ref>/g, "").replace(/<ref>.*$|.*$<\/ref>/g, "");
 };
 
 const isOnlyContainsSymbols = (text) => /^[\W\s]+$/.test(text);
