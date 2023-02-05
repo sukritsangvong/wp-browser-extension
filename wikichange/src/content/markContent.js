@@ -1,7 +1,7 @@
 import { HighlightType, HIGHLIGHT_TYPE } from "./enums";
 import { cleanText, escapeRegex } from "./cleanText";
 
-const fuzzySeach = (text, textToSearch, startIndex, endIndex, errorAllowed, enableOffset) => {
+const fuzzySeach = (text, textToSearch, startIndex, endIndex, errorAllowed) => {
     if (startIndex < 0 || endIndex > text.length) console.error(`Error: invalid start and end index for fuzzy search.`);
     const textToSearchLen = textToSearch.length;
     const maxError = Math.floor(textToSearchLen * errorAllowed) + 1;
@@ -10,27 +10,9 @@ const fuzzySeach = (text, textToSearch, startIndex, endIndex, errorAllowed, enab
     // console.log(textToSearchLen - maxError);
     for (let i = startIndex; i < endIndex; i++) {
         let distance = 0;
-        let offsetBig = 0;
-        let offsetSmall = 0;
-        for (let j = 0; j + offsetSmall < textToSearchLen && i + j + offsetBig < endIndex; j++) {
-            if (text[i + j + offsetBig] === textToSearch[j + offsetSmall]) {
+        for (let j = 0; j < textToSearchLen && i + j < endIndex; j++) {
+            if (text[i + j] === textToSearch[j]) {
                 distance++;
-            } else if (enableOffset) {
-                let tmpOffBig = offsetBig;
-                let tmpOffSmall = offsetSmall;
-
-                while (text[i + j + tmpOffBig] !== textToSearch[j + offsetSmall] && i + j + tmpOffBig < endIndex) {
-                    tmpOffBig++;
-                }
-                while (text[i + j + offsetBig] !== textToSearch[j + tmpOffSmall] && j + tmpOffSmall < textToSearchLen) {
-                    tmpOffSmall++;
-                }
-
-                if (tmpOffBig < tmpOffSmall) {
-                    offsetBig = tmpOffBig;
-                } else {
-                    offsetSmall = tmpOffSmall;
-                }
             }
         }
 
@@ -38,6 +20,7 @@ const fuzzySeach = (text, textToSearch, startIndex, endIndex, errorAllowed, enab
             return i;
         }
     }
+
     return -1;
 };
 
@@ -49,7 +32,7 @@ const getHighlightIndex = (text, context) => {
     // isRun = true;
 
     while (true) {
-        const startHighlight = fuzzySeach(text, highlight, startSearchIndex, text.length, 0.2, false);
+        const startHighlight = fuzzySeach(text, highlight, startSearchIndex, text.length, 0.2);
         const endHighlight = startHighlight + highlight.length;
 
         if (startHighlight == -1) break;
@@ -59,10 +42,9 @@ const getHighlightIndex = (text, context) => {
         const searchRangeForContentAfter = Math.min(text.length, endHighlight + 1.5 * content_after.length);
         const isContentBeforeMatch =
             content_before == "" ||
-            fuzzySeach(text, content_before, searchRangeForContentBefore, startHighlight, 0.4, true) != -1;
+            fuzzySeach(text, content_before, searchRangeForContentBefore, startHighlight, 0.4) != -1;
         const isContentAfterMatch =
-            content_after == "" ||
-            fuzzySeach(text, content_after, endHighlight, searchRangeForContentAfter, 0.4, true) != -1;
+            content_after == "" || fuzzySeach(text, content_after, endHighlight, searchRangeForContentAfter, 0.4) != -1;
         // console.log(context);
         // console.log(text.substring(startHighlight, endHighlight));
         // console.log(content_before);
@@ -109,7 +91,7 @@ const markContentHelper = (_text, _mark, _remove_mark) => {
         // const bigText = `, published by an association of food industries with the goal of promoting pasta in the  United States . [17] Rustichello da Pisa  writes in his  Travels  that Marco Polo described a food similar to "lagana".  Jeffrey Steingarten  asserts that  Arabs  introduced pasta in the  Emirate of Sicily  in the ninth century, mentioning also that traces of pasta have been found in ancient Greece and that  Jane Grigson  believed the Marco Polo story to have originated in the 1920s or `;
         // const textToSearch = `, published by an association of food industries with the goal of promoting pasta in the United States. Rustichello da Pisa writes in his ''Travels that Marco Polo described a food similar to "lagana". Jeffrey Steingarten asserts that Arabs introduced pasta in the Emirate of Sicily in the ninth century, mentioning also that traces of pasta have been found in ancient Greece and that Jane Grigson believed the Marco Polo story to have originated in the 1920s or `;
 
-        // const start = fuzzySeach(bigText, textToSearch, 0, bigText.length, 0.5, false);
+        // const start = fuzzySeach(bigText, textToSearch, 0, bigText.length, 0.5);
 
         // const testContext = {
         //     content_before:
@@ -120,7 +102,7 @@ const markContentHelper = (_text, _mark, _remove_mark) => {
 
         // const start = getHighlightIndex(_text, testContext);
 
-        // const start = fuzzySeach(_text, highlight, 0, _text.length, 0.5, false);
+        // const start = fuzzySeach(_text, highlight, 0, _text.length, 0.5);
         // const start = [..._text.matchAll(new RegExp(escapeRegex(highlight), "g"))];
         if (start > 0) {
             return [true, start, start + highlight.length];
