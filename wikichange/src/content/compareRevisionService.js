@@ -21,8 +21,9 @@ const fetchChangeWithHTML = async (startID, endID) => {
         (v, i, a) => a.findIndex((v2) => v2.innerHTML === v.innerHTML) === i
     );
 
-    const result = [];
+    let result = [];
     divsWithIns.forEach((element) => {
+        const localResult = [];
         element.childNodes.forEach((child, i) => {
             const nodeName = child.nodeName;
             const content = child.textContent;
@@ -35,9 +36,26 @@ const fetchChangeWithHTML = async (startID, endID) => {
                         ? element.childNodes[i + 1].textContent
                         : "";
 
-                addJsonToResult(result, contentBefore, content, contentAfter);
+                addJsonToResult(localResult, contentBefore, content, contentAfter);
             }
         });
+
+        const combinedResult = [];
+        localResult.forEach((child) => {
+            if (
+                combinedResult.length != 0 &&
+                isOnlyContainsSymbols(child.content_before) &&
+                combinedResult.at(-1).content_after == child.content_before
+            ) {
+                const previouslyAddedResult = combinedResult.at(-1);
+                previouslyAddedResult.highlight =
+                    previouslyAddedResult.highlight + previouslyAddedResult.content_after + child.highlight;
+                previouslyAddedResult.content_after = child.content_after;
+            } else {
+                combinedResult.push(child);
+            }
+        });
+        result.push(...combinedResult);
     });
 
     divsWithNoInsOuts.forEach((curDiv) => {
