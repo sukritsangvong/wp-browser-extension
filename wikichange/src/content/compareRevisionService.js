@@ -61,6 +61,16 @@ const fetchChangeWithHTML = async (startID, endID) => {
     divsWithNoInsOuts.forEach((curDiv) => {
         addJsonToResult(result, "", curDiv.innerText, "");
     });
+
+    result = result
+        .map((res) => {
+            return {
+                content_before: cleanUpContent(res.content_before),
+                highlight: cleanUpContent(res.highlight),
+                content_after: cleanUpContent(res.content_after),
+            };
+        })
+        .filter((res) => !isOnlyContainsSymbols(res.highlight) && !res.highlight == "");
     return result;
 };
 
@@ -69,20 +79,19 @@ const fetchChangeWithHTML = async (startID, endID) => {
  * @returns cleaned up content that has no {{...}}, <ref>...</ref>, <ref>..., and ...</ref>
  */
 const cleanUpContent = (content) => {
-    return content.replace(/{{.*?}}|<ref.*?<\/ref>/g, "").replace(/<ref>.*$|.*$<\/ref>/g, "");
+    return content.replace(/{{.*?}}|<ref.*?<\/ref>/g, "").replace(/<ref.*|.*<\/ref>/g, "");
 };
 
 const isOnlyContainsSymbols = (text) => /^[\W\s]+$/.test(text);
 
 const addJsonToResult = (result, contentBefore, highlight, contentAfter) => {
     // don't add to json if highlight is empty or only contains symbols
-    const cleanUpHighlight = cleanUpContent(highlight);
-    if (cleanUpHighlight == "" || isOnlyContainsSymbols(cleanUpHighlight)) return;
+    if (highlight == "" || isOnlyContainsSymbols(highlight)) return;
 
     result.push({
-        content_before: cleanUpContent(contentBefore),
-        highlight: cleanUpHighlight,
-        content_after: cleanUpContent(contentAfter),
+        content_before: contentBefore,
+        highlight: highlight,
+        content_after: contentAfter,
     });
 };
 
