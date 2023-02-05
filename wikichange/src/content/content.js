@@ -381,21 +381,11 @@ const highlightContentUsingNodes = (context, color) => {
         node = textNode;
         parent = node.parentNode;
         let value = node.nodeValue;
-        let filter_highlight = context.highlight.replace(/<ref>.*<\/ref>/g, "").replace(/\{\{Cite.*?\}\}/g, "");
-        if (context.highlight.includes("[[") && context.highlight.includes("]]")) {
-            // This includes a link in the content it is supposed to highlight.
-            // Will highlight only first sentence
-            newValue = value.replace(
-                filter_highlight,
-                `<mark style='background-color: ${color}' class='extension-highlight'>${value}</mark>`
-            );
-        } else {
-            newValue = value.replace(
-                filter_highlight,
-                `<mark style='background-color: ${color}' class='extension-highlight'>${filter_highlight}</mark>`
-            );
-        }
-
+        let filter_highlight = context.highlight.replace(/<ref>.*<\/ref>/g, "").replace(/\{\{Cite.*?\}\}/g, ""); 
+        newValue = value.replace(
+            filter_highlight,
+            `<mark style='background-color: ${color}' class='extension-highlight'>${filter_highlight}</mark>`
+        );
         if (newValue !== value) {
             // Clean up the context.content_after and context.content_before from wiki markup
             let content_after = context.content_after.replace(/[|=\[\]{}]+|<[^>]*>/g, "").replace("cite web", "");
@@ -487,6 +477,28 @@ const highlightRevisionBetweenRevisionIds = async (title, curRevisionId, oldRevi
 };
 
 /**
+ * If there's a link in the text to highlight, it will split and update the context after and before
+ * 
+ * @param {dictionary} element dictionary entry with keys "content_before", "highlight" and "content_after"
+ * @returns an array of dictionaries 
+ */
+const splitElementNode = (element) => {
+    let result = [];
+    if (element.highlight.includes("[[") && element.highlight.includes("]]")) {
+        let split = element.highlight.split(/\[\[(.*?)\]\]/);
+        for (let i = 0; i < split.length; i++) {
+            result.push({
+                content_before: i != 0 ? split[i-1] : "",
+                highlight: split[i],
+                content_after: i != (split.length-1) ? split[i+1] : "",
+            });
+        }
+        return result;
+    }
+    return [element];
+};
+
+/**
  * Highlight a page by comparing two revisions
  *
  * @param {int} revisionId of the page that contains highlights
@@ -497,12 +509,15 @@ const highlight = async (revisionId, oldRevisionId) => {
     if (HIGHLIGHT_TYPE == HighlightType.NODE) {
         const succeed = [];
         const fail = [];
-        for(let element of arr){
-            element = cleanText(element);
-            if(highlightContentUsingNodes(element, "#AFE1AF")){
-                succeed.push(element);
-            } else {
-                fail.push(element);
+        for(let element of arr) {
+            let splitElement = splitElementNode(element);
+            for (let subElement of splitElement) {
+                subElement = cleanText(subElement);
+                if (highlightContentUsingNodes(subElement, "#AFE1AF")) {
+                    succeed.push(subElement);
+                } else {
+                    fail.push(subElement);
+                }
             }
         }
     } else {
