@@ -476,6 +476,12 @@ const highlightRevisionBetweenRevisionIds = async (title, curRevisionId, oldRevi
     }
 };
 
+/**
+ * If there's a link in the text to highlight, it will split and update the context after and before
+ * 
+ * @param {dictionary} element dictionary entry with keys "content_before", "highlight" and "content_after"
+ * @returns an array of dictionaries 
+ */
 const splitElementNode = (element) => {
     let result = [];
     if (element.highlight.includes("[[") && element.highlight.includes("]]")) {
@@ -514,7 +520,6 @@ const highlight = async (revisionId, oldRevisionId) => {
                 }
             }
         }
-        console.log(fail);
     } else {
         markContent(arr, "#AFE1AF").then(({ succeed, fail }) => {});
     }
