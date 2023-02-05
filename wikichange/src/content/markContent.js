@@ -37,7 +37,7 @@ const getHighlightIndex = (text, context) => {
 
         if (startHighlight == -1) break;
 
-        if (content_after == "" && content_after == "") return -1;
+        if (content_after == "" && content_after == "") return startHighlight;
         const searchRangeForContentBefore = Math.max(0, startHighlight - 1.5 * content_before.length);
         const searchRangeForContentAfter = Math.min(text.length, endHighlight + 1.5 * content_after.length);
         const isContentBeforeMatch =
