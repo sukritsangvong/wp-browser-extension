@@ -28,7 +28,8 @@ const cleanText = (context) => {
                  .replace(/\{\{Cite.*?\}\}/g, "")
                  .replace(/cite web/g, "")
                  .replace(/=/g, "")
-                 .replace(/{{/g, "").replace(/}}/g, "");
+                 .replace(/{{/g, "").replace(/}}/g, "")
+                 .replace(/'(.*?)'/g, "");
             context[type] = clean;
         }
     }
