@@ -5,61 +5,58 @@ const fetchChangeWithHTML = async (startID, endID) => {
     const data = await response.json();
     const parser = new DOMParser();
 
-    const document = parser.parseFromString(data["compare"]["body"], "text/html");
-    const insNodes = document.querySelectorAll("ins.diffchange.diffchange-inline");
-    const divsWithInsWithDuplicate = [...insNodes].map((node) => {
-        return node.parentElement;
-    });
-
-    const allDivs = document.querySelectorAll("div");
-    const divsWithNoInsOuts = [...allDivs].filter((curDiv) => {
-        return curDiv.querySelectorAll("ins.diffchange.diffchange-inline,del.diffchange.diffchange-inline").length == 0;
-    });
-
-    // Removes duplicate divs
-    const divsWithIns = divsWithInsWithDuplicate.filter(
-        (v, i, a) => a.findIndex((v2) => v2.innerHTML === v.innerHTML) === i
-    );
+    const document = parser.parseFromString(`<table>${data["compare"]["body"]}</table>`, "text/html");
 
     let result = [];
-    divsWithIns.forEach((element) => {
-        const localResult = [];
-        element.childNodes.forEach((child, i) => {
-            const nodeName = child.nodeName;
-            const content = child.textContent;
+    const trsWithAddition = [...document.getElementsByClassName("diff-addedline")];
+    trsWithAddition.forEach((tr) => {
+        const curDivs = tr.querySelectorAll("div");
+        if (curDivs.length === 0) return;
+        if (curDivs.length !== 1) console.error(`Error: Found tr that has more than one div: ${tr}`);
 
-            if (nodeName == "INS") {
-                const contentBefore =
-                    i > 0 && element.childNodes[i - 1].nodeName == "#text" ? element.childNodes[i - 1].textContent : "";
-                const contentAfter =
-                    i + 1 < element.childNodes.length && element.childNodes[i + 1].nodeName == "#text"
-                        ? element.childNodes[i + 1].textContent
-                        : "";
+        const curDiv = curDivs[0];
+        const inNodes = curDiv.querySelectorAll("ins.diffchange.diffchange-inline");
+        if (inNodes.length === 0) {
+            // add the entire paragraph
+            addJsonToResult(result, "", curDiv.innerText, "");
+        } else {
+            // add in nodes separately
+            const localResult = [];
+            curDiv.childNodes.forEach((child, i) => {
+                const nodeName = child.nodeName;
+                const content = child.textContent;
 
-                addJsonToResult(localResult, contentBefore, content, contentAfter);
-            }
-        });
+                if (nodeName == "INS") {
+                    const contentBefore =
+                        i > 0 && curDiv.childNodes[i - 1].nodeName == "#text"
+                            ? curDiv.childNodes[i - 1].textContent
+                            : "";
+                    const contentAfter =
+                        i + 1 < curDiv.childNodes.length && curDiv.childNodes[i + 1].nodeName == "#text"
+                            ? curDiv.childNodes[i + 1].textContent
+                            : "";
 
-        const combinedResult = [];
-        localResult.forEach((child) => {
-            if (
-                combinedResult.length != 0 &&
-                isOnlyContainsSymbols(child.content_before) &&
-                combinedResult.at(-1).content_after == child.content_before
-            ) {
-                const previouslyAddedResult = combinedResult.at(-1);
-                previouslyAddedResult.highlight =
-                    previouslyAddedResult.highlight + previouslyAddedResult.content_after + child.highlight;
-                previouslyAddedResult.content_after = child.content_after;
-            } else {
-                combinedResult.push(child);
-            }
-        });
-        result.push(...combinedResult);
-    });
+                    addJsonToResult(localResult, contentBefore, content, contentAfter);
+                }
+            });
 
-    divsWithNoInsOuts.forEach((curDiv) => {
-        addJsonToResult(result, "", curDiv.innerText, "");
+            const combinedResult = [];
+            localResult.forEach((child) => {
+                if (
+                    combinedResult.length != 0 &&
+                    isOnlyContainsSymbols(child.content_before) &&
+                    combinedResult.at(-1).content_after == child.content_before
+                ) {
+                    const previouslyAddedResult = combinedResult.at(-1);
+                    previouslyAddedResult.highlight =
+                        previouslyAddedResult.highlight + previouslyAddedResult.content_after + child.highlight;
+                    previouslyAddedResult.content_after = child.content_after;
+                } else {
+                    combinedResult.push(child);
+                }
+            });
+            result.push(...combinedResult);
+        }
     });
 
     result = result
@@ -71,6 +68,7 @@ const fetchChangeWithHTML = async (startID, endID) => {
             };
         })
         .filter((res) => !isOnlyContainsSymbols(res.highlight) && !res.highlight == "");
+
     return result;
 };
 
