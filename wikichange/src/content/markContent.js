@@ -1,5 +1,5 @@
 import { HighlightType, HIGHLIGHT_TYPE } from "./enums";
-import { cleanText, escapeRegex } from "./cleanText";
+import { cleanText, escapeRegex, splitElementNode } from "./cleanText";
 
 /**
  * 
@@ -40,7 +40,7 @@ const markContentHelper = (_text, _mark, _remove_mark) => {
         _remove_mark();
         let succeed = [];
         let fail = [];
-        context_array.forEach((context) => {
+        context_array.forEach((element) => splitElementNode(element).forEach((context) => {
             const [ found, start, end ] = textMatching(context);
             if (found) {
                 _mark(start, end, color);
@@ -48,7 +48,7 @@ const markContentHelper = (_text, _mark, _remove_mark) => {
             } else {
                 fail.push(context);
             }
-        });
+        }));
         return { succeed, fail };
     };
     return markContent;
