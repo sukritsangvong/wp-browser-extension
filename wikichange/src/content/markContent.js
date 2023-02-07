@@ -25,9 +25,9 @@ const fuzzySeach = (text, textToSearch, startIndex, endIndex, errorAllowed) => {
 };
 
 let isRun = false;
-const getHighlightIndex = (text, context) => {
+const getHighlightIndex = (text, context, startIndex) => {
     const { content_before, highlight, content_after } = context;
-    let startSearchIndex = 0;
+    let startSearchIndex = startIndex;
     // if (isRun) return;
     // isRun = true;
 
@@ -81,13 +81,13 @@ const markContentHelper = (_text, _mark, _remove_mark) => {
      * , the second is the start index of the item found
      * and the last is the end index of the item found
      */
-    const textMatching = (context) => {
+    const textMatching = (context, curIndex) => {
         // if (isRun) return [false];
         // isRun = true;
         context = cleanText(context);
         const { content_before, highlight, content_after } = context;
 
-        const start = getHighlightIndex(_text, context);
+        const start = getHighlightIndex(_text, context, curIndex);
         // const bigText = `, published by an association of food industries with the goal of promoting pasta in the  United States . [17] Rustichello da Pisa  writes in his  Travels  that Marco Polo described a food similar to "lagana".  Jeffrey Steingarten  asserts that  Arabs  introduced pasta in the  Emirate of Sicily  in the ninth century, mentioning also that traces of pasta have been found in ancient Greece and that  Jane Grigson  believed the Marco Polo story to have originated in the 1920s or `;
         // const textToSearch = `, published by an association of food industries with the goal of promoting pasta in the United States. Rustichello da Pisa writes in his ''Travels that Marco Polo described a food similar to "lagana". Jeffrey Steingarten asserts that Arabs introduced pasta in the Emirate of Sicily in the ninth century, mentioning also that traces of pasta have been found in ancient Greece and that Jane Grigson believed the Marco Polo story to have originated in the 1920s or `;
 
@@ -119,11 +119,13 @@ const markContentHelper = (_text, _mark, _remove_mark) => {
      */
     const markContent = async (context_array, color) => {
         _remove_mark();
-        let succeed = [];
-        let fail = [];
+        const succeed = [];
+        const fail = [];
+        let curIndex = 0;
         context_array.forEach((context) => {
-            const [found, start, end] = textMatching(context);
+            const [found, start, end] = textMatching(context, curIndex);
             if (found) {
+                // curIndex = end;
                 _mark(start, end, color);
                 succeed.push(context);
             } else {
