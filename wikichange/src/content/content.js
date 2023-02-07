@@ -1,7 +1,7 @@
 import { getPageCreationDate } from "./timeSeriesService.js";
 import { injectGraphToPage, injectScaledCurrentGraphToPage } from "./graph.js";
 import { fetchChangeWithHTML, fetchRevisionFromDate, getRevisionPageLink } from "./compareRevisionService.js";
-import { HighlightType, HIGHLIGHT_TYPE } from "./enums";
+import { HighlightType, HIGHLIGHT_TYPE, DEBUG } from "./enums";
 import { markContent  } from "./markContent.js";
 import { cleanText, splitElementNode } from "./cleanText";
 
@@ -452,10 +452,12 @@ const highlightContentUsingNodes = (context, color) => {
         throw new Error("Can't find page id!");
     }
     const wiki_page_id = wiki_data_url.split("/").slice(-1)[0];
-    console.info({
-        wiki_data_url: wiki_data_url,
-        wiki_page_id: wiki_page_id,
-    });
+    if(DEBUG) {
+        console.info({
+            wiki_data_url: wiki_data_url,
+            wiki_page_id: wiki_page_id,
+        });
+    }
     return wiki_page_id;
 })();
 
@@ -507,10 +509,12 @@ const highlight = async (revisionId, oldRevisionId) => {
     let button = document.getElementById("highlightButton");
     button.disabled = false;
     document.getElementById("loader").style.display = "none";
-    console.groupCollapsed('found')
-    console.log(_succeed.map(elm => elm.highlight));
-    console.groupEnd();
-    console.groupCollapsed('not-found')
-    console.log(_fail);
-    console.groupEnd();
+    if (DEBUG) {
+        console.groupCollapsed('found')
+        _succeed.forEach(elm => console.log(elm.highlight));
+        console.groupEnd();
+        console.groupCollapsed('not-found')
+        console.log(_fail);
+        console.groupEnd();
+    }
 };

@@ -1,4 +1,4 @@
-import { HighlightType, HIGHLIGHT_TYPE } from "./enums";
+import { HighlightType, HIGHLIGHT_TYPE, DEBUG } from "./enums";
 import { cleanText, escapeRegex, splitElementNode } from "./cleanText";
 
 /**
@@ -9,10 +9,11 @@ import { cleanText, escapeRegex, splitElementNode } from "./cleanText";
  * @returns markContent function
  */
 const markContentHelper = (_text, _mark, _remove_mark) => {
-    console.groupCollapsed('Text');
-    console.info(_text);
-    console.groupEnd();
-
+    if(DEBUG){
+        console.groupCollapsed('Text');
+        console.info(_text);
+        console.groupEnd();
+    }
     /**
      * @param {object} context Object containing the context_before, context_after and highlight portions
      * @returns an array where the first item is a boolean if a match was found
