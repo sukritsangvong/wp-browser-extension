@@ -2,7 +2,7 @@ import { getPageCreationDate } from "./timeSeriesService.js";
 import { injectGraphToPage, injectScaledCurrentGraphToPage } from "./graph.js";
 import { fetchChangeWithHTML, fetchRevisionFromDate, getRevisionPageLink } from "./compareRevisionService.js";
 import { HighlightType, HIGHLIGHT_TYPE } from "./enums";
-import { markContent  } from "./markContent.js";
+import { markContent } from "./markContent.js";
 import { cleanText } from "./cleanText";
 
 /**
@@ -381,7 +381,7 @@ const highlightContentUsingNodes = (context, color) => {
         node = textNode;
         parent = node.parentNode;
         let value = node.nodeValue;
-        let filter_highlight = context.highlight.replace(/<ref>.*<\/ref>/g, "").replace(/\{\{Cite.*?\}\}/g, ""); 
+        let filter_highlight = context.highlight.replace(/<ref>.*<\/ref>/g, "").replace(/\{\{Cite.*?\}\}/g, "");
         newValue = value.replace(
             filter_highlight,
             `<mark style='background-color: ${color}' class='extension-highlight'>${filter_highlight}</mark>`
@@ -478,9 +478,9 @@ const highlightRevisionBetweenRevisionIds = async (title, curRevisionId, oldRevi
 
 /**
  * If there's a link in the text to highlight, it will split and update the context after and before
- * 
+ *
  * @param {dictionary} element dictionary entry with keys "content_before", "highlight" and "content_after"
- * @returns an array of dictionaries 
+ * @returns an array of dictionaries
  */
 const splitElementNode = (element) => {
     let result = [];
@@ -488,9 +488,9 @@ const splitElementNode = (element) => {
         let split = element.highlight.split(/\[\[(.*?)\]\]/);
         for (let i = 0; i < split.length; i++) {
             result.push({
-                content_before: i != 0 ? split[i-1] : "",
+                content_before: i != 0 ? split[i - 1] : "",
                 highlight: split[i],
-                content_after: i != (split.length-1) ? split[i+1] : "",
+                content_after: i != split.length - 1 ? split[i + 1] : "",
             });
         }
         return result;
@@ -506,10 +506,11 @@ const splitElementNode = (element) => {
  */
 const highlight = async (revisionId, oldRevisionId) => {
     const arr = await fetchChangeWithHTML(oldRevisionId, revisionId);
+    // console.log(arrs);
     if (HIGHLIGHT_TYPE == HighlightType.NODE) {
         const succeed = [];
         const fail = [];
-        for(let element of arr) {
+        for (let element of arr) {
             let splitElement = splitElementNode(element);
             for (let subElement of splitElement) {
                 subElement = cleanText(subElement);
