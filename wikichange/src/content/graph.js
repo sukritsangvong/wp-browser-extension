@@ -92,6 +92,14 @@ const makePageViewAndReivisionGraphFromData = (pageViewsData, revisionsData) => 
                 },
             },
             scales: {
+                x: {
+                    ticks:{
+                    callback: function(val, index) {
+                        return index % 4 === 0 ? this.getLabelForValue(val) : '';
+                      },
+                      color: 'grey',
+                    },
+                },
                 y: {
                     type: "linear",
                     display: true,
