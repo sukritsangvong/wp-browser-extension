@@ -10,12 +10,12 @@ document.head.append(stylesheet);
 const markPageChar = (start, end, color) => {
     let style = '';
     for(let i = start; i <= end; i++) {
-        style += `mark#mark-${i} {
-            background-color: ${color};
-        }
-        `;
+        style += `mark#mark-${i}, `
     }
-    stylesheet.innerText += style;
+    stylesheet.innerText += `${style.slice(0, style.length-2)} {
+        background-color: ${color};
+    }
+    `;
 };
 
 /**

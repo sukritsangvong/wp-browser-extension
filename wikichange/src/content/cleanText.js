@@ -36,4 +36,26 @@ const cleanText = (context) => {
     return context;
 }
 
-export { escapeRegex, cleanText };
+/**
+ * If there's a link in the text to highlight, it will split and update the context after and before
+ * 
+ * @param {dictionary} element dictionary entry with keys "content_before", "highlight" and "content_after"
+ * @returns an array of dictionaries 
+ */
+const splitElementNode = (element) => {
+    let result = [];
+    if (element.highlight.includes("[[") && element.highlight.includes("]]")) {
+        let split = element.highlight.split(/\[\[(.*?)\]\]/);
+        for (let i = 0; i < split.length; i++) {
+            result.push({
+                content_before: i != 0 ? split[i-1] : "",
+                highlight: split[i],
+                content_after: i != (split.length-1) ? split[i+1] : "",
+            });
+        }
+        return result;
+    }
+    return [element];
+};
+
+export { escapeRegex, cleanText, splitElementNode };

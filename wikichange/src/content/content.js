@@ -1,9 +1,9 @@
 import { getPageCreationDate } from "./timeSeriesService.js";
 import { injectGraphToPage, injectScaledCurrentGraphToPage } from "./graph.js";
 import { fetchChangeWithHTML, fetchRevisionFromDate, getRevisionPageLink } from "./compareRevisionService.js";
-import { HighlightType, HIGHLIGHT_TYPE } from "./enums";
+import { HighlightType, HIGHLIGHT_TYPE, DEBUG } from "./enums";
 import { markContent  } from "./markContent.js";
-import { cleanText } from "./cleanText";
+import { cleanText, splitElementNode } from "./cleanText";
 
 /**
  * Inserts a new node after an existing node
@@ -452,10 +452,12 @@ const highlightContentUsingNodes = (context, color) => {
         throw new Error("Can't find page id!");
     }
     const wiki_page_id = wiki_data_url.split("/").slice(-1)[0];
-    console.info({
-        wiki_data_url: wiki_data_url,
-        wiki_page_id: wiki_page_id,
-    });
+    if(DEBUG) {
+        console.info({
+            wiki_data_url: wiki_data_url,
+            wiki_page_id: wiki_page_id,
+        });
+    }
     return wiki_page_id;
 })();
 
@@ -477,28 +479,6 @@ const highlightRevisionBetweenRevisionIds = async (title, curRevisionId, oldRevi
 };
 
 /**
- * If there's a link in the text to highlight, it will split and update the context after and before
- * 
- * @param {dictionary} element dictionary entry with keys "content_before", "highlight" and "content_after"
- * @returns an array of dictionaries 
- */
-const splitElementNode = (element) => {
-    let result = [];
-    if (element.highlight.includes("[[") && element.highlight.includes("]]")) {
-        let split = element.highlight.split(/\[\[(.*?)\]\]/);
-        for (let i = 0; i < split.length; i++) {
-            result.push({
-                content_before: i != 0 ? split[i-1] : "",
-                highlight: split[i],
-                content_after: i != (split.length-1) ? split[i+1] : "",
-            });
-        }
-        return result;
-    }
-    return [element];
-};
-
-/**
  * Highlight a page by comparing two revisions
  *
  * @param {int} revisionId of the page that contains highlights
@@ -506,24 +486,35 @@ const splitElementNode = (element) => {
  */
 const highlight = async (revisionId, oldRevisionId) => {
     const arr = await fetchChangeWithHTML(oldRevisionId, revisionId);
+    const _succeed = [];
+    const _fail = [];
     if (HIGHLIGHT_TYPE == HighlightType.NODE) {
-        const succeed = [];
-        const fail = [];
         for(let element of arr) {
             let splitElement = splitElementNode(element);
             for (let subElement of splitElement) {
                 subElement = cleanText(subElement);
                 if (highlightContentUsingNodes(subElement, "#AFE1AF")) {
-                    succeed.push(subElement);
+                    _succeed.push(subElement);
                 } else {
-                    fail.push(subElement);
+                    _fail.push(subElement);
                 }
             }
         }
     } else {
-        markContent(arr, "#AFE1AF").then(({ succeed, fail }) => {});
+        await markContent(arr, "#AFE1AF").then(({ succeed, fail }) => {
+            _succeed.push(...succeed);
+            _fail.push(...fail);
+        });
     }
     let button = document.getElementById("highlightButton");
     button.disabled = false;
     document.getElementById("loader").style.display = "none";
+    if (DEBUG) {
+        console.groupCollapsed('found')
+        _succeed.forEach(elm => console.log(elm.highlight));
+        console.groupEnd();
+        console.groupCollapsed('not-found')
+        console.log(_fail);
+        console.groupEnd();
+    }
 };
