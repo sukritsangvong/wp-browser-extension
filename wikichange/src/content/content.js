@@ -211,8 +211,6 @@ const renderItemsBelowGraph = async (creationDate) => {
     const oldRevision = revisions[1];
     let oldRevisionId = oldRevision[0];
     const oldRevisionDate = oldRevision[1].toLocaleDateString().slice(0, 10);
-    highlightRevisionBetweenRevisionIds(title, curRevisionId, oldRevisionId);
-
     belowGraphDiv.innerHTML = `<div id="loader"></div><button class="extensionButton" id="highlightButton">Highlight Changes From</button>
     <input type="date" value="${initialDate
         .toISOString()
@@ -278,6 +276,8 @@ const renderItemsBelowGraph = async (creationDate) => {
             );
         }
     });
+
+    return [curRevisionId, oldRevisionId]
 };
 
 const toggleShowOnPopup = () => {
@@ -344,8 +344,11 @@ getPageCreationDate(title).then((date) => {
     promises.push(renderGraphOverlay());
     promises.push(renderItemsBelowGraph(date));
 
-    // Render popups only when graph and buttons are loaded
-    Promise.all(promises).then(() => renderPopup());
+    // Render popups and initial highlight only when graph and buttons are loaded
+    Promise.all(promises).then(([, [curRevisionId, oldRevisionId]]) => {
+        renderPopup();
+        highlightRevisionBetweenRevisionIds(title, curRevisionId, oldRevisionId)
+    });
 });
 
 /**
