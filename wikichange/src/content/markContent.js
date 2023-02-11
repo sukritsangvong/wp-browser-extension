@@ -1,5 +1,5 @@
-import { HighlightType, HIGHLIGHT_TYPE } from "./enums";
-import { cleanText, escapeRegex } from "./cleanText";
+import { HighlightType, HIGHLIGHT_TYPE, DEBUG } from "./enums";
+import { cleanText, escapeRegex, splitElementNode } from "./cleanText";
 
 /**
  * 
@@ -8,11 +8,12 @@ import { cleanText, escapeRegex } from "./cleanText";
  * @param {funtion} _remove_mark function to remove all marks in the html
  * @returns markContent function
  */
-const markContentHelper = (_text, _mark, _remove_mark) => {
-    console.groupCollapsed('Text');
-    console.info(_text);
-    console.groupEnd();
-
+const markContentHelper = (_text, _track, _remove_mark, _apply) => {
+    if(DEBUG){
+        console.groupCollapsed('Text');
+        console.info(_text);
+        console.groupEnd();
+    }
     /**
      * @param {object} context Object containing the context_before, context_after and highlight portions
      * @returns an array where the first item is a boolean if a match was found
@@ -40,15 +41,20 @@ const markContentHelper = (_text, _mark, _remove_mark) => {
         _remove_mark();
         let succeed = [];
         let fail = [];
-        context_array.forEach((context) => {
+        let startTime = Date.now();
+        context_array.forEach((element) => splitElementNode(element).forEach((context) => {
             const [ found, start, end ] = textMatching(context);
             if (found) {
-                _mark(start, end, color);
+                _track(start, end);
                 succeed.push(context);
             } else {
                 fail.push(context);
             }
-        });
+        }));    
+        _apply(color);
+        if(DEBUG){
+            console.info((Date.now() - startTime)/1000);
+        }
         return { succeed, fail };
     };
     return markContent;
@@ -61,11 +67,11 @@ const markContent = (() => {
     if (HIGHLIGHT_TYPE === HighlightType.TAGGING_CHAR) {
         const tag = require("./tagEveryChar");
         const mark = require("./markPageChar");
-        return markContentHelper(tag.text, mark.markPageChar, mark.removeMarks);
+        return markContentHelper(tag.text, mark.addChars, mark.removeMarks, mark.applyMarks);
     } else if (HIGHLIGHT_TYPE === HighlightType.TAGGING_WORD) {
         const tag = require("./tagEveryWord");
         const mark = require("./markPageWord");
-        return markContentHelper(tag.text, mark.markPageWord, mark.removeMarks);
+        return markContentHelper(tag.text, mark.addWords, mark.removeMarks, mark.applyMarks);
     } else {
         return undefined;
     }

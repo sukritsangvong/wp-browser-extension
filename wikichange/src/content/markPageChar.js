@@ -1,28 +1,36 @@
 const stylesheet = document.createElement('style');
 document.head.append(stylesheet);
 
+let toMark = '';
+
 /**
- * Add a highlight over an index range
+ * Keep track in characters to highlight
  * @param {int} start of the indexes to highlight
  * @param {int} end of the indexes to highligh (inclusive)
- * @param {string} color of the highlight mark
  */
-const markPageChar = (start, end, color) => {
-    let style = '';
+const addChars = (start, end) => {
     for(let i = start; i <= end; i++) {
-        style += `mark#mark-${i} {
-            background-color: ${color};
-        }
-        `;
+        toMark += `mark#mark-${i}, `;
     }
-    stylesheet.innerText += style;
 };
+
+/**
+ * Apply a highlight to all the saved characters
+ * @param {string} color of the highlighted marks
+ */
+const applyMarks = (color) => {
+    stylesheet.innerText = `${toMark.slice(0, toMark.length-2)} {
+        background-color: ${color};
+    }
+    `;
+}
 
 /**
  * Remove all highlights
  */
 const removeMarks = () => {
     stylesheet.innerText = '';
+    toMark = '';
 };
 
-export { markPageChar, removeMarks };
+export { addChars, applyMarks, removeMarks };

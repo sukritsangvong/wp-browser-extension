@@ -3,13 +3,14 @@ import { map } from "./tagEveryWord";
 const stylesheet = document.createElement('style');
 document.head.append(stylesheet);
 
+let toMark = '';
+
 /**
  * Add a highlight over an index range
  * @param {int} start of the indexes to highlight
  * @param {int} end of the indexes to highligh (inclusive)
- * @param {string} color of the highlight mark
  */
-const markPageWord = (start, end, color) => {
+const addWords = (start, end) => {
     let prevStart = 0;
     let intermediary = [];
     for(let index of map){
@@ -23,12 +24,18 @@ const markPageWord = (start, end, color) => {
             break;
         }
     }
-    let style = intermediary.reduce((accumulator, index) => `${accumulator}, mark#mark-${index}`, `mark#mark-${prevStart}`);
-    style = `${style} {
-            background-color: ${color};
-        }
-        `;
-    stylesheet.innerText += style;
+    toMark += intermediary.reduce((accumulator, index) => `${accumulator}, mark#mark-${index}`, `mark#mark-${prevStart}`);
+};
+
+/**
+ * Apply a highlight to all the saved words
+ * @param {string} color of the highlighted marks
+ */
+const applyMarks = (color) => {
+    stylesheet.innerText = `${toMark} {
+        background-color: ${color};
+    }
+    `;
 };
 
 /**
@@ -38,4 +45,4 @@ const removeMarks = () => {
     stylesheet.innerText = '';
 };
 
-export { markPageWord, removeMarks };
+export { addWords, applyMarks, removeMarks };
