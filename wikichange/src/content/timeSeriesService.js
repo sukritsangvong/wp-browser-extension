@@ -114,6 +114,7 @@ const fetchPageRevisions = async (title, startDate, endDate) => {
     let curJsonResponse = await response.json();
 
     let revisions = curJsonResponse.query.pages[0].revisions;
+    if (!revisions) return [];
 
     while (curJsonResponse.hasOwnProperty("continue")) {
         let continueString = curJsonResponse.continue.rvcontinue;
@@ -123,6 +124,7 @@ const fetchPageRevisions = async (title, startDate, endDate) => {
 
         curJsonResponse = await continueResponse.json();
         const localRevisions = curJsonResponse.query.pages[0].revisions;
+        if (!localRevisions) continue;
         revisions.push(...localRevisions);
     }
 
