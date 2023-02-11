@@ -26,7 +26,7 @@ let currentChart = null;
 
 const updateDateSelector = (newDate) => {
     const dateSelector = document.getElementById("dateOutput");
-    dateSelector.value = new Date(newDate).toISOString().slice(0, 10);
+    dateSelector.value = new Date(newDate).toLocaleDateString("en-US");
 };
 
 const makePageViewAndReivisionGraphFromData = (pageViewsData, revisionsData) => {
@@ -169,6 +169,7 @@ const injectScaledCurrentGraphToPage = (startDate) => {
     if (startDate == null) {
         makePageViewAndReivisionGraphFromData(pageViews, revisions);
     } else {
+
         const filteredPageViews = getFilterGraphDataThatComeAfterStartDate(pageViews, startDate);
         const filteredRevisions = getFilterGraphDataThatComeAfterStartDate(revisions, startDate);
 

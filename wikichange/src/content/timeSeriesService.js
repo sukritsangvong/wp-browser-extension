@@ -28,11 +28,11 @@ const isDateWhenPageViewDataBecameAvailable = (isPageViewTimeSeries, date) => {
 const formatResponseToTimeseries = (response, startDate, endDate, isPageViewTimeSeries) => {
     const allDates = getDatesBetweenTwoDates(startDate, endDate);
     return {
-        x: allDates.map((date) => date.toLocaleDateString()),
+        x: allDates.map((date) => date.toLocaleDateString("en-US")),
         y: allDates.map((date) =>
             isDateWhenPageViewDataBecameAvailable(isPageViewTimeSeries, date)
                 ? null
-                : response.get(date.toLocaleDateString()) ?? 0
+                : response.get(date.toLocaleDateString("en-US")) ?? 0
         ),
     };
 };
@@ -135,7 +135,7 @@ const fetchPageRevisions = async (title, startDate, endDate) => {
 const formatPageViews = (fetchedPageViews) => {
     return new Map(
         Array.from(fetchedPageViews.items).map((pageViewObject) => {
-            return [formatYYYYMMDDToDate(pageViewObject.timestamp).toLocaleDateString(), pageViewObject.views];
+            return [formatYYYYMMDDToDate(pageViewObject.timestamp).toLocaleDateString("en-US"), pageViewObject.views];
         })
     );
 };
@@ -163,7 +163,7 @@ const formatPageRevisions = (fetchedRevisions, aggregateType) => {
         }, {});
 
     return new Map(
-        Object.keys(pageRevisionCountMap).map((key) => [new Date(key).toLocaleDateString(), pageRevisionCountMap[key]])
+        Object.keys(pageRevisionCountMap).map((key) => [new Date(key).toLocaleDateString("en-US"), pageRevisionCountMap[key]])
     );
 };
 
