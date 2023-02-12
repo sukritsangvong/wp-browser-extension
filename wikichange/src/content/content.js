@@ -263,34 +263,6 @@ const renderItemsBelowGraph = async (creationDate) => {
     return [curRevisionId, oldRevisionId];
 };
 
-/**
- * Render a simple JS loader by the highlight button
- */
-const renderLoader = () => {
-    let button = document.getElementById("highlightButton");
-    button.disabled = true;
-
-    let loader = document.getElementById("loader");
-    loader.style.paddingTop = "3px";
-    loader.style.border = "5px solid white";
-    loader.style.borderTop = "5px solid #3498db";
-    loader.style.borderRadius = "50%";
-    loader.style.width = "15px";
-    loader.style.height = "15px";
-    loader.style.position = "absolute";
-    loader.style.marginTop = "6.5px";
-    loader.style.marginLeft = "350px";
-    loader.style.display = "inline-block";
-    loader.style.animation = "spin 2s linear infinite";
-
-    let keyframes = `@keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }`;
-    let style = document.createElement("style");
-    style.innerHTML = keyframes;
-    document.head.appendChild(style);
-};
 
 const toggleShowOnPopup = () => {
     document.getElementById("graphPopup").classList.toggle("show");
@@ -335,6 +307,37 @@ getPageCreationDate(title).then((date) => {
         highlightRevisionBetweenRevisionIds(title, curRevisionId, oldRevisionId)
     });
 });
+
+
+/**
+ * Render a simple JS loader by the highlight button
+ */
+const renderLoader = () => {
+    let button = document.getElementById("highlightButton");
+    button.disabled = true;
+
+    let loader = document.getElementById("loader");
+    loader.style.paddingTop = "3px";
+    loader.style.border = "5px solid white";
+    loader.style.borderTop = "5px solid #3498db";
+    loader.style.borderRadius = "50%";
+    loader.style.width = "15px";
+    loader.style.height = "15px";
+    loader.style.position = "absolute";
+    loader.style.marginTop = "6.5px";
+    loader.style.marginLeft = "335px";
+    loader.style.display = "inline-block";
+    loader.style.animation = "spin 2s linear infinite";
+
+    let keyframes = `@keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }`;
+    let style = document.createElement("style");
+    style.innerHTML = keyframes;
+    document.head.appendChild(style);
+};
+
 
 /**
  *  Highlights the words that are given with context. Support for links,

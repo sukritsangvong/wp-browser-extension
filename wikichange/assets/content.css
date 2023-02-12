@@ -20,6 +20,7 @@ button.highlightButton {
     font-size: 14px;
     cursor: pointer;
     height: 24px;
+    margin-left: 4px;
 }
 
 button:hover.extensionButton {
