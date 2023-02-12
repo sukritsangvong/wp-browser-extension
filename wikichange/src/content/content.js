@@ -294,22 +294,6 @@ const renderPopup = () => {
 };
 
 /**
- * Once we have the Wikipedia's page creation date, we render items below graph
- */
-getPageCreationDate(title).then((date) => {
-    const promises = [];
-    promises.push(renderGraphOverlay());
-    promises.push(renderItemsBelowGraph(date));
-
-    // Render popups and initial highlight only when graph and buttons are loaded
-    Promise.all(promises).then(([, [curRevisionId, oldRevisionId]]) => {
-        renderPopup();
-        highlightRevisionBetweenRevisionIds(title, curRevisionId, oldRevisionId)
-    });
-});
-
-
-/**
  * Render a simple JS loader by the highlight button
  */
 const renderLoader = () => {
@@ -338,6 +322,20 @@ const renderLoader = () => {
     document.head.appendChild(style);
 };
 
+/**
+ * Once we have the Wikipedia's page creation date, we render items below graph
+ */
+getPageCreationDate(title).then((date) => {
+    const promises = [];
+    promises.push(renderGraphOverlay());
+    promises.push(renderItemsBelowGraph(date));
+
+    // Render popups and initial highlight only when graph and buttons are loaded
+    Promise.all(promises).then(([, [curRevisionId, oldRevisionId]]) => {
+        renderPopup();
+        highlightRevisionBetweenRevisionIds(title, curRevisionId, oldRevisionId)
+    });
+});
 
 /**
  *  Highlights the words that are given with context. Support for links,
