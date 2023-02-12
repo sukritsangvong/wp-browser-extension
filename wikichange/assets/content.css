@@ -148,20 +148,7 @@ button:disabled.highlightButton {
 #belowGraphDiv {
   padding-top: 2%;
 }
-#loader {
-    padding-top: 3px; 
-    border-width: 5px; 
-    border-style: solid; 
-    border-color: rgb(52, 152, 219) white white; 
-    border-image: initial; 
-    border-radius: 50%; 
-    width: 15px; height: 15px;
-    position: absolute; 
-    margin-top: 6.5px;
-    margin-left: 40%; 
-    display: none; 
-    animation: 2s linear 0s infinite normal none running spin;
-}
+
 .flex-container {
     border: 2px solid #3366cc; 
     border-radius: 3px;

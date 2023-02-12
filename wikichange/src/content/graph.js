@@ -82,7 +82,7 @@ const makePageViewAndReivisionGraphFromData = (pageViewsData, revisionsData) => 
             onClick: (e) => {
                 const date = e.chart.tooltip.dataPoints[0].label;
                 updateDateSelector(date);
-                const highlightButton = document.getElementById("buttonContainer");
+                const highlightButton = document.getElementById("highlightButton");
                 highlightButton.classList.add("wiggleAnimation");
                 delay(500).then(() => highlightButton.classList.remove("wiggleAnimation"));
             },
