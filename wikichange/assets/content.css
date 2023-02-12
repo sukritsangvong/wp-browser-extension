@@ -11,6 +11,18 @@ button.extensionButton {
     border-radius: 3px;
 }
 
+button.highlightButton {
+    background-color: #3366cc;
+    color: white;
+    border: #3366cc;
+    border-radius: 3px;
+    font-family: sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    height: 24px;
+    margin-left: 4px;
+}
+
 button:hover.extensionButton {
     background-color: #3366cc;
     color: white;
@@ -26,6 +38,14 @@ to those of the actual button above
 }
 
 button:disabled.extensionButton {
+    cursor: not-allowed;
+    pointer-events: none;
+    border: 2px solid #999999;
+    background-color: #cccccc;
+    color: #999999;
+}
+
+button:disabled.highlightButton {
     cursor: not-allowed;
     pointer-events: none;
     border: 2px solid #999999;
@@ -85,9 +105,9 @@ button:disabled.extensionButton {
     padding: 8px 0;
     position: absolute;
     z-index: 1;
-    bottom: 125%;
+    bottom: 100%;
     left: 50%;
-    margin-left: -80px;
+    margin-left: -40px;
 }
 
 /* Popup arrow */
@@ -127,17 +147,27 @@ button:disabled.extensionButton {
 }
 
 #belowGraphDiv {
-  padding-top: 10px;
+  padding-top: 2%;
 }
 
-input[type="date"] {
-  appearance: none;
-  -webkit-appearance: none;
-  color: #2b2b2b;
-  font-family: sans-serif;
-  border:1px solid #b4b4b4;
-  background:#ecf0f1;
-  padding:3px;
-  display: inline-block !important;
-  visibility: visible !important;
+.flex-container {
+    border: 2px solid #3366cc; 
+    border-radius: 3px;
+    padding: 4px; 
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
 }
+
+input[type="text"] {
+    appearance: none;
+    -webkit-appearance: none;
+    font-family: sans-serif;
+    font-size: 14px;
+    display: inline-block !important;
+    visibility: visible !important;
+    text-align: center;
+    cursor: text;
+    height: 24px;
+    border: white;
+  }

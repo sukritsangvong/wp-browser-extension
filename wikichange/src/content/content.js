@@ -37,7 +37,7 @@ const title = (() => {
  */
 const renderGraphOverlay = async () => {
     let floatContainer = document.createElement("div");
-    floatContainer.style.cssText = "display: flex;";
+    floatContainer.style.cssText = "display: flex; background-image: linear-gradient(white, rgb(239, 239, 239));";
     floatContainer.setAttribute("id", "floatContainer");
 
     let graphContainer = document.createElement("div");
@@ -61,6 +61,7 @@ const renderGraphOverlay = async () => {
         const {
             canvas: { width, height },
         } = ctx;
+
         const angle = Math.PI / 180;
         diff = ((percentage / 100) * angle * 360 * 10).toFixed(2);
         ctx.clearRect(0, 0, width, height);
@@ -92,6 +93,7 @@ const renderGraphOverlay = async () => {
         } else {
             document.getElementById("5y").click();
         }
+        clearTimeout(sim);
     });
 
     renderScaleButtons(creationDate);
@@ -169,17 +171,12 @@ const renderScaleButtons = (creationDate) => {
 const updateClosestDate = (pageLink, oldRevisionDate) => {
     const revisionDate = document.getElementById("revisionDate");
     revisionDate.innerHTML = getRevisionToClosestDateText(pageLink, oldRevisionDate);
-    const revisionButton = document.getElementById("revisionButton");
-    revisionButton.innerHTML = getTextForRevisionButton(oldRevisionDate);
 };
 
 const getRevisionToClosestDateText = (pageLink, oldRevisionDate) => {
     return `Comparing the current Wikipedia page to the <a href=${pageLink} target="_blank">${oldRevisionDate} version</a> (the closest revision to your chosen time)`;
 };
 
-const getTextForRevisionButton = (oldRevisionDate) => {
-    return `See Differences From ${oldRevisionDate}'s Version`;
-};
 
 const getCurAndOldRevisionsParallel = async (title, curDate, oldDate) => {
     const revisionPromises = [fetchRevisionFromDate(title, curDate), fetchRevisionFromDate(title, oldDate)];
@@ -210,38 +207,37 @@ const renderItemsBelowGraph = async (creationDate) => {
     let curRevisionId = revisions[0][0];
     const oldRevision = revisions[1];
     let oldRevisionId = oldRevision[0];
-    const oldRevisionDate = oldRevision[1].toLocaleDateString().slice(0, 10);
-    belowGraphDiv.innerHTML = `<div id="loader"></div><button class="extensionButton" id="highlightButton">Highlight Changes From</button>
-    <input type="date" value="${initialDate
-        .toISOString()
-        .slice(0, 10)}" id="dateOutput" name="dateOutput" style="text-align: center;"> 
-                                <p></p>
-                                <button class="extensionButton" id="revisionButton">${getTextForRevisionButton(
-                                    oldRevisionDate
-                                )}</button>
-                            <div style="padding-left: 3%; padding-top: 3%; text-align: center;">
-                                <div class="card" style="border-style: solid;">
-                                    <div class="card-body" style="text-align: center;">
-                                    <p class="card-text" id="revisionDate"> ${getRevisionToClosestDateText(
-                                        getRevisionPageLink(title, curRevisionId, oldRevisionId).replace(/\s/g, "_"),
-                                        oldRevisionDate
-                                    )}</p>
-                                    <p class="card-text"> Newly added texts are highlighted in green, but the deletions are not included </p>
-                                    </div>
-                                </div>
-                            </div>`;
+    const oldRevisionDate = oldRevision[1].toLocaleDateString("en-US").slice(0, 10);
+
+    belowGraphDiv.innerHTML = `<div style="display: flex; flex-direction: row; justify-content: center;">
+    <div class="flex-container" id="buttonContainer">
+    <input type="text" pattern="\d{1,2}/\d{1,2}/\d{4}" class="datepicker" title="Please match the mm/dd/yyyy format" value="${initialDate
+        .toLocaleDateString("en-US")
+        .slice(0, 10)}" id="dateOutput" name="dateOutput" style="text-align: center;">
+        <button class="highlightButton" id="highlightButton">Highlight Changes</button>
+    </div>
+    <div id="loader"></div>
+    </div>
+    <div style="padding-left: 3%; padding-top: 1%; text-align: center;">
+        <div class="card">
+            <div class="card-body" style="text-align: center;">
+            <p class="card-text" id="revisionDate"> ${getRevisionToClosestDateText(
+                getRevisionPageLink(title, curRevisionId, oldRevisionId).replace(/\s/g, "_"),
+                oldRevisionDate
+            )}</p>
+            <p class="card-text"> Newly added texts are highlighted in green, but the deletions are not included </p>
+            </div>
+        </div>
+    </div>`;
     belowGraphDiv.style.cssText = "text-align:center;";
     insertAfter(belowGraphDiv, viewsEditsChart);
     renderLoader();
-
     const dateInput = document.getElementById("dateOutput");
     const highlightButton = document.getElementById("highlightButton");
-    const revisionButton = document.getElementById("revisionButton");
 
     highlightButton.addEventListener("click", async () => {
         document.getElementById("loader").style.display = "inline-block";
         highlightButton.disabled = true;
-        revisionButton.disabled = true; // disable until we get new set of revIds
         const date = new Date(dateInput.value);
 
         const oldHighlights = document.getElementsByClassName("extension-highlight");
@@ -255,30 +251,18 @@ const renderItemsBelowGraph = async (creationDate) => {
         let curRevisionId = revisions[0][0];
         const oldRevision = revisions[1];
         let oldRevisionId = oldRevision[0];
-        const oldRevisionDate = oldRevision[1].toLocaleDateString().slice(0, 10);
+        const oldRevisionDate = oldRevision[1].toLocaleDateString("en-US").slice(0, 10);
 
         // Change the revision context box
         updateClosestDate(
             getRevisionPageLink(title, curRevisionId, oldRevisionId).replace(/\s/g, "_"),
             oldRevisionDate
         );
-
         highlightRevisionBetweenRevisionIds(title, curRevisionId, oldRevisionId);
-        revisionButton.disabled = false;
     });
-
-    revisionButton.addEventListener("click", async () => {
-        try {
-            window.open(getRevisionPageLink(title, curRevisionId, oldRevisionId), "_blank");
-        } catch (err) {
-            console.error(
-                `Error getting revision link between revision ids for inputs title:${title} curRevisionId:${curRevisionId} oldRevisionId:${oldRevisionId}\nError: ${err}`
-            );
-        }
-    });
-
-    return [curRevisionId, oldRevisionId]
+    return [curRevisionId, oldRevisionId];
 };
+
 
 const toggleShowOnPopup = () => {
     document.getElementById("graphPopup").classList.toggle("show");
@@ -317,13 +301,15 @@ const renderLoader = () => {
     button.disabled = true;
 
     let loader = document.getElementById("loader");
-    loader.style.border = "5px solid #f3f3f3";
+    loader.style.paddingTop = "3px";
+    loader.style.border = "5px solid white";
     loader.style.borderTop = "5px solid #3498db";
     loader.style.borderRadius = "50%";
     loader.style.width = "15px";
     loader.style.height = "15px";
     loader.style.position = "absolute";
-    loader.style.marginLeft = "-30px";
+    loader.style.marginTop = "6.5px";
+    loader.style.marginLeft = "335px";
     loader.style.display = "inline-block";
     loader.style.animation = "spin 2s linear infinite";
 
