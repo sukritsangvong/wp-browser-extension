@@ -171,17 +171,12 @@ const renderScaleButtons = (creationDate) => {
 const updateClosestDate = (pageLink, oldRevisionDate) => {
     const revisionDate = document.getElementById("revisionDate");
     revisionDate.innerHTML = getRevisionToClosestDateText(pageLink, oldRevisionDate);
-    const revisionButton = document.getElementById("revisionButton");
-    // revisionButton.innerHTML = getTextForRevisionButton(oldRevisionDate);
 };
 
 const getRevisionToClosestDateText = (pageLink, oldRevisionDate) => {
     return `Comparing the current Wikipedia page to the <a href=${pageLink} target="_blank">${oldRevisionDate} version</a> (the closest revision to your chosen time)`;
 };
 
-const getTextForRevisionButton = (oldRevisionDate) => {
-    return `See Differences From ${oldRevisionDate}'s Version`;
-};
 
 const getCurAndOldRevisionsParallel = async (title, curDate, oldDate) => {
     const revisionPromises = [fetchRevisionFromDate(title, curDate), fetchRevisionFromDate(title, oldDate)];
@@ -215,12 +210,15 @@ const renderItemsBelowGraph = async (creationDate) => {
     const oldRevisionDate = oldRevision[1].toLocaleDateString("en-US").slice(0, 10);
     highlightRevisionBetweenRevisionIds(title, curRevisionId, oldRevisionId);
 
-    belowGraphDiv.innerHTML = `<div style="display: flex; flex-direction: row; justify-content: center;"><div class="flex-container">
+    belowGraphDiv.innerHTML = `<div style="display: flex; flex-direction: row; justify-content: center;">
+    <div class="flex-container" id="buttonContainer">
     <input type="text" pattern="\d{1,2}/\d{1,2}/\d{4}" class="datepicker" title="Please match the mm/dd/yyyy format" value="${initialDate
         .toLocaleDateString("en-US")
         .slice(0, 10)}" id="dateOutput" name="dateOutput" style="text-align: center;">
-        <button class="highlightButton" id="highlightButton">Highlight Changes</button></div>
-        <div id="loader"></div></div>
+        <button class="highlightButton" id="highlightButton">Highlight Changes</button>
+    </div>
+    <div id="loader"></div>
+    </div>
     <div style="padding-left: 3%; padding-top: 1%; text-align: center;">
         <div class="card">
             <div class="card-body" style="text-align: center;">
@@ -234,16 +232,13 @@ const renderItemsBelowGraph = async (creationDate) => {
     </div>`;
     belowGraphDiv.style.cssText = "text-align:center;";
     insertAfter(belowGraphDiv, viewsEditsChart);
-    renderLoader();
 
     const dateInput = document.getElementById("dateOutput");
     const highlightButton = document.getElementById("highlightButton");
-    const revisionButton = document.getElementById("revisionButton");
 
     highlightButton.addEventListener("click", async () => {
         document.getElementById("loader").style.display = "inline-block";
         highlightButton.disabled = true;
-        // revisionButton.disabled = true; // disable until we get new set of revIds
         const date = new Date(dateInput.value);
 
         const oldHighlights = document.getElementsByClassName("extension-highlight");
@@ -266,18 +261,7 @@ const renderItemsBelowGraph = async (creationDate) => {
         );
 
         highlightRevisionBetweenRevisionIds(title, curRevisionId, oldRevisionId);
-        // revisionButton.disabled = false;
     });
-
-    // revisionButton.addEventListener("click", async () => {
-    //     try {
-    //         window.open(getRevisionPageLink(title, curRevisionId, oldRevisionId), "_blank");
-    //     } catch (err) {
-    //         console.error(
-    //             `Error getting revision link between revision ids for inputs title:${title} curRevisionId:${curRevisionId} oldRevisionId:${oldRevisionId}\nError: ${err}`
-    //         );
-    //     }
-    // });
 };
 
 const toggleShowOnPopup = () => {
@@ -307,35 +291,6 @@ const renderPopup = () => {
             toggleShowOnPopup();
         }
     });
-};
-
-/**
- * Render a simple JS loader by the highlight button
- */
-const renderLoader = () => {
-    let button = document.getElementById("highlightButton");
-    button.disabled = true;
-
-    let loader = document.getElementById("loader");
-    loader.style.paddingTop = "3px";
-    loader.style.border = "5px solid #f3f3f3";
-    loader.style.borderTop = "5px solid #3498db";
-    loader.style.borderRadius = "50%";
-    loader.style.width = "15px";
-    loader.style.height = "15px";
-    loader.style.position = "absolute";
-    loader.style.marginTop = "6.5px";
-    loader.style.marginLeft = "-30px";
-    loader.style.display = "inline-block";
-    loader.style.animation = "spin 2s linear infinite";
-
-    let keyframes = `@keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }`;
-    let style = document.createElement("style");
-    style.innerHTML = keyframes;
-    document.head.appendChild(style);
 };
 
 /**
