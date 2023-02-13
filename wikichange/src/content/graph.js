@@ -95,6 +95,9 @@ const makePageViewAndReivisionGraphFromData = (pageViewsData, revisionsData) => 
                 tooltip: {
                     position: "nearest",
                 },
+                legend: {
+                    onClick: null,
+                },
             },
             scales: {
                 x: {
