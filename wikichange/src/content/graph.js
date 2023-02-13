@@ -29,6 +29,11 @@ const updateDateSelector = (newDate) => {
     dateSelector.value = new Date(newDate).toISOString().slice(0, 10);
 };
 
+const decimation = {
+    enabled: false,
+    algorithm: 'min-max',
+  };
+
 const makePageViewAndReivisionGraphFromData = (pageViewsData, revisionsData) => {
     const xLabels = pageViewsData["x"];
 
