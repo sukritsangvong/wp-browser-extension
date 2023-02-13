@@ -14,6 +14,28 @@ const markContentHelper = (_text, _track, _remove_mark, _apply) => {
         console.info(_text);
         console.groupEnd();
     }
+
+    /**
+     * Checks if the text found it is the correct one to highlight based
+     * on context. This will make it a little slower but much more accurate
+     * 
+     * @param {string} content_before 
+     * @param {string} content_after 
+     * @param {integer} index 
+     */
+    const matchContext = (content_before, content_after, match) => {
+        let index = match['index'];
+        let afterText = _text.slice(
+            index + match[0].length,
+            index + match[0].length + content_after.length
+        );
+        let beforeText = _text.slice(index - content_before.length, index);
+        if (afterText.includes(content_after) && beforeText.includes(content_before)) {
+            return true;
+        }
+        return false;
+    }
+
     /**
      * @param {object} context Object containing the context_before, context_after and highlight portions
      * @returns an array where the first item is a boolean if a match was found
@@ -22,13 +44,16 @@ const markContentHelper = (_text, _track, _remove_mark, _apply) => {
      */
     const textMatching = (context) => {
         context = cleanText(context);
-        const {content_before, highlight, content_after } = context;
-        const start = [..._text.matchAll(new RegExp(escapeRegex(highlight), 'g'))];
-        if (start.length > 0) {
-            return [true, start[0]['index'], start[0]['index'] + highlight.length];
-        } else {
-            return [false];
+        const {content_before, highlight, content_after} = context;
+        const matches = [..._text.matchAll(new RegExp(escapeRegex(highlight), 'g'))];
+        // Now we need to highlight the correct segment
+        for (let i = 0; i < matches.length; i++) {
+            let index = matches[i]['index'];
+            if (matchContext(content_before, content_after, matches[i])) {
+                return [true, index, index + highlight.length];
+            }
         }
+        return [false];
     };
 
     /**

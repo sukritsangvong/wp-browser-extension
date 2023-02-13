@@ -379,7 +379,7 @@ const highlightContentUsingNodes = (context, color) => {
             // Clean up the context.content_after and context.content_before from wiki markup
             let content_after = context.content_after.replace(/[|=\[\]{}]+|<[^>]*>/g, "").replace("cite web", "");
             let content_before = context.content_before.replace(/[|=\[\]{}]+|<[^>]*>/g, "").replace("cite web", "");
-            if (value.includes(content_after) || value.includes(content_before)) {
+            if (value.includes(content_after) && value.includes(content_before)) {
                 // Or because of edge cases, if good context this will almost always work
                 let newNode = document.createElement("span");
                 newNode.innerHTML = newValue;
@@ -394,7 +394,7 @@ const highlightContentUsingNodes = (context, color) => {
                     node.parentNode.nextSibling.nodeValue != null &&
                     node.parentNode.previousSibling != null &&
                     node.parentNode.previousSibling.nodeValue != null &&
-                    (node.parentNode.nextSibling.nodeValue.includes(content_after) ||
+                    (node.parentNode.nextSibling.nodeValue.includes(content_after) &&
                         node.parentNode.previousSibling.nodeValue.includes(content_before))
                 ) {
                     let newNode = document.createElement("span");
