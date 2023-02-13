@@ -29,6 +29,11 @@ const updateDateSelector = (newDate) => {
     dateSelector.value = new Date(newDate).toLocaleDateString("en-US");
 };
 
+const decimation = {
+    enabled: false,
+    algorithm: 'min-max',
+  };
+
 const makePageViewAndReivisionGraphFromData = (pageViewsData, revisionsData) => {
     const xLabels = pageViewsData["x"];
 
@@ -92,6 +97,14 @@ const makePageViewAndReivisionGraphFromData = (pageViewsData, revisionsData) => 
                 },
             },
             scales: {
+                x: {
+                    ticks:{
+                        callback: function(val, index) {
+                        return index % 4 === 0 ? this.getLabelForValue(val) : '';
+                        },
+                        color: 'grey',
+                    },
+                },
                 y: {
                     type: "linear",
                     display: true,
