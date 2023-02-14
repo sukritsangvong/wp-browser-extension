@@ -1,12 +1,12 @@
 {
-    "name": "Wiki Addition Viewer",
+    "name": "wikichange",
     "description": "Add insights to your Wikipedia experience",
     "version": "1.0.0",
     "homepage": "http://chrome.google.com/webstore",
-    "author": "Comps team",
+    "author": "Carleton College CS Comps team",
     "repository": {
         "type": "git",
-        "url": "ENTER GIT REPO URL"
+        "url": "https://github.com/sukritsangvong/wp-browser-extension"
     },
     "scripts": {
         "start": "xt-build -e dev -w",
