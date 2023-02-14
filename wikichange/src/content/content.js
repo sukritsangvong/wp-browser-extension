@@ -155,13 +155,8 @@ const renderScaleButtons = (creationDate) => {
     viewsEditsChart.parentNode.insertBefore(scaleButtonsDiv, viewsEditsChart);
 };
 
-const updateClosestDate = (pageLink, oldRevisionDate) => {
-    const revisionDate = document.getElementById("revisionDate");
-    revisionDate.innerHTML = getRevisionToClosestDateText(pageLink, oldRevisionDate);
-};
-
 const getRevisionToClosestDateText = (pageLink, oldRevisionDate) => {
-    return `Comparing the current Wikipedia page to the <a href=${pageLink} target="_blank">${oldRevisionDate} version</a> (the closest revision to your chosen time)`;
+    return `<a href=${pageLink} target="_blank">${oldRevisionDate}</a> (the closest revision to your chosen time)`;
 };
 
 
@@ -197,24 +192,17 @@ const renderItemsBelowGraph = async (creationDate) => {
     const oldRevisionDate = oldRevision[1].toLocaleDateString("en-US").slice(0, 10);
 
     belowGraphDiv.innerHTML = `<div style="display: flex; flex-direction: row; justify-content: center;">
-    <div class="flex-container" id="buttonContainer">
-    <input type="text" pattern="\d{1,2}/\d{1,2}/\d{4}" class="datepicker" title="Please match the mm/dd/yyyy format" value="${initialDate
-        .toLocaleDateString("en-US")
-        .slice(0, 10)}" id="dateOutput" name="dateOutput" style="text-align: center;">
-        <button class="highlightButton" id="highlightButton">Highlight Changes</button>
-    </div>
-    <div id="loader"></div>
-    </div>
-    <div style="padding-left: 3%; padding-top: 1%; text-align: center;">
-        <div class="card">
-            <div class="card-body" style="text-align: center;">
-            <p class="card-text" id="revisionDate"> ${getRevisionToClosestDateText(
-                getRevisionPageLink(title, curRevisionId, oldRevisionId).replace(/\s/g, "_"),
-                oldRevisionDate
-            )}</p>
-            <p class="card-text"> Newly added texts are highlighted in green, but the deletions are not included </p>
-            </div>
+        <div class="flex-container" id="buttonContainer">
+            <input type="text" pattern="\d{1,2}/\d{1,2}/\d{4}" class="datepicker" title="Please match the mm/dd/yyyy format" value="${initialDate
+                .toLocaleDateString("en-US")
+                .slice(0, 10)
+            }" id="dateOutput" name="dateOutput" style="text-align: center;" />
+            <button class="highlightButton" id="highlightButton">Highlight Changes</button>
         </div>
+        <div id="loader"></div>
+    </div>
+    <div style="padding-left: 3%; padding-right: 3%; padding-top: 1%; text-align: center;">
+        <p class="card-text" id="revisionDate"></p>
     </div>`;
     belowGraphDiv.style.cssText = "text-align:center;";
     insertAfter(belowGraphDiv, viewsEditsChart);
@@ -240,14 +228,9 @@ const renderItemsBelowGraph = async (creationDate) => {
         let oldRevisionId = oldRevision[0];
         const oldRevisionDate = oldRevision[1].toLocaleDateString("en-US").slice(0, 10);
 
-        // Change the revision context box
-        updateClosestDate(
-            getRevisionPageLink(title, curRevisionId, oldRevisionId).replace(/\s/g, "_"),
-            oldRevisionDate
-        );
-        highlightRevisionBetweenRevisionIds(title, curRevisionId, oldRevisionId);
+        highlightRevisionBetweenRevisionIds(title, curRevisionId, oldRevisionId, oldRevisionDate);
     });
-    return [curRevisionId, oldRevisionId];
+    return [curRevisionId, oldRevisionId, oldRevisionDate];
 };
 
 
@@ -318,9 +301,9 @@ getPageCreationDate(title).then((date) => {
     promises.push(renderItemsBelowGraph(date));
 
     // Render popups and initial highlight only when graph and buttons are loaded
-    Promise.all(promises).then(([, [curRevisionId, oldRevisionId]]) => {
+    Promise.all(promises).then(([, [curRevisionId, oldRevisionId, oldRevisionDate]]) => {
         renderPopup();
-        highlightRevisionBetweenRevisionIds(title, curRevisionId, oldRevisionId)
+        highlightRevisionBetweenRevisionIds(title, curRevisionId, oldRevisionId, oldRevisionDate)
     });
 });
 
@@ -422,9 +405,17 @@ const highlightContentUsingNodes = (context, color) => {
  * @param {string} curRevisionId to highlight on
  * @param {string} oldRevisionId to compare reivion on curDate to
  */
-const highlightRevisionBetweenRevisionIds = async (title, curRevisionId, oldRevisionId) => {
+const highlightRevisionBetweenRevisionIds = async (title, curRevisionId, oldRevisionId, oldRevisionDate) => {
     try {
-        highlight(curRevisionId, oldRevisionId);
+        highlight(curRevisionId, oldRevisionId).then((found_count) => {
+            const new_text = `We highlighted <span style="color: #468946; font-weight: 700;">${found_count}</span> changes which represent additions to the page between ${
+                getRevisionToClosestDateText(
+                    getRevisionPageLink(title, curRevisionId, oldRevisionId).replace(/\s/g, "_"),
+                    oldRevisionDate
+                )
+            } and the present day. Some of the changes were purely formatting or deletions and, therefore, are not highlighted.`;
+            document.getElementById('revisionDate').innerHTML = new_text;
+        })
     } catch (err) {
         debug_console?.error(
             `Error highlighting revisions between revition ids for inputs title:${title} curRevisionId:${curRevisionId} oldRevisionId:${oldRevisionId}\nError: ${err}`
@@ -470,4 +461,5 @@ const highlight = async (revisionId, oldRevisionId) => {
     debug_console?.groupCollapsed('not-found')
     debug_console?.log(_fail);
     debug_console?.groupEnd();
+    return _succeed.length;
 };
