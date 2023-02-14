@@ -2,37 +2,19 @@ import { getPageWikitext } from "./globals";
 import { escapeRegex } from "./cleanText";
 import { debug_log, debug_warn } from "./helper";
 
-
-class Graph {
-    constructor(_nodes) {
-        this.nodes = _nodes.filter(x => x.length > 0).map(x => x.map(j => j.index));
-        debug_log(this.nodes);
-        this.nodes.reduce((mainNodes, currNodes) => {
-            const nextNodes = this.setDifference(mainNodes, currNodes);
-            debug_log(nextNodes);
-
-            return nextNodes;
-        }, this.nodes.flat());
-    }
-
-    setDifference(mainSet, removeSet) {
-        return mainSet.filter(x => !removeSet.includes(x));
-    }
-}
-
 export default class textMatching {
     #matchWikitextToText() {
-        const node_regex = /([a-zA-Z0-9]+ )([a-zA-Z0-9]+ ?)+/g;
-        const nodes = this.wikitext.match(node_regex);
+        const node_regex = /([^-[\]\\{}|<>\n]+[- ])([^-[\]\\{}|<>\n]+[- ]?)+/g;
+        const nodes = [...this.wikitext.matchAll(node_regex)];
         console.log(nodes);
         let nodeMatches = nodes.map((a) => ({
-            "matches": [...this.text.matchAll(new RegExp(escapeRegex(a), 'g'))],
+            "matches": [...this.text.matchAll(new RegExp(escapeRegex(a[0]), 'g'))],
             "start": -1,
-            "end": -1
+            "end": -1,
+            "wikitext_start": a.index
         })).filter((element) => element.matches.length > 0);
-        console.log(nodeMatches);
-        let new_change = true;
 
+        let new_change = true;
         let non_solved_index = Array.apply(null, Array(nodeMatches.length)).map(function (x, i) { return i; })
         while(new_change) {
             console.count(non_solved_index.length);
@@ -43,6 +25,9 @@ export default class textMatching {
                     if (nodeMatches[index].matches.length === 1) {
                         nodeMatches[index].start = nodeMatches[index].matches[0].index;
                         nodeMatches[index].end = nodeMatches[index].start + nodeMatches[index].matches[0][0].length - 1;
+                        for(let i = 0; i < nodeMatches[index].matches[0][0].length; i++){
+                            this.mapping[nodeMatches[index].wikitext_start + i] = nodeMatches[index].start + i;
+                        }
                         non_solved_index.splice(loc, 1);
                         new_change = true;
                     } else {
@@ -69,7 +54,11 @@ export default class textMatching {
         console.log(nodeMatches);
         nodeMatches.forEach(({start, end,}) => {
             if(start !== -1){
-                this.track(start, end);
+                const arr = []
+                for(let i = start; i < end; i++){
+                    arr.push(i);
+                }
+                this.track(arr);
             }
         });
     }
@@ -82,7 +71,11 @@ export default class textMatching {
             if (start.length > 1) {
                 debug_warn("More than one match in wikitext: ", _change);
             }
-            return [true, start[0]['index'] + content_before.length, start[0]['index'] + content_before.length + highlight.length];
+            let mapping_interval = this.mapping.slice(
+                start[0]['index'] + content_before.length,
+                start[0]['index'] + content_before.length + highlight.length + 1
+            ).filter((i) => i !== -1);
+            return [mapping_interval.length > 0, mapping_interval];
         } else {
             debug_warn("No matches in wikitext: ", _change);
             return [false];
@@ -96,23 +89,12 @@ export default class textMatching {
      * and the last is the end index of the item found
     */
     match(context) {
-        const [ found, _start, end ] = this.#matchToWikitext(context);
+        const [ found, mapping_interval ] = this.#matchToWikitext(context);
         if(found) {
-            // debug_log(this.wikitext.slice(_start, end));
-            // debug_log(context.highlight);
+            this.track(mapping_interval);
         }
-
-        
-        // const start = [...this.text.matchAll(new RegExp(escapeRegex(highlight), 'g'))];
-        // if (start.length > 0){
-        //     return [true, start[0]['index'], start[0]['index'] + highlight.length];
-        // } else {
-        //     return [false];
-        // }
-        
+        return found;
     }
-
-    
 
     constructor(_text, _track, _apply) {
         this.text = _text;

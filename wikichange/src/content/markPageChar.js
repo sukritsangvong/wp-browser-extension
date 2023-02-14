@@ -2,15 +2,23 @@ const stylesheet = document.createElement('style');
 document.head.append(stylesheet);
 
 let toMark = '';
+let toStyle = ''
 
 /**
  * Keep track in characters to highlight
  * @param {int} start of the indexes to highlight
  * @param {int} end of the indexes to highligh (inclusive)
  */
-const addChars = (start, end) => {
-    for(let i = start; i <= end; i++) {
+const addChars = (array) => {
+    for(let i of array) {
         toMark += `mark#mark-${i}, `;
+    }
+    if(toMark.length > 3000){
+        toStyle += `${toMark.slice(0, toMark.length-2)} {
+            background-color: var(--highlight-color);
+        }
+        `;
+        toMark='';
     }
 };
 
@@ -19,10 +27,11 @@ const addChars = (start, end) => {
  * @param {string} color of the highlighted marks
  */
 const applyMarks = (color) => {
-    stylesheet.innerText = `${toMark.slice(0, toMark.length-2)} {
-        background-color: ${color};
+    console.count('apply');
+    stylesheet.innerText = `:root {
+        --highlight-color: ${color};
     }
-    `;
+    ${toStyle}`;
 }
 
 /**

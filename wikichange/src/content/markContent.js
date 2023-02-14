@@ -50,8 +50,14 @@ const markContentHelper = (_text, _track, _remove_mark, _apply) => {
         let succeed = [];
         let fail = [];
         let startTime = Date.now();
-        context_array.forEach(element => textMatcher.match(element));
-        _apply(color);
+        context_array.forEach(element => {
+            if(textMatcher.match(element)){
+                succeed.push(element);
+            } else {
+                fail.push(element)
+            }
+        });
+        // _apply(color);
         debug_info((Date.now() - startTime)/1000);
         return { succeed, fail };
     };
