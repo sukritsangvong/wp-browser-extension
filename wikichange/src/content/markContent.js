@@ -1,7 +1,7 @@
 import { HighlightType, HIGHLIGHT_TYPE } from "./enums";
 import { cleanText, escapeRegex, splitElementNode } from "./cleanText";
 import textMatching from "./textMatching";
-import { debug_info } from "./helper";
+import { debug_info, debug_group_start, debug_group_end, debug_log } from "./helper";
 
 /**
  * 
@@ -11,9 +11,9 @@ import { debug_info } from "./helper";
  * @returns markContent function
  */
 const markContentHelper = (_text, _track, _remove_mark, _apply) => {
-    console.groupCollapsed('Text');
+    debug_group_start('Text');
     debug_info(_text);
-    console.groupEnd();
+    debug_group_end();
     
 
     /**
@@ -37,7 +37,7 @@ const markContentHelper = (_text, _track, _remove_mark, _apply) => {
         return false;
     }
 
-    const textMatcher = new textMatching(_text);
+    const textMatcher = new textMatching(_text, _track, _apply);
 
     /**
      * @param {object} context_array 
@@ -46,17 +46,13 @@ const markContentHelper = (_text, _track, _remove_mark, _apply) => {
      * and fail in an array of all the context_array elements not matched
      */
     return async (context_array, color) => {
-        _remove_mark();
+        // _remove_mark();
         let succeed = [];
         let fail = [];
         let startTime = Date.now();
-        context_array.forEach((element) => splitElementNode(element).forEach((context) => {
-            const [ found, start, end ] = textMatching(context);
-            _apply(color);
-            
-        }));
-        if(DEBUG)
-        console.groupEnd();
+        context_array.forEach(element => textMatcher.match(element));
+        _apply(color);
+        debug_info((Date.now() - startTime)/1000);
         return { succeed, fail };
     };
 }

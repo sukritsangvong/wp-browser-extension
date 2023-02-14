@@ -1,3 +1,5 @@
+import { debug_info } from "./helper";
+
 /** The page id can be found as the last part of the link to
  * the wikidata item on the left side of wikipedia pages.
  * If no page id is found throws an error.
@@ -11,7 +13,7 @@ const page_id = (() => {
         throw new Error("Can't find page id!");
     }
     const wiki_page_id = wiki_data_url.split("/").slice(-1)[0];
-    console.info({
+    debug_info({
         wiki_data_url: wiki_data_url,
         wiki_page_id: wiki_page_id,
     });

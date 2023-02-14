@@ -13,7 +13,7 @@ const HighlightType = {
     TAGGING_WORD: 2,
 };
 
-const DEBUG = false;
+const DEBUG = true;
 
 const HIGHLIGHT_TYPE = HighlightType.TAGGING_CHAR;
 
