@@ -1,3 +1,5 @@
+import { debug_console } from "./globals";
+
 const fetchChangeWithHTML = async (startID, endID) => {
     const response = await fetch(
         `https://en.wikipedia.org/w/api.php?action=compare&format=json&fromrev=${startID}&torev=${endID}&prop=diff%7Cids%7Ctitle%7Ctimestamp&formatversion=2`
@@ -12,7 +14,7 @@ const fetchChangeWithHTML = async (startID, endID) => {
     trsWithAddition.forEach((tr) => {
         const curDivs = tr.querySelectorAll("div");
         if (curDivs.length === 0) return;
-        if (curDivs.length !== 1) console.error(`Error: Found tr that has more than one div: ${tr}`);
+        if (curDivs.length !== 1) debug_console?.error(`Error: Found tr that has more than one div: ${tr}`);
 
         const curDiv = curDivs[0];
         const inNodes = curDiv.querySelectorAll("ins.diffchange.diffchange-inline");
@@ -127,7 +129,7 @@ const fetchRevisionFromDate = async (title, date) => {
             new Date(data["query"]["pages"][0]["revisions"][0]["timestamp"]),
         ];
     } catch (err) {
-        console.error(
+        debug_console?.error(
             `Error getting revision for newer and older inputs on title:${title} date:${date}\nFirst Try's Error: ${firstTryError}\nError: ${err}`
         );
         return -1;

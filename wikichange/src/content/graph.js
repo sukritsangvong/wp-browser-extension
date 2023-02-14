@@ -1,5 +1,6 @@
 import Chart from "chart.js/auto";
 import { getPageViewTimeseries, getPageRevisionCountTimeseries } from "./timeSeriesService.js";
+import { debug_console } from "./globals.js";
 
 const CHART_COLORS = {
     red: "rgb(255, 99, 132)",
@@ -176,7 +177,7 @@ const getFilterGraphDataThatComeAfterStartDate = (graphData, startDate) => {
 
 const injectScaledCurrentGraphToPage = (startDate) => {
     if (pageViews == null || revisions == null || currentChart == null) {
-        console.error("Error injecting scaled current graph to page because a graph has not been initialized.");
+        debug_console?.error("Error injecting scaled current graph to page because a graph has not been initialized.");
     }
 
     currentChart.destroy();

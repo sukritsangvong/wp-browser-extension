@@ -1,4 +1,5 @@
 import { WIKI_PAGE_VIEW_DATA_AVAILABLE_DATE, AggregateType } from "./enums.js";
+import { debug_console } from "./globals.js";
 
 const formatDateToYYYYMMDD = (date) =>
     `${date.getFullYear()}${("0" + (date.getMonth() + 1)).slice(-2)}${("0" + date.getDate()).slice(-2)}`;
@@ -81,7 +82,7 @@ const fetchPageRevisionsParallel = async (title, startDate, endDate, numPartitio
     return Promise.all(promises)
         .then((results) => results.reduce((acc, res) => acc.concat(res), []))
         .catch((error) =>
-            console.error(
+            debug_console?.error(
                 `$Error parallel fetching revisions for title:${title} startDate:${startDate} endDate:${endDate} \nErrror:${error}`
             )
         );
@@ -184,7 +185,7 @@ const getPageViews = async (title, startDate, endDate, aggregateType) => {
         let formattedResult = formatPageViews(result);
         return formattedResult;
     } catch (err) {
-        console.error(
+        debug_console?.error(
             `Error fetching page views on inputs title:${title} startDate:${startDate} endDate:${endDate} aggregateType:${aggregateType}\nError: ${err.message}`
         );
         return err;
@@ -206,7 +207,7 @@ const getPageRevisionCount = async (title, startDate, endDate, aggregateType) =>
         let formattedResult = formatPageRevisions(result, aggregateType);
         return formattedResult;
     } catch (err) {
-        console.error(
+        debug_console?.error(
             `Error fetching revision count on inputs title:${title} startDate:${startDate} endDate:${endDate} aggregateType:${aggregateType}\nError: ${err.message}`
         );
         return err;
@@ -226,7 +227,7 @@ const getPageViewTimeseries = async (title, startDate, endDate) => {
         const pageViewsResponse = await getPageViews(title, startDate, endDate, AggregateType.DAILY);
         return formatResponseToTimeseries(pageViewsResponse, startDate, endDate, true);
     } catch (err) {
-        console.error(
+        debug_console?.error(
             `Error getting page view timeseries data on title:${title} startDate:${startDate} endDate:${endDate}\nError: ${err.message}`
         );
         return err;
@@ -246,7 +247,7 @@ const getPageRevisionCountTimeseries = async (title, startDate, endDate) => {
         const pageRevisionCountResponse = await getPageRevisionCount(title, startDate, endDate, AggregateType.DAILY);
         return formatResponseToTimeseries(pageRevisionCountResponse, startDate, endDate, false);
     } catch (err) {
-        console.error(
+        debug_console?.error(
             `Error getting page revision count timeseries data on title:${title} startDate:${startDate} endDate:${endDate}\nError: ${err.message}`
         );
         return err;
