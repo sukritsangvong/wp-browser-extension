@@ -1,4 +1,4 @@
-# [WikiChange: Wikipedia Browser Extension](https://sukritsangvong.github.io/wp-browser-extension/)
+# [Wiki Addition Viewer: Add insights to your Wikipedia experience](https://sukritsangvong.github.io/wp-browser-extension/)
 
 
 # Dev

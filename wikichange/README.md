@@ -1,6 +1,6 @@
-# WikiChange
+# Wiki Addition Viewer
 
-Annontate changes on Wikipedia pages
+Add insights to your Wikipedia experience
 
 ## Development 
 
