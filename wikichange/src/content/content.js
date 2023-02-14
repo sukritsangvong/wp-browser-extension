@@ -1,9 +1,10 @@
 import { getPageCreationDate } from "./timeSeriesService.js";
 import { injectGraphToPage, injectScaledCurrentGraphToPage } from "./graph.js";
 import { fetchChangeWithHTML, fetchRevisionFromDate, getRevisionPageLink } from "./compareRevisionService.js";
-import { HighlightType, HIGHLIGHT_TYPE, DEBUG } from "./enums";
+import { HighlightType, HIGHLIGHT_TYPE } from "./enums";
 import { markContent  } from "./markContent.js";
 import { cleanText, splitElementNode } from "./cleanText";
+import { debug_console, title } from "./globals.js";
 
 /**
  * Inserts a new node after an existing node
@@ -14,20 +15,6 @@ import { cleanText, splitElementNode } from "./cleanText";
 const insertAfter = (newNode, existingNode) => {
     existingNode.parentNode.insertBefore(newNode, existingNode.nextSibling);
 };
-
-/**
- * Get the title of a Wikipedia page by inspecting the html
- * @returns a string with title of a page
- */
-const title = (() => {
-    let titleSpan = document.getElementsByClassName("mw-page-title-main");
-    if (titleSpan.length == 0) {
-        let url = document.URL.split("/");
-        return url[url.length - 1].replace("_", " ");
-    } else {
-        return titleSpan[0].innerHTML;
-    }
-})();
 
 /**
  * Creates the div for the graph overlay by first creating a container
@@ -428,28 +415,6 @@ const highlightContentUsingNodes = (context, color) => {
     return highlightSucceeded;
 };
 
-/** The page id can be found as the last part of the link to
- * the wikidata item on the left side of wikipedia pages.
- * If no page id is found throws an error.
- * @returns the page id of a Wikipedia page
- */
-(() => {
-    let wiki_data_url;
-    try {
-        wiki_data_url = document.getElementById("t-wikibase").getElementsByTagName("a")[0].href;
-    } catch {
-        throw new Error("Can't find page id!");
-    }
-    const wiki_page_id = wiki_data_url.split("/").slice(-1)[0];
-    if(DEBUG) {
-        console.info({
-            wiki_data_url: wiki_data_url,
-            wiki_page_id: wiki_page_id,
-        });
-    }
-    return wiki_page_id;
-})();
-
 /**
  * Highlight the current page to a revision on a given date
  *
@@ -461,7 +426,7 @@ const highlightRevisionBetweenRevisionIds = async (title, curRevisionId, oldRevi
     try {
         highlight(curRevisionId, oldRevisionId);
     } catch (err) {
-        console.error(
+        debug_console?.error(
             `Error highlighting revisions between revition ids for inputs title:${title} curRevisionId:${curRevisionId} oldRevisionId:${oldRevisionId}\nError: ${err}`
         );
     }
@@ -475,6 +440,7 @@ const highlightRevisionBetweenRevisionIds = async (title, curRevisionId, oldRevi
  */
 const highlight = async (revisionId, oldRevisionId) => {
     const arr = await fetchChangeWithHTML(oldRevisionId, revisionId);
+    debug_console?.info(arr);
     const _succeed = [];
     const _fail = [];
     if (HIGHLIGHT_TYPE == HighlightType.NODE) {
@@ -498,12 +464,10 @@ const highlight = async (revisionId, oldRevisionId) => {
     let button = document.getElementById("highlightButton");
     button.disabled = false;
     document.getElementById("loader").style.display = "none";
-    if (DEBUG) {
-        console.groupCollapsed('found')
-        _succeed.forEach(elm => console.log(elm.highlight));
-        console.groupEnd();
-        console.groupCollapsed('not-found')
-        console.log(_fail);
-        console.groupEnd();
-    }
+    debug_console?.groupCollapsed('found')
+    debug_console?.log(_succeed)
+    debug_console?.groupEnd();
+    debug_console?.groupCollapsed('not-found')
+    debug_console?.log(_fail);
+    debug_console?.groupEnd();
 };

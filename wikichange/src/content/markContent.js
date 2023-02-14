@@ -1,5 +1,6 @@
-import { HighlightType, HIGHLIGHT_TYPE, DEBUG } from "./enums";
+import { HighlightType, HIGHLIGHT_TYPE } from "./enums";
 import { cleanText, escapeRegex, splitElementNode } from "./cleanText";
+import { debug_console } from "./globals";
 
 /**
  * 
@@ -9,12 +10,6 @@ import { cleanText, escapeRegex, splitElementNode } from "./cleanText";
  * @returns markContent function
  */
 const markContentHelper = (_text, _track, _remove_mark, _apply) => {
-    if(DEBUG){
-        console.groupCollapsed('Text');
-        console.info(_text);
-        console.groupEnd();
-    }
-
     /**
      * Checks if the text found it is the correct one to highlight based
      * on context. This will make it a little slower but much more accurate
@@ -77,9 +72,7 @@ const markContentHelper = (_text, _track, _remove_mark, _apply) => {
             }
         }));    
         _apply(color);
-        if(DEBUG){
-            console.info((Date.now() - startTime)/1000);
-        }
+        debug_console?.info((Date.now() - startTime)/1000);
         return { succeed, fail };
     };
     return markContent;
