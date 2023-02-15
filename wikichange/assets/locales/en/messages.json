@@ -1,11 +1,11 @@
 {
     "appName": {
-        "message": "WikiChange"
+        "message": "Wiki Addition Viewer"
     },
     "appShortName": {
-        "message": "WikiChange"
+        "message": "Wiki Addition Viewer"
     },
     "appDescription": {
-        "message": "Annontate changes on Wikipedia pages"
+        "message": "Add insights to your Wikipedia experience"
     }
 }

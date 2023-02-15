@@ -1,12 +1,12 @@
 {
     "name": "wikichange",
-    "description": "Annontate changes on Wikipedia pages",
-    "version": "0.0.1",
+    "description": "Add insights to your Wikipedia experience",
+    "version": "1.0.0",
     "homepage": "http://chrome.google.com/webstore",
-    "author": "ENTER YOUR NAME HERE",
+    "author": "Carleton College CS Comps team",
     "repository": {
         "type": "git",
-        "url": "ENTER GIT REPO URL"
+        "url": "https://github.com/sukritsangvong/wp-browser-extension"
     },
     "scripts": {
         "start": "xt-build -e dev -w",
