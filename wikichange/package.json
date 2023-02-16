@@ -51,6 +51,10 @@
             {
                 "name": "popup",
                 "src": "./src/popup/popup.js"
+            },
+            {
+                "name": "options",
+                "src": "./src/options/options.js"
             }
         ]
     },

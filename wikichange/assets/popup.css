@@ -1,0 +1,10 @@
+.container {
+    display: flex;
+    flex-direction: column;
+}
+a {
+    text-align: center;
+}
+ul {
+    margin: 0;
+}
