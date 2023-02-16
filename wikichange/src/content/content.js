@@ -271,10 +271,9 @@ const renderLoader = () => {
     button.disabled = true;
 
     let loader = document.getElementById("loader");
-    loader.style.paddingTop = "3px";
     loader.style.border = "5px solid white";
     loader.style.borderTop = "5px solid #3498db";
-    loader.style.borderRadius = "50%";
+    loader.style.borderRadius = "100%";
     loader.style.width = "15px";
     loader.style.height = "15px";
     loader.style.position = "absolute";
