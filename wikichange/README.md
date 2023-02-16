@@ -1,6 +1,6 @@
 # Wiki Addition Viewer
 
-Add insights to your Wikipedia experience
+An extension to add insights to your Wikipedia experience
 
 ## Development 
 
