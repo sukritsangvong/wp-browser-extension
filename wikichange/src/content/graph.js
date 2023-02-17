@@ -30,22 +30,45 @@ const updateDateSelector = (newDate) => {
     dateSelector.value = new Date(newDate).toLocaleDateString("en-US");
 };
 
-const decimation = {
-    enabled: false,
-    algorithm: 'min-max',
-  };
+const formatDatesIntoShortMonthAndYear = (dates) =>
+    dates.map(
+        (date) =>
+            `${date.toLocaleString("en-US", { month: "short" })} ${(date.getYear() > 99
+                ? date.getYear() - 100
+                : date.getYear()
+            )
+                .toString()
+                .padStart(2, "0")}`
+    );
+
+const formatDatesIntoDateAndShortMonth = (dates) =>
+    dates.map(
+        (date) => `${date.getUTCDate().toString().padStart(2, "0")} ${date.toLocaleString("en-US", { month: "short" })}`
+    );
+
+const isSixMonthOrThreeMonthSelected = () => {
+    return (
+        document.getElementById("6m").classList.contains("buttonHoverEffect") ||
+        document.getElementById("3m").classList.contains("buttonHoverEffect")
+    );
+};
 
 const makePageViewAndReivisionGraphFromData = (pageViewsData, revisionsData) => {
-    const xLabels = pageViewsData["x"];
+    const xLabels = isSixMonthOrThreeMonthSelected()
+        ? formatDatesIntoDateAndShortMonth(pageViewsData["x"])
+        : formatDatesIntoShortMonthAndYear(pageViewsData["x"]);
+    const labelsToFullDateMap = Object.fromEntries(pageViewsData["x"].map((v, i) => [xLabels[i], v]));
+
+    const pageViewsY = pageViewsData["y"].slice(pageViewsData["y"].length - len, pageViewsData["y"].length);
+    const pageRevisionsY = revisionsData["y"].slice(pageViewsData["y"].length - len, pageViewsData["y"].length);
 
     const ctx = document.getElementById("viewsEditsChart");
-
     const data = {
         labels: xLabels,
         datasets: [
             {
                 label: "Views",
-                data: pageViewsData["y"],
+                data: pageViewsY,
                 borderColor: "#a9a9a9",
                 backgroundColor: "#a9a9a9",
                 yAxisID: "y",
@@ -53,7 +76,7 @@ const makePageViewAndReivisionGraphFromData = (pageViewsData, revisionsData) => 
             },
             {
                 label: "Edits",
-                data: revisionsData["y"],
+                data: pageRevisionsY,
                 borderColor: CHART_COLORS.blue,
                 backgroundColor: CHART_COLORS.blue,
                 yAxisID: "y1",
@@ -95,6 +118,12 @@ const makePageViewAndReivisionGraphFromData = (pageViewsData, revisionsData) => 
             plugins: {
                 tooltip: {
                     position: "nearest",
+                    callbacks: {
+                        title: (titleObj) => {
+                            const shortDate = titleObj[0].label;
+                            return labelsToFullDateMap[shortDate].toLocaleDateString("en-US");
+                        },
+                    },
                 },
                 legend: {
                     onClick: null,
@@ -102,11 +131,11 @@ const makePageViewAndReivisionGraphFromData = (pageViewsData, revisionsData) => 
             },
             scales: {
                 x: {
-                    ticks:{
-                        callback: function(val, index) {
-                        return index % 4 === 0 ? this.getLabelForValue(val) : '';
+                    ticks: {
+                        callback: function (val, index) {
+                            return index % 4 === 0 ? this.getLabelForValue(val) : "";
                         },
-                        color: 'grey',
+                        color: "grey",
                     },
                 },
                 y: {
@@ -170,7 +199,7 @@ const injectGraphToPage = async (title, startDate, endDate) => {
  * @returns a Chart.js graph of views and revisions
  */
 const getFilterGraphDataThatComeAfterStartDate = (graphData, startDate) => {
-    const filteredX = graphData.x.filter((date) => new Date(date) >= startDate);
+    const filteredX = graphData.x.filter((date) => date >= startDate);
     const filteredY = graphData.y.filter((_, i) => filteredX.indexOf(graphData.x[i]) !== -1);
     return { x: filteredX, y: filteredY };
 };
@@ -186,7 +215,6 @@ const injectScaledCurrentGraphToPage = (startDate) => {
     if (startDate == null) {
         makePageViewAndReivisionGraphFromData(pageViews, revisions);
     } else {
-
         const filteredPageViews = getFilterGraphDataThatComeAfterStartDate(pageViews, startDate);
         const filteredRevisions = getFilterGraphDataThatComeAfterStartDate(revisions, startDate);
 
