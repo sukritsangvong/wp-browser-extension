@@ -2,7 +2,7 @@ import { getPageCreationDate } from "./timeSeriesService.js";
 import { injectGraphToPage, injectScaledCurrentGraphToPage } from "./graph.js";
 import { fetchChangeWithHTML, fetchRevisionFromDate, getRevisionPageLink } from "./compareRevisionService.js";
 import { HighlightType, HIGHLIGHT_TYPE } from "./enums";
-import { markContent  } from "./markContent.js";
+import { markContent } from "./markContent.js";
 import { cleanText, splitElementNode } from "./cleanText";
 import { debug_console, title } from "./globals.js";
 
@@ -97,14 +97,13 @@ const setUpScaleButton = (scaleButtonsDiv, buttonId, buttonText, duration, scale
     scaleButtonsDiv.appendChild(button);
 
     button.addEventListener("click", () => {
-        injectScaledCurrentGraphToPage(duration);
-
         // remove hover effect from all scale buttons
         scaleButtonInputs.forEach((input) => {
             document.getElementById(input.id).classList.remove("buttonHoverEffect");
         });
 
         button.classList.add("buttonHoverEffect");
+        injectScaledCurrentGraphToPage(duration);
     });
 };
 
@@ -159,7 +158,6 @@ const getRevisionToClosestDateText = (pageLink, oldRevisionDate) => {
     return `<a href=${pageLink} target="_blank">${oldRevisionDate}</a> (the closest revision to your chosen time)`;
 };
 
-
 const getCurAndOldRevisionsParallel = async (title, curDate, oldDate) => {
     const revisionPromises = [fetchRevisionFromDate(title, curDate), fetchRevisionFromDate(title, oldDate)];
     return Promise.all(revisionPromises);
@@ -195,8 +193,7 @@ const renderItemsBelowGraph = async (creationDate) => {
         <div class="flex-container" id="buttonContainer">
             <input type="text" pattern="\d{1,2}/\d{1,2}/\d{4}" class="datepicker" title="Please match the mm/dd/yyyy format" value="${initialDate
                 .toLocaleDateString("en-US")
-                .slice(0, 10)
-            }" id="dateOutput" name="dateOutput" style="text-align: center;" />
+                .slice(0, 10)}" id="dateOutput" name="dateOutput" style="text-align: center;" />
             <button class="highlightButton" id="highlightButton">Highlight Changes</button>
         </div>
         <div id="loader"></div>
@@ -232,7 +229,6 @@ const renderItemsBelowGraph = async (creationDate) => {
     });
     return [curRevisionId, oldRevisionId, oldRevisionDate];
 };
-
 
 const toggleShowOnPopup = () => {
     document.getElementById("graphPopup").classList.toggle("show");
@@ -302,7 +298,7 @@ getPageCreationDate(title).then((date) => {
     // Render popups and initial highlight only when graph and buttons are loaded
     Promise.all(promises).then(([, [curRevisionId, oldRevisionId, oldRevisionDate]]) => {
         renderPopup();
-        highlightRevisionBetweenRevisionIds(title, curRevisionId, oldRevisionId, oldRevisionDate)
+        highlightRevisionBetweenRevisionIds(title, curRevisionId, oldRevisionId, oldRevisionDate);
     });
 });
 
@@ -339,7 +335,7 @@ const highlightContentUsingNodes = (context, color) => {
         node = textNode;
         parent = node.parentNode;
         let value = node.nodeValue;
-        let filter_highlight = context.highlight.replace(/<ref>.*<\/ref>/g, "").replace(/\{\{Cite.*?\}\}/g, ""); 
+        let filter_highlight = context.highlight.replace(/<ref>.*<\/ref>/g, "").replace(/\{\{Cite.*?\}\}/g, "");
         newValue = value.replace(
             filter_highlight,
             `<mark style='background-color: ${color}' class='extension-highlight'>${filter_highlight}</mark>`
@@ -363,8 +359,8 @@ const highlightContentUsingNodes = (context, color) => {
                     node.parentNode.nextSibling.nodeValue != null &&
                     node.parentNode.previousSibling != null &&
                     node.parentNode.previousSibling.nodeValue != null &&
-                    (node.parentNode.nextSibling.nodeValue.includes(content_after) &&
-                        node.parentNode.previousSibling.nodeValue.includes(content_before))
+                    node.parentNode.nextSibling.nodeValue.includes(content_after) &&
+                    node.parentNode.previousSibling.nodeValue.includes(content_before)
                 ) {
                     let newNode = document.createElement("span");
                     newNode.innerHTML = newValue;
@@ -407,14 +403,12 @@ const highlightContentUsingNodes = (context, color) => {
 const highlightRevisionBetweenRevisionIds = async (title, curRevisionId, oldRevisionId, oldRevisionDate) => {
     try {
         highlight(curRevisionId, oldRevisionId).then((found_count) => {
-            const new_text = `We highlighted <span style="color: #468946; font-weight: 700;">${found_count}</span> changes which represent additions to the page between ${
-                getRevisionToClosestDateText(
-                    getRevisionPageLink(title, curRevisionId, oldRevisionId).replace(/\s/g, "_"),
-                    oldRevisionDate
-                )
-            } and the present day. Some of the changes were purely formatting or deletions and, therefore, are not highlighted.`;
-            document.getElementById('revisionDate').innerHTML = new_text;
-        })
+            const new_text = `We highlighted <span style="color: #468946; font-weight: 700;">${found_count}</span> changes which represent additions to the page between ${getRevisionToClosestDateText(
+                getRevisionPageLink(title, curRevisionId, oldRevisionId).replace(/\s/g, "_"),
+                oldRevisionDate
+            )} and the present day. Some of the changes were purely formatting or deletions and, therefore, are not highlighted.`;
+            document.getElementById("revisionDate").innerHTML = new_text;
+        });
     } catch (err) {
         debug_console?.error(
             `Error highlighting revisions between revition ids for inputs title:${title} curRevisionId:${curRevisionId} oldRevisionId:${oldRevisionId}\nError: ${err}`
@@ -434,7 +428,7 @@ const highlight = async (revisionId, oldRevisionId) => {
     const _succeed = [];
     const _fail = [];
     if (HIGHLIGHT_TYPE == HighlightType.NODE) {
-        for(let element of arr) {
+        for (let element of arr) {
             let splitElement = splitElementNode(element);
             for (let subElement of splitElement) {
                 subElement = cleanText(subElement);
@@ -454,10 +448,10 @@ const highlight = async (revisionId, oldRevisionId) => {
     let button = document.getElementById("highlightButton");
     button.disabled = false;
     document.getElementById("loader").style.display = "none";
-    debug_console?.groupCollapsed('found')
-    debug_console?.log(_succeed)
+    debug_console?.groupCollapsed("found");
+    debug_console?.log(_succeed);
     debug_console?.groupEnd();
-    debug_console?.groupCollapsed('not-found')
+    debug_console?.groupCollapsed("not-found");
     debug_console?.log(_fail);
     debug_console?.groupEnd();
     return _succeed.length;
