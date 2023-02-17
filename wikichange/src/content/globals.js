@@ -35,15 +35,16 @@ const page_id = (() => {
  * @returns a string with title of a page
  */
 const title = (() => {
-    let alternate_title = document.getElementById("firstHeading").innerText;
+    const alternate_title = document.getElementById("firstHeading").innerText;
     debug_console?.info(alternate_title);
     if (alternate_title.length !== 0) {
         return alternate_title;
     }
-    let titleSpan = document.getElementsByClassName("mw-page-title-main");
+
+    const titleSpan = document.getElementsByClassName("mw-page-title-main");
     if (titleSpan.length === 0) {
-        let url = document.URL.split("/");
-        return url[url.length - 1].replace("_", " ");
+        const titleFromUrl = document.URL.match(/^https?:\/\/[^/]+\/[^/]+\/([^/?#]*)/i)[1].replace("_", " ");
+        return titleFromUrl;
     } else {
         return titleSpan[0].innerHTML;
     }
