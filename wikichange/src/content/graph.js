@@ -59,8 +59,8 @@ const makePageViewAndReivisionGraphFromData = (pageViewsData, revisionsData) => 
         : formatDatesIntoShortMonthAndYear(pageViewsData["x"]);
     const labelsToFullDateMap = Object.fromEntries(pageViewsData["x"].map((v, i) => [xLabels[i], v]));
 
-    const pageViewsY = pageViewsData["y"].slice(pageViewsData["y"].length - len, pageViewsData["y"].length);
-    const pageRevisionsY = revisionsData["y"].slice(pageViewsData["y"].length - len, pageViewsData["y"].length);
+    const pageViewsY = pageViewsData["y"];
+    const pageRevisionsY = revisionsData["y"];
 
     const ctx = document.getElementById("viewsEditsChart");
     const data = {
