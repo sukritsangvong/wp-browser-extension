@@ -14,39 +14,13 @@ const HighlightType = {
 };
 
 chrome.storage.sync.get({
-    higlightingOnOff: true,
-    invertHighlighting: false,
     highlightColor: '#AFE1AF'
 }, function (items) {
-    console.log(items);
     const stylesheet = document.createElement('style');
-
-    if(!items.higlightingOnOff){
-        stylesheet.innerText = `:root {
-            --highlight-color: transparent;
-        }`;
-        return;
-    }
-
-    if(items.invertHighlighting){
-        console.log('a');
-        stylesheet.innerText = `:root {
-            --highlight-color: transparent;
-        }
-        mark {
-            background-color: ${items.highlightColor};
-        }`;
-    } else {
-        stylesheet.innerText = `:root {
-            --highlight-color: ${items.highlightColor};
-        }
-        mark {
-            background-color: transparent;
-        }
-        `;
-    }
+    stylesheet.innerText = `:root {
+        --highlight-color: ${items.highlightColor};
+    }`;
     document.head.append(stylesheet);
-    console.log(stylesheet);
 }); 
 
 const DEBUG = false;

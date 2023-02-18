@@ -2,7 +2,7 @@ const stylesheet = document.createElement('style');
 document.head.append(stylesheet);
 
 let toMark = '';
-let toStyle = ''
+let toStyle = '';
 /**
  * Keep track in characters to highlight
  * @param {int} start of the indexes to highlight
@@ -25,8 +25,9 @@ const addChars = (start, end) => {
  * Apply a highlight to all the saved characters
  */
 const applyMarks = () => {
-    console.count('apply');
     stylesheet.innerText = toStyle;
+    toMark = '';
+    toStyle = '';
 }
 
 /**
@@ -35,6 +36,7 @@ const applyMarks = () => {
 const removeMarks = () => {
     stylesheet.innerText = '';
     toMark = '';
+    toStyle = '';
 };
 
 export { addChars, applyMarks, removeMarks };
