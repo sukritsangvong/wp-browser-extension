@@ -313,12 +313,14 @@ getPageCreationDate(title).then((date) => {
 const highlightRevisionBetweenRevisionIds = async (title, curRevisionId, oldRevisionId, oldRevisionDate) => {
     try {
         highlight(curRevisionId, oldRevisionId).then((found_count) => {
-            const new_text = `We highlighted <span style="color: #468946; font-weight: 700;">${found_count}</span> changes which represent additions to the page between ${getRevisionToClosestDateText(
-                getRevisionPageLink(title, curRevisionId, oldRevisionId).replace(/\s/g, "_"),
-                oldRevisionDate
-            )} and the present day. Some of the changes were purely formatting or deletions and, therefore, are not highlighted.`;
-            document.getElementById("revisionDate").innerHTML = new_text;
-        });
+            const new_text = `We highlighted <span style="color: #468946; font-weight: 700;">${found_count}</span> changes which represent additions to the page between ${
+                getRevisionToClosestDateText(
+                    getRevisionPageLink(title, curRevisionId, oldRevisionId).replace(/\s/g, "_"),
+                    oldRevisionDate
+                )
+            } and the present day. Some of the changes were purely formatting or deletions and, therefore, are not highlighted. Visit our <a href="">limitations</a> page to learn more.`;
+            document.getElementById('revisionDate').innerHTML = new_text;
+        })
     } catch (err) {
         debug_console?.error(
             `Error highlighting revisions between revition ids for inputs title:${title} curRevisionId:${curRevisionId} oldRevisionId:${oldRevisionId}\nError: ${err}`
