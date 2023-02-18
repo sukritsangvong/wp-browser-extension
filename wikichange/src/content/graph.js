@@ -27,7 +27,7 @@ let currentChart = null;
 
 const updateDateSelector = (newDate) => {
     const dateSelector = document.getElementById("dateOutput");
-    dateSelector.value = new Date(newDate).toLocaleDateString("en-US");
+    dateSelector.value = newDate.toLocaleDateString("en-US");
 };
 
 const formatDatesIntoShortMonthAndYear = (dates) =>
@@ -109,7 +109,7 @@ const makePageViewAndReivisionGraphFromData = (pageViewsData, revisionsData) => 
         data: data,
         options: {
             onClick: (e) => {
-                const date = e.chart.tooltip.dataPoints[0].label;
+                const date = labelsToFullDateMap[e.chart.tooltip.dataPoints[0].label];
                 updateDateSelector(date);
                 const highlightButton = document.getElementById("highlightButton");
                 highlightButton.classList.add("wiggleAnimation");
