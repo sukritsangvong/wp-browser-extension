@@ -54,10 +54,10 @@ const isSixMonthOrThreeMonthSelected = () => {
 };
 
 const makePageViewAndReivisionGraphFromData = (pageViewsData, revisionsData) => {
+    const xDates = pageViewsData["x"];
     const xLabels = isSixMonthOrThreeMonthSelected()
-        ? formatDatesIntoDateAndShortMonth(pageViewsData["x"])
-        : formatDatesIntoShortMonthAndYear(pageViewsData["x"]);
-    const labelsToFullDateMap = Object.fromEntries(pageViewsData["x"].map((v, i) => [xLabels[i], v]));
+        ? formatDatesIntoDateAndShortMonth(xDates)
+        : formatDatesIntoShortMonthAndYear(xDates);
 
     const pageViewsY = pageViewsData["y"];
     const pageRevisionsY = revisionsData["y"];
@@ -109,7 +109,8 @@ const makePageViewAndReivisionGraphFromData = (pageViewsData, revisionsData) => 
         data: data,
         options: {
             onClick: (e) => {
-                const date = labelsToFullDateMap[e.chart.tooltip.dataPoints[0].label];
+                const dataIndex = e.chart.tooltip.dataPoints[0].dataIndex;
+                const date = xDates[dataIndex];
                 updateDateSelector(date);
                 const highlightButton = document.getElementById("highlightButton");
                 highlightButton.classList.add("wiggleAnimation");
@@ -120,8 +121,8 @@ const makePageViewAndReivisionGraphFromData = (pageViewsData, revisionsData) => 
                     position: "nearest",
                     callbacks: {
                         title: (titleObj) => {
-                            const shortDate = titleObj[0].label;
-                            return labelsToFullDateMap[shortDate].toLocaleDateString("en-US");
+                            const dataIndex = titleObj[0].dataIndex;
+                            return xDates[dataIndex].toLocaleDateString("en-US");
                         },
                     },
                 },
