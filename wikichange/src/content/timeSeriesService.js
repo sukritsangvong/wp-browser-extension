@@ -29,7 +29,7 @@ const isDateWhenPageViewDataBecameAvailable = (isPageViewTimeSeries, date) => {
 const formatResponseToTimeseries = (response, startDate, endDate, isPageViewTimeSeries) => {
     const allDates = getDatesBetweenTwoDates(startDate, endDate);
     return {
-        x: allDates.map((date) => date.toLocaleDateString("en-US")),
+        x: allDates,
         y: allDates.map((date) =>
             isDateWhenPageViewDataBecameAvailable(isPageViewTimeSeries, date)
                 ? null
@@ -166,7 +166,10 @@ const formatPageRevisions = (fetchedRevisions, aggregateType) => {
         }, {});
 
     return new Map(
-        Object.keys(pageRevisionCountMap).map((key) => [new Date(key).toLocaleDateString("en-US"), pageRevisionCountMap[key]])
+        Object.keys(pageRevisionCountMap).map((key) => [
+            new Date(key).toLocaleDateString("en-US"),
+            pageRevisionCountMap[key],
+        ])
     );
 };
 
