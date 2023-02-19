@@ -5,6 +5,8 @@
 a {
     text-align: center;
 }
-ul {
-    margin: 0;
+
+body > div.card, body div.alert {
+    border-radius: 0;
+    border: 0;
 }
