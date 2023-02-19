@@ -298,9 +298,9 @@ const highlightRevisionBetweenRevisionIds = async (title, curRevisionId, oldRevi
                     getRevisionPageLink(title, curRevisionId, oldRevisionId).replace(/\s/g, "_"),
                     oldRevisionDate
                 )
-            } and the present day. Some of the changes were purely formatting or deletions and, therefore, are not highlighted.`;
-            document.getElementById('revisionDate').innerHTML = new_text;
-        })
+            } and the present day. Some of the changes were purely formatting or deletions and, therefore, are not highlighted. Visit our <a href="">limitations</a> page to learn more.`;
+            document.getElementById("revisionDate").innerHTML = new_text;
+        });
     } catch (err) {
         debug_console?.error(
             `Error highlighting revisions between revition ids for inputs title:${title} curRevisionId:${curRevisionId} oldRevisionId:${oldRevisionId}\nError: ${err}`
