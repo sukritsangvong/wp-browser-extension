@@ -9,10 +9,10 @@ let toStyle = '';
  * @param {int} end of the indexes to highligh (inclusive)
  */
 const addChars = (start, end) => {
-    for(let i = start; i <= end; i++) {
+    for (let i = start; i <= end; i++) {
         toMark += `mark#mark-${i}, `;
     }
-    if(toMark.length > 3000){
+    if (toMark.length > 3000){
         toStyle += `${toMark.slice(0, toMark.length-2)} {
             background-color: var(--highlight-color);
         }

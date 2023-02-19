@@ -13,7 +13,7 @@ let toStyle = '';
 const addWords = (start, end) => {
     let prevStart = 0;
     let intermediary = [];
-    for(let index of map){
+    for (let index of map){
         if(index <= start){
             prevStart = index;
         } else {
@@ -25,7 +25,7 @@ const addWords = (start, end) => {
         }
     }
     toMark += intermediary.reduce((accumulator, index) => `${accumulator}mark#mark-${index}, `, `mark#mark-${prevStart}, `);
-    if(toMark.length > 3000){
+    if (toMark.length > 3000){
         toStyle += `${toMark.slice(0, toMark.length-2)} {
             background-color: var(--highlight-color);
         }
