@@ -1,0 +1,12 @@
+.container {
+    display: flex;
+    flex-direction: column;
+}
+a {
+    text-align: center;
+}
+
+body > div.card, body div.alert {
+    border-radius: 0;
+    border: 0;
+}

@@ -13,6 +13,16 @@ const HighlightType = {
     TAGGING_WORD: 2,
 };
 
+chrome.storage.sync.get({
+    highlightColor: '#AFE1AF'
+}, function (items) {
+    const stylesheet = document.createElement('style');
+    stylesheet.innerText = `:root {
+        --highlight-color: ${items.highlightColor};
+    }`;
+    document.head.append(stylesheet);
+}); 
+
 const DEBUG = false;
 
 const HIGHLIGHT_TYPE = HighlightType.TAGGING_CHAR;

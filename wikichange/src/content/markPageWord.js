@@ -4,7 +4,7 @@ const stylesheet = document.createElement('style');
 document.head.append(stylesheet);
 
 let toMark = '';
-
+let toStyle = '';
 /**
  * Add a highlight over an index range
  * @param {int} start of the indexes to highlight
@@ -13,7 +13,7 @@ let toMark = '';
 const addWords = (start, end) => {
     let prevStart = 0;
     let intermediary = [];
-    for(let index of map){
+    for (let index of map){
         if(index <= start){
             prevStart = index;
         } else {
@@ -24,18 +24,23 @@ const addWords = (start, end) => {
             break;
         }
     }
-    toMark += intermediary.reduce((accumulator, index) => `${accumulator}, mark#mark-${index}`, `mark#mark-${prevStart}`);
+    toMark += intermediary.reduce((accumulator, index) => `${accumulator}mark#mark-${index}, `, `mark#mark-${prevStart}, `);
+    if (toMark.length > 3000){
+        toStyle += `${toMark.slice(0, toMark.length-2)} {
+            background-color: var(--highlight-color);
+        }
+        `;
+        toMark='';
+    }
 };
 
 /**
  * Apply a highlight to all the saved words
- * @param {string} color of the highlighted marks
  */
-const applyMarks = (color) => {
-    stylesheet.innerText = `${toMark} {
-        background-color: ${color};
-    }
-    `;
+const applyMarks = () => {
+    stylesheet.innerText = toStyle;
+    toMark = '';
+    toStyle = '';
 };
 
 /**
@@ -43,6 +48,8 @@ const applyMarks = (color) => {
  */
 const removeMarks = () => {
     stylesheet.innerText = '';
+    toMark = '';
+    toStyle = '';
 };
 
 export { addWords, applyMarks, removeMarks };

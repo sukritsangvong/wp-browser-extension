@@ -1,0 +1,45 @@
+h1 {
+  text-align: center;
+}
+form {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  grid-template-areas: 
+    "label input"
+    "submit submit";
+  column-gap: 7%;
+  row-gap: 7%;
+  align-items: center;
+  justify-items: center;
+
+}
+
+label {
+  justify-self: end;
+
+  font-weight: 700;
+  font-size: 20px;
+
+  /* prevent text selection https://www.w3schools.com/howto/howto_css_disable_text_selection.asp*/
+  -webkit-user-select: none; /* Safari */
+  -ms-user-select: none; /* IE 10 and IE 11 */
+  user-select: none; /* Standard syntax */
+}
+
+form > div {
+  justify-self: start;
+}
+
+#save {
+  grid-area: submit;
+
+  max-width: min(15%, 150px);
+}
+
+#status {
+  width: 100%;
+  height: 10px;
+  text-align: center;
+}
+  

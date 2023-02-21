@@ -196,8 +196,8 @@ const renderItemsBelowGraph = async (creationDate) => {
                 .toLocaleDateString("en-US")
                 .slice(0, 10)}" id="dateOutput" name="dateOutput" style="text-align: center;" />
             <button class="highlightButton" id="highlightButton">Highlight Changes</button>
+            <div id="loader"></div>
         </div>
-        <div id="loader"></div>
     </div>
     <div style="padding-left: 3%; padding-right: 3%; padding-top: 1%; text-align: center;">
         <p class="card-text" id="revisionDate"></p>
@@ -266,26 +266,6 @@ const renderPopup = () => {
 const renderLoader = () => {
     let button = document.getElementById("highlightButton");
     button.disabled = true;
-
-    let loader = document.getElementById("loader");
-    loader.style.border = "5px solid white";
-    loader.style.borderTop = "5px solid #3498db";
-    loader.style.borderRadius = "100%";
-    loader.style.width = "15px";
-    loader.style.height = "15px";
-    loader.style.position = "absolute";
-    loader.style.marginTop = "6.5px";
-    loader.style.marginLeft = "335px";
-    loader.style.display = "inline-block";
-    loader.style.animation = "spin 2s linear infinite";
-
-    let keyframes = `@keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }`;
-    let style = document.createElement("style");
-    style.innerHTML = keyframes;
-    document.head.appendChild(style);
 };
 
 /**
@@ -313,12 +293,14 @@ getPageCreationDate(title).then((date) => {
 const highlightRevisionBetweenRevisionIds = async (title, curRevisionId, oldRevisionId, oldRevisionDate) => {
     try {
         highlight(curRevisionId, oldRevisionId).then((found_count) => {
-            const new_text = `We highlighted <span style="color: #468946; font-weight: 700;">${found_count}</span> changes which represent additions to the page between ${getRevisionToClosestDateText(
-                getRevisionPageLink(title, curRevisionId, oldRevisionId).replace(/\s/g, "_"),
-                oldRevisionDate
-            )} and the present day. Some of the changes were purely formatting or deletions and, therefore, are not highlighted.`;
-            document.getElementById("revisionDate").innerHTML = new_text;
-        });
+            const new_text = `We highlighted <span style="color: #468946; font-weight: 700;">${found_count}</span> changes which represent additions to the page between ${
+                getRevisionToClosestDateText(
+                    getRevisionPageLink(title, curRevisionId, oldRevisionId).replace(/\s/g, "_"),
+                    oldRevisionDate
+                )
+            } and the present day. Some of the changes were purely formatting or deletions and, therefore, are not highlighted.`;
+            document.getElementById('revisionDate').innerHTML = new_text;
+        })
     } catch (err) {
         debug_console?.error(
             `Error highlighting revisions between revition ids for inputs title:${title} curRevisionId:${curRevisionId} oldRevisionId:${oldRevisionId}\nError: ${err}`
