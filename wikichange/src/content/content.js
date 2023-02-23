@@ -298,7 +298,7 @@ const highlightRevisionBetweenRevisionIds = async (title, curRevisionId, oldRevi
                     getRevisionPageLink(title, curRevisionId, oldRevisionId).replace(/\s/g, "_"),
                     oldRevisionDate
                 )
-            } and the present day. Some of the changes were purely formatting or deletions and, therefore, are not highlighted. Visit our <a href="">limitations</a> page to learn more.`;
+            } and the present day. Some of the changes were purely formatting or deletions and, therefore, are not highlighted. Visit our <a href="https://sukritsangvong.github.io/wp-browser-extension/description.html#limitations">limitations</a> page to learn more.`;
             document.getElementById("revisionDate").innerHTML = new_text;
         });
     } catch (err) {
