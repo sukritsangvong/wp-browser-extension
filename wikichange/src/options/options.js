@@ -38,7 +38,6 @@ document.querySelector("form").addEventListener("submit", (event) => {
     event.preventDefault();
     save_options();
 });
-console.log(document.getElementById("restore-color"));
 document.getElementById("restore-color").addEventListener("click", () => {
     document.getElementById("highlight-color").value = "#AFE1AF";
 });
