@@ -1,23 +1,28 @@
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 h1 {
     text-align: center;
 }
+
 form {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(2, 1fr);
     grid-template-areas:
         "label input"
-        "restore restore"
-        "submit submit";
+        "restore submit";
     column-gap: 7%;
     row-gap: 7%;
     align-items: center;
     justify-items: center;
+    width: 400px;
 }
 
 label {
-    justify-self: end;
-
     font-weight: 700;
     font-size: 20px;
 
@@ -27,17 +32,14 @@ label {
     user-select: none; /* Standard syntax */
 }
 
-form > div {
+#save {
+    grid-area: submit;
     justify-self: start;
 }
 
-#save {
-    grid-area: submit;
-
-    max-width: min(15%, 150px);
-}
-
 #restore-color {
+    justify-self: end;
+    width: auto;
     grid-area: restore;
 }
 

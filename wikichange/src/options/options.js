@@ -33,11 +33,29 @@ function restore_options() {
     );
 }
 
+/** Reset color to default and store change
+ */
+function reset_color() {
+    /** Use default value highlightColor #AFE1AF */
+    chrome.storage.sync.set(
+        {
+            highlightColor: "#AFE1AF",
+        },
+        function () {
+            document.getElementById("highlight-color").value = "#AFE1AF";
+            /** Update status to let user know options were saved. */
+            const status = document.getElementById("status");
+            status.textContent = "Options saved.";
+            setTimeout(function () {
+                status.textContent = "";
+            }, 750);
+        }
+    );
+}
+
 document.addEventListener("DOMContentLoaded", restore_options);
 document.querySelector("form").addEventListener("submit", (event) => {
     event.preventDefault();
     save_options();
 });
-document.getElementById("restore-color").addEventListener("click", () => {
-    document.getElementById("highlight-color").value = "#AFE1AF";
-});
+document.getElementById("restore-color").addEventListener("click", reset_color);
