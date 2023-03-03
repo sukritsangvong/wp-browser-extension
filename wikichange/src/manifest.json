@@ -20,8 +20,7 @@
         "default_popup": "popup.html"
     },
     "permissions": [
-		"storage",
-		"tabs"
+		"storage"
     ],
     "host_permissions": [
 		"https://en.wikipedia.org/*"
