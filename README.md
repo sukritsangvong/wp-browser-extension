@@ -1,7 +1,8 @@
 # Wiki Addition Viewer: An extension to add insights to your Wikipedia experience
 
 [Website Link](https://sukritsangvong.github.io/wp-browser-extension/)
-[Chrome Webstore Link](https://chrome.google.com/webstore/detail/wiki-addition-viewer/mnaejggfbjoahdenlcfldglmkekdcljo?hl=en&authuser=1)
+
+[Chrome Web Store Link](https://chrome.google.com/webstore/detail/wiki-addition-viewer/mnaejggfbjoahdenlcfldglmkekdcljo?hl=en&authuser=1)
 
 # Dev
 
