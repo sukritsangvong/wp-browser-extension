@@ -1,5 +1,8 @@
-# [Wiki Addition Viewer: An extension to add insights to your Wikipedia experience](https://sukritsangvong.github.io/wp-browser-extension/)
+# Wiki Addition Viewer: An extension to add insights to your Wikipedia experience
 
+[Website Link](https://sukritsangvong.github.io/wp-browser-extension/)
+
+[Chrome Web Store Link](https://chrome.google.com/webstore/detail/wiki-addition-viewer/mnaejggfbjoahdenlcfldglmkekdcljo?hl=en&authuser=1)
 
 # Dev
 
@@ -24,11 +27,7 @@ Use enums.js as inputs for some of the parameters if needed.
 import { getPageViewTimeseries } from "./timeseriesService.js";
 
 // Get page views for the Pasta article
-const pastaResponse = await getPageViewTimeseries(
-  "Pasta",
-  new Date("2015-07-01"),
-  new Date("2022-01-01")
-);
+const pastaResponse = await getPageViewTimeseries("Pasta", new Date("2015-07-01"), new Date("2022-01-01"));
 /*
     Returns:
     {
@@ -45,9 +44,9 @@ import { getPageRevisionCountTimeseries } from "./timeseriesService.js";
 
 // Get revision count for the Pasta article from Jan 2022
 const pastaRevisionResponse = await getPageRevisionCountTimeseries(
-  "Pasta",
-  new Date("2022-01-01"),
-  new Date("2022-01-31")
+    "Pasta",
+    new Date("2022-01-01"),
+    new Date("2022-01-31")
 );
 /*
     Returns:
@@ -60,13 +59,13 @@ const pastaRevisionResponse = await getPageRevisionCountTimeseries(
 
 ## Highlighting
 
-Highlighting needs to be given raw content (text, including bolding and links). To highlight something, we need a context dictionary, with what is supposed to be highlighted, the content after and before. 
+Highlighting needs to be given raw content (text, including bolding and links). To highlight something, we need a context dictionary, with what is supposed to be highlighted, the content after and before.
 
 ### Set the desired highlighting method
 
 We have 3 highlighting methods (HighlightType.NODE, HighlightType.TAGGING_CHAR, HighlightType.TAGGING_WORD). Each one has its pros and cons. For more info, look at the enums.js file, and read the next sections.
 
-To change methods, go to ```root.js``` and change the var ```HIGHLIGHT_TYPE```
+To change methods, go to `root.js` and change the var `HIGHLIGHT_TYPE`
 
 ### Highlighting - Node Version
 
@@ -74,51 +73,52 @@ In this method, we go over the DOM tree text nodes searching for what should be 
 
 ```javascript
 const arr = [
-  {
-    content_before: "800-acre ",
-    highlight: "Cowling Arboretum",
-    content_after: ", which",
-  },
-  {
-    content_before: "Teaching by ",
-    highlight: "U.S. News & World Report",
-    content_after: " for over a decade",
-  },
-  {
-    content_before: "was ",
-    highlight: "founded in",
-    content_after: " 1866",
-  },
+    {
+        content_before: "800-acre ",
+        highlight: "Cowling Arboretum",
+        content_after: ", which",
+    },
+    {
+        content_before: "Teaching by ",
+        highlight: "U.S. News & World Report",
+        content_after: " for over a decade",
+    },
+    {
+        content_before: "was ",
+        highlight: "founded in",
+        content_after: " 1866",
+    },
 ];
 
 let arrayLength = arr.length;
 for (let i = 0; i < arrayLength; i++) {
-  highlightContentUsingNodes(arr[i], "#99FF84");
+    highlightContentUsingNodes(arr[i], "#99FF84");
 }
 ```
 
 ## Highlighting - Char Version and Word Version
 
-This method will tag the entire wikipedia page, and we can highlight the given text by setting some CSS matching the given class. We can do highlighting in one pass, but it may be slower than the node version, however shouldn't be a problem in regular Wikipedia pages. For heavy pages, there's a way to not tag the references at the bottom of the page. 
+This method will tag the entire wikipedia page, and we can highlight the given text by setting some CSS matching the given class. We can do highlighting in one pass, but it may be slower than the node version, however shouldn't be a problem in regular Wikipedia pages. For heavy pages, there's a way to not tag the references at the bottom of the page.
 
 ## How to get highlight count
 
 ### Node Version
-The highlight node code in content.js keeps track of the changes that it managed to highlight and the changes that it failed to highlight. You can get the length attribute of the arrays to get a count. 
+
+The highlight node code in content.js keeps track of the changes that it managed to highlight and the changes that it failed to highlight. You can get the length attribute of the arrays to get a count.
 
 ### Mark Version
-The markContent funciton reutrns an object of with a succeed and fail array of the content. You can get the length attribute of the arrays to get a count. 
+
+The markContent funciton reutrns an object of with a succeed and fail array of the content. You can get the length attribute of the arrays to get a count.
 
 ```javascript
 markContent(arr, "#AFE1AF").then(({ succeed, fail }) => {
-            console.info(succeed.length);
-            console.groupCollapsed('succeed');
-            console.info(succeed);
-            console.groupEnd();
+    console.info(succeed.length);
+    console.groupCollapsed("succeed");
+    console.info(succeed);
+    console.groupEnd();
 
-            console.groupCollapsed('fail');
-            console.info(fail);
-            console.groupEnd();
-        });
+    console.groupCollapsed("fail");
+    console.info(fail);
+    console.groupEnd();
+});
 ```
-
