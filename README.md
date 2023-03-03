@@ -100,7 +100,7 @@ for (let i = 0; i < arrayLength; i++) {
 
 ## Highlighting - Char Version and Word Version
 
-This method will tag the entire wikipedia page, and we can highlight the given text by setting some CSS matching the given class. We can do highlighting in one pass, but it may be slower than the node version, however shouldn't be a problem in regular Wikipedia pages. For heavy pages, there's a way to not tag the references at the bottom of the page.
+This method will tag the entire wikipedia page, and we can highlight the given text by setting some CSS matching the given class. We can do highlighting in one pass.
 
 ## How to get highlight count
 
@@ -124,3 +124,12 @@ markContent(arr, "#AFE1AF").then(({ succeed, fail }) => {
     console.groupEnd();
 });
 ```
+
+# Chrome extension privacy details
+
+We don't collect user data, however, we need some permissions to run our extension:
+
+- Storage: To store data in chrome extension's storage, as we implemented a feature to select the highlighting color (options page).
+- Host permission: We need to change the Wikipedia's HTML to render our changes.
+
+Furthermore, we use remote code to render a chart using Chart.js, and we use bootstrap css scripts. 
