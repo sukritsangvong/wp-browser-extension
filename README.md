@@ -4,6 +4,8 @@
 
 [Chrome Web Store Link](https://chrome.google.com/webstore/detail/wiki-addition-viewer/mnaejggfbjoahdenlcfldglmkekdcljo?hl=en&authuser=1)
 
+[Comps Presentation Slides Link](https://docs.google.com/presentation/d/1b3sQO0TZfH-8ePtacDl21yhdmK1cCb0iYKwia8RRDUg/edit?usp=sharing)
+
 # Dev
 
 ## Set Up the code for development
