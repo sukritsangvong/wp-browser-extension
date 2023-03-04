@@ -11,25 +11,32 @@ function escapeRegex(string) {
 /**
  * Will clean links. Works with links with different and same titles, for instance
  * [[text]], [[text something|text]], ''[text]'' and return the clean version "text"
+ * Chat GPT helped fix this regex
+ * 
  * @param {string} content
  */
 const returnCleanLink = (content) => {
-    return content.replace(/\[\[[^\]]+\|([^\]]+)\]\]/g, '$1')
-            .replace(/\[\[[^\]]+\]\]/g, (match) => match.replace(/\[\[|\]\]/g, ''))
-            .replace(/''(.+)''/g, '$1');
+    return content.replace(/\[\[[^\]]+\|([^\]]+)\]\]/g, '$1') // [[text something|text]]
+            .replace(/\[\[[^\]]+\]\]/g, (match) => match.replace(/\[\[|\]\]/g, '')) // remove [[ ]]
+            .replace(/''(.+)''/g, '$1'); // remove '' formatting 
 };
 
+/**
+ * Will clean the wikitext, and remove some common formatting characters
+ * 
+ * @param {dictionary} context
+ */
 const cleanText = (context) => {
     for (const [type, value] of Object.entries(context)) {
         if (context[type]) {
             let clean = value.trim();
             clean = returnCleanLink(value);
-            clean = clean.replace(/<ref>.*<\/ref>/g, "")
-                 .replace(/\{\{Cite.*?\}\}/g, "")
+            clean = clean.replace(/\{\{Cite.*?\}\}/g, "") // for Wiki {{Cite stuff
                  .replace(/cite web/g, "")
                  .replace(/=/g, "")
-                 .replace(/{{/g, "").replace(/}}/g, "")
-                 .replace(/'(.*?)'/g, "");
+                 .replace(/Cite news/g, "")
+                 .replace(/::/g, "")
+                 .replace(/'(.*?)'/g, ""); // any text inside single quotes
             context[type] = clean;
         }
     }
@@ -45,6 +52,10 @@ const cleanText = (context) => {
 const splitElementNode = (element) => {
     let result = [];
     if (element.highlight.includes("[[") && element.highlight.includes("]]")) {
+        // Cases where links are not simple, example: [[text something|text]]. Chat GPT helped fix the regex
+        // [[, 0+ of non | (optional), the rest ]]. Won't do anything to regular links
+        element.highlight = element.highlight.replace(/\[\[(?:[^|]+\|)?(.+?)\]\]/, '[[$1]]');
+        // Matches any text inside the link - [[, any group of text inside (0+), and ]]
         let split = element.highlight.split(/\[\[(.*?)\]\]/);
         for (let i = 0; i < split.length; i++) {
             result.push({

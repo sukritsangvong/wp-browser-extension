@@ -3,6 +3,7 @@ document.head.append(stylesheet);
 
 let toMark = '';
 let toStyle = '';
+
 /**
  * Keep track in characters to highlight
  * @param {int} start of the indexes to highlight

@@ -1,7 +1,6 @@
 /**
- *  Highlights the words that are given with context. Support for links,
- *  there are some edge cases that don't work yet (highlight is link + no link) or
- *  context and highlight are links. Loops through the DOM tree text nodes, and if no patial
+ *  Highlights the words that are given with context. Support for links.
+ *  Loops through the DOM tree text nodes, and if no match or patial
  *  match, checks if it's a link (parent's siblings may contain the needed text)
  *  Note: Walker code idea and sample use (eg.: document.createTreeWalker and walker.nextNode())
  *  and the regex /[|=\[\]{}]+|<[^>]*>/g are courtesy of ChatGPT
@@ -31,15 +30,15 @@ const highlightContentUsingNodes = (context, color) => {
         node = textNode;
         parent = node.parentNode;
         let value = node.nodeValue;
-        let filter_highlight = context.highlight.replace(/<ref>.*<\/ref>/g, "").replace(/\{\{Cite.*?\}\}/g, "");
         newValue = value.replace(
-            filter_highlight,
-            `<mark style='background-color: ${color}' class='extension-highlight'>${filter_highlight}</mark>`
+            context.highlight,
+            `<mark style='background-color: ${color}' class='extension-highlight'>${context.highlight}</mark>`
         );
         if (newValue !== value) {
-            // Clean up the context.content_after and context.content_before from wiki markup
-            let content_after = context.content_after.replace(/[|=\[\]{}]+|<[^>]*>/g, "").replace("cite web", "");
-            let content_before = context.content_before.replace(/[|=\[\]{}]+|<[^>]*>/g, "").replace("cite web", "");
+            // Clean up the context.content_after and context.content_before from wiki markup, 
+            // some additional cleanings not performed in cleanText
+            let content_after = context.content_after.replace(/[|]+|<[^>]*>/g, "");
+            let content_before = context.content_before.replace(/[|]+|<[^>]*>/g, "");
             if (value.includes(content_after) && value.includes(content_before)) {
                 // Or because of edge cases, if good context this will almost always work
                 let newNode = document.createElement("span");
@@ -68,11 +67,9 @@ const highlightContentUsingNodes = (context, color) => {
                 // We can try matching with smaller context, as links or html may be further along blocking
                 let short_content_after = content_after
                     .slice(0, Math.round(content_after.length * 0.1))
-                    .replace("Cite news", "")
                     .trim();
                 let short_content_before = content_before
                     .substring(Math.round(content_before.length * 0.9))
-                    .replace("Cite news", "")
                     .trim();
                 // As it is short context, we match both after and before for accuracy
                 if (value.includes(short_content_after) && value.includes(short_content_before)) {

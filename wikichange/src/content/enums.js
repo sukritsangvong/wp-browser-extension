@@ -23,8 +23,10 @@ chrome.storage.sync.get({
     document.head.append(stylesheet);
 }); 
 
+// No console.logs when we are not testing
 const DEBUG = false;
 
+// Set the default tagging method
 const HIGHLIGHT_TYPE = HighlightType.TAGGING_CHAR;
 
 export { WIKI_CREATION_DATE, WIKI_PAGE_VIEW_DATA_AVAILABLE_DATE, AggregateType, HIGHLIGHT_TYPE, HighlightType, DEBUG };

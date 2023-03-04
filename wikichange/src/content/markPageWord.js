@@ -5,6 +5,7 @@ document.head.append(stylesheet);
 
 let toMark = '';
 let toStyle = '';
+
 /**
  * Add a highlight over an index range
  * @param {int} start of the indexes to highlight
