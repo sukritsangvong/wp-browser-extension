@@ -11,10 +11,12 @@ const tagEveryWord = () => {
             if (node.parentElement.tagName === 'STYLE') {
                 return NodeFilter.FILTER_REJECT;
             }
-            // Skip the references
+
+            // Skip the references, the code is fast so no need to do so
             // if (node.parentElement.closest('.reflist')){
             //     return NodeFilter.FILTER_REJECT;
             // }
+            
             if (node.nodeValue.trim()){
                 return NodeFilter.FILTER_ACCEPT;
             } 
