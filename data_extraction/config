@@ -1,0 +1,5 @@
+[config]
+host=localhost
+database=clickstream
+user=duc
+password=password

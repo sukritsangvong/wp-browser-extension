@@ -1,11 +1,6 @@
 import { getPageCreationDate } from "./timeSeriesService.js";
-import { injectGraphToPage, injectScaledCurrentGraphToPage } from "./graph.js";
-import { fetchChangeWithHTML, fetchRevisionFromDate, getRevisionPageLink } from "./compareRevisionService.js";
-import { HighlightType, HIGHLIGHT_TYPE } from "./enums";
-import { markContent } from "./markContent.js";
-import { cleanText, splitElementNode } from "./cleanText";
+import { injectGraphToPage, injectScaledCurrentGraphToPage, injectClickStreamGraphToPage} from "./graph.js";
 import { debug_console, title } from "./globals.js";
-import { highlightContentUsingNodes } from "./highlightNode";
 
 /**
  * Inserts a new node after an existing node
@@ -72,29 +67,23 @@ const renderGraphOverlay = async () => {
 
     const siteSub = document.getElementById("siteSub");
     insertAfter(floatContainer, siteSub);
-    const creationDate = await getPageCreationDate(title);
     const sim = setInterval(progressBar, 3);
 
-    const graphPromise = injectGraphToPage(title, creationDate, new Date(Date.now())).then(async () => {
-        if (document.getElementById("5y").disabled) {
-            document.getElementById("all").click();
-        } else {
-            document.getElementById("5y").click();
-        }
+    const graphPromise = injectClickStreamGraphToPage(title, 5).then(async () => {
+        document.getElementById("5").click();
         clearTimeout(sim);
     });
 
-    renderScaleButtons(creationDate);
+    renderScaleButtons();
     return graphPromise; // Promise of whether the graph is injected
 };
 
-const setUpScaleButton = (scaleButtonsDiv, buttonId, buttonText, duration, scaleButtonInputs, isDisable) => {
+const setUpScaleButton = (scaleButtonsDiv, buttonId, buttonText, count, scaleButtonInputs) => {
     const button = document.createElement("button");
     button.setAttribute("id", buttonId);
     button.setAttribute("style", "margin-right: 5px;");
     button.setAttribute("class", "extensionButton");
     button.innerHTML = buttonText;
-    button.disabled = isDisable;
     scaleButtonsDiv.appendChild(button);
 
     button.addEventListener("click", () => {
@@ -104,29 +93,18 @@ const setUpScaleButton = (scaleButtonsDiv, buttonId, buttonText, duration, scale
         });
 
         button.classList.add("buttonHoverEffect");
-        injectScaledCurrentGraphToPage(duration);
+        injectClickStreamGraphToPage(title, count);
     });
 };
 
-const getDateObjectFromNow = (monthsFromCurrent) => {
-    if (monthsFromCurrent == null) {
-        return null;
-    }
-    const date = new Date();
-    date.setMonth(date.getMonth() - monthsFromCurrent);
-    return date;
-};
-
-const setUpScaleButtons = (scaleButtonsDiv, scaleButtonInputs, creationDate) => {
-    const pageAgeInMonths = (new Date().getTime() - creationDate.getTime()) / (1000 * 3600 * 24 * 30);
+const setUpScaleButtons = (scaleButtonsDiv, scaleButtonInputs) => {
     scaleButtonInputs.forEach((input) => {
         setUpScaleButton(
             scaleButtonsDiv,
             input.id,
             input.name,
-            getDateObjectFromNow(input.duration),
-            scaleButtonInputs,
-            input.duration && pageAgeInMonths < input.duration
+            input.count,
+            scaleButtonInputs
         );
     });
 };
@@ -134,217 +112,22 @@ const setUpScaleButtons = (scaleButtonsDiv, scaleButtonInputs, creationDate) => 
 /**
  * Render buttons to scale the graph.
  */
-const renderScaleButtons = (creationDate) => {
+const renderScaleButtons = () => {
     const viewsEditsChart = document.getElementById("viewsEditsChart");
     const scaleButtonsDiv = document.createElement("div");
     scaleButtonsDiv.setAttribute("id", "scaleButtonsDiv");
     scaleButtonsDiv.setAttribute("style", "text-align: start;");
 
     const scaleButtonInputs = [
-        { id: "all", name: "ALL", duration: null }, // null represents shows everything
-        { id: "5y", name: "5Y", duration: 5 * 12 },
-        { id: "3y", name: "3Y", duration: 3 * 12 },
-        { id: "1y", name: "1Y", duration: 12 },
-        { id: "6m", name: "6M", duration: 6 },
-        { id: "3m", name: "3M", duration: 3 },
+        { id: "5", name: "5", count: 5 },
+        { id: "10", name: "10", count: 10 },
+        { id: "25", name: "25", count: 25 },
     ];
 
-    setUpScaleButtons(scaleButtonsDiv, scaleButtonInputs, creationDate);
+    setUpScaleButtons(scaleButtonsDiv, scaleButtonInputs);
 
     // inserts buttons above graph
     viewsEditsChart.parentNode.insertBefore(scaleButtonsDiv, viewsEditsChart);
 };
 
-const getRevisionToClosestDateText = (pageLink, oldRevisionDate) => {
-    return `<a href=${pageLink} target="_blank">${oldRevisionDate}</a> (the closest revision to your chosen time)`;
-};
-
-const getCurAndOldRevisionsParallel = async (title, curDate, oldDate) => {
-    const revisionPromises = [fetchRevisionFromDate(title, curDate), fetchRevisionFromDate(title, oldDate)];
-    return Promise.all(revisionPromises);
-};
-
-/**
- * Add date input and buttons, below the graph. Upon clicking highlight and closest revision date appears
- *
- * @param {Date} creationDate of a Wiki page
- */
-const renderItemsBelowGraph = async (creationDate) => {
-    let now = new Date();
-    let totalDaysDiff = (now.getTime() - creationDate.getTime()) / (1000 * 3600 * 24);
-    let viewsEditsChart = document.getElementById("viewsEditsChart");
-    let belowGraphDiv = document.createElement("div");
-    belowGraphDiv.setAttribute("id", "belowGraphDiv");
-    let initialDate = new Date();
-
-    // set to half on small page, else set to 2.5 years
-    if (totalDaysDiff < 365 * 5) {
-        initialDate.setDate(now.getDate() - totalDaysDiff * 0.5);
-    } else {
-        initialDate.setDate(now.getDate() - 365 * 2.5);
-    }
-
-    const revisions = await getCurAndOldRevisionsParallel(title, now, initialDate);
-    let curRevisionId = revisions[0][0];
-    const oldRevision = revisions[1];
-    let oldRevisionId = oldRevision[0];
-    const oldRevisionDate = oldRevision[1].toLocaleDateString("en-US").slice(0, 10);
-
-    belowGraphDiv.innerHTML = `<div style="display: flex; flex-direction: row; justify-content: center;">
-        <div class="flex-container" id="buttonContainer">
-            <input type="text" pattern="\d{1,2}/\d{1,2}/\d{4}" class="datepicker" title="Please match the mm/dd/yyyy format" value="${initialDate
-                .toLocaleDateString("en-US")
-                .slice(0, 10)}" id="dateOutput" name="dateOutput" style="text-align: center;" />
-            <button class="highlightButton" id="highlightButton">Highlight Changes</button>
-            <div id="loader"></div>
-        </div>
-    </div>
-    <div style="padding-left: 3%; padding-right: 3%; padding-top: 1%; text-align: center;">
-        <p class="card-text" id="revisionDate"></p>
-    </div>`;
-    belowGraphDiv.style.cssText = "text-align:center;";
-    insertAfter(belowGraphDiv, viewsEditsChart);
-    renderLoader();
-    const dateInput = document.getElementById("dateOutput");
-    const highlightButton = document.getElementById("highlightButton");
-
-    highlightButton.addEventListener("click", async () => {
-        document.getElementById("loader").style.display = "inline-block";
-        highlightButton.disabled = true;
-        const date = new Date(dateInput.value);
-
-        const oldHighlights = document.getElementsByClassName("extension-highlight");
-        Array.from(oldHighlights).forEach((oldHighlights) => {
-            oldHighlights.style.backgroundColor = "inherit";
-            oldHighlights.style.color = "inherit";
-        });
-
-        // update revision ids
-        const revisions = await getCurAndOldRevisionsParallel(title, now, date);
-        let curRevisionId = revisions[0][0];
-        const oldRevision = revisions[1];
-        let oldRevisionId = oldRevision[0];
-        const oldRevisionDate = oldRevision[1].toLocaleDateString("en-US").slice(0, 10);
-
-        highlightRevisionBetweenRevisionIds(title, curRevisionId, oldRevisionId, oldRevisionDate);
-    });
-    return [curRevisionId, oldRevisionId, oldRevisionDate];
-};
-
-const toggleShowOnPopup = () => {
-    document.getElementById("graphPopup").classList.toggle("show");
-};
-
-const renderPopup = () => {
-    const popupDiv = document.createElement("div");
-    popupDiv.setAttribute("id", "popupDiv");
-    popupDiv.setAttribute("class", "popup");
-    popupDiv.innerHTML = `<span class="popuptext" id="graphPopup">Clicking on the graph will change the date in this box!</span>`;
-
-    const dateOutput = document.getElementById("dateOutput");
-    dateOutput.parentNode.insertBefore(popupDiv, dateOutput);
-
-    toggleShowOnPopup();
-
-    let hasUnshown = false;
-    popupDiv.addEventListener("mouseover", () => {
-        toggleShowOnPopup();
-        hasUnshown = true;
-    });
-
-    // disable popup after 10 seconds
-    new Promise((resolve) => setTimeout(resolve, 10000)).then(() => {
-        if (!hasUnshown) {
-            toggleShowOnPopup();
-        }
-    });
-};
-
-/**
- * Render a simple JS loader by the highlight button
- */
-const renderLoader = () => {
-    let button = document.getElementById("highlightButton");
-    button.disabled = true;
-};
-
-/**
- * Once we have the Wikipedia's page creation date, we render items below graph
- */
-getPageCreationDate(title).then((date) => {
-    const promises = [];
-    promises.push(renderGraphOverlay());
-    promises.push(renderItemsBelowGraph(date));
-
-    // Render popups and initial highlight only when graph and buttons are loaded
-    Promise.all(promises).then(([, [curRevisionId, oldRevisionId, oldRevisionDate]]) => {
-        renderPopup();
-        highlightRevisionBetweenRevisionIds(title, curRevisionId, oldRevisionId, oldRevisionDate);
-    });
-});
-
-/**
- * Highlight the current page to a revision on a given date
- *
- * @param {string} title of the wikipedia page
- * @param {string} curRevisionId to highlight on
- * @param {string} oldRevisionId to compare reivion on curDate to
- */
-const highlightRevisionBetweenRevisionIds = async (title, curRevisionId, oldRevisionId, oldRevisionDate) => {
-    try {
-        highlight(curRevisionId, oldRevisionId).then((found_count) => {
-            const new_text = `We highlighted <span style="color: #468946; font-weight: 700;">${found_count}</span> changes which represent additions to the page between ${
-                getRevisionToClosestDateText(
-                    getRevisionPageLink(title, curRevisionId, oldRevisionId).replace(/\s/g, "_"),
-                    oldRevisionDate
-                )
-            } and the present day. Some of the changes were purely formatting or deletions and, therefore, are not highlighted.`;
-            document.getElementById('revisionDate').innerHTML = new_text;
-        })
-    } catch (err) {
-        debug_console?.error(
-            `Error highlighting revisions between revition ids for inputs title:${title} curRevisionId:${curRevisionId} oldRevisionId:${oldRevisionId}\nError: ${err}`
-        );
-    }
-};
-
-/**
- * Highlight a page by comparing two revisions
- *
- * @param {int} revisionId of the page that contains highlights
- * @param {int} oldRevisionId of the page to compare to
- */
-const highlight = async (revisionId, oldRevisionId) => {
-    const arr = await fetchChangeWithHTML(oldRevisionId, revisionId);
-    debug_console?.info(arr);
-    const _succeed = [];
-    const _fail = [];
-    if (HIGHLIGHT_TYPE == HighlightType.NODE) {
-        for (let element of arr) {
-            let splitElement = splitElementNode(element);
-            for (let subElement of splitElement) {
-                subElement = cleanText(subElement);
-                if (highlightContentUsingNodes(subElement, "#AFE1AF")) {
-                    _succeed.push(subElement);
-                } else {
-                    _fail.push(subElement);
-                }
-            }
-        }
-    } else {
-        await markContent(arr, "#AFE1AF").then(({ succeed, fail }) => {
-            _succeed.push(...succeed);
-            _fail.push(...fail);
-        });
-    }
-    let button = document.getElementById("highlightButton");
-    button.disabled = false;
-    document.getElementById("loader").style.display = "none";
-    debug_console?.groupCollapsed("found");
-    debug_console?.log(_succeed);
-    debug_console?.groupEnd();
-    debug_console?.groupCollapsed("not-found");
-    debug_console?.log(_fail);
-    debug_console?.groupEnd();
-    return _succeed.length;
-};
+renderGraphOverlay();

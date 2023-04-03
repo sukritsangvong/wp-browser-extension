@@ -59,6 +59,7 @@
         ]
     },
     "dependencies": {
-        "chart.js": "^3.9.1"
+        "chart.js": "^3.9.1",
+        "chartjs-chart-sankey": "^0.8.1"
     }
 }
